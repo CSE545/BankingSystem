@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'phone_field',
     'user_management'
 ]
 
@@ -68,6 +69,7 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = 'user_management.User'
 WSGI_APPLICATION = 'banking_system.wsgi.application'
 
 
@@ -76,8 +78,12 @@ WSGI_APPLICATION = 'banking_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ss_project',
+        'USER': 'root',
+        'PASSWORD': 'ripu',
+        'HOST': 'localhost',
+        'PORT': '3306'
     }
 }
 
