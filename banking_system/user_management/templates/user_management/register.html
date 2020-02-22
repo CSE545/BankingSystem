@@ -1,8 +1,33 @@
 {% extends 'base_layout.html' %}
 {% block content %}
 <div class="container">
-    <form method="POST" action="">
-        {{ form }}
-    </form>
+    <div class="row">
+        <div class="modal-body" style="overflow-y: visible;">
+            <div class="well">
+                <div id="myTabContent" class="tab-content">
+                    <div class="tab-pane active in" id="login">
+                        <form method="POST">{% csrf_token %}
+                            <fieldset>
+                                <div id="legend">
+                                    <legend class="">Register</legend>
+                                </div>
+                                {% for field in registration_form %}
+                                <div class="control-group">
+                                    <label class="control-label" for="username">{{ field.label_tag }}</label>
+                                    {{ field }}
+                                    {% for error in field.errors %}
+                                    <p style="color: red;">{{ error }}</p>
+                                    {% endfor %}
+                                </div>
+                                {% endfor %}
+                            </fieldset>
+                            <button type="submit" class="btn btn-primary">Register</button>
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

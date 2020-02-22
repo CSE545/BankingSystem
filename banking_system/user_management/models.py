@@ -8,7 +8,7 @@ GENDER = (
 )
 # Create your models here.
 
-
+# Important to implement this for Django to Recognize
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, phone_number, password=None):
 
@@ -47,7 +47,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-
+# created_at, last_login, is_admin, is_active, is_staff, is_superuser are mandatory fields.
 class User(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
