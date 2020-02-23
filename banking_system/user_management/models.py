@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.contrib.auth.signals import user_logged_in, user_logged_out
 
 GENDER = (
     ("M", "MALE"),
@@ -103,3 +106,18 @@ class User(AbstractBaseUser):
     # Does this user have permission to view this app? (ALWAYS YES FOR SIMPLICITY)
     def has_module_perms(self, app_label):
         return True
+
+
+class UserLogin(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    failed_attempts = models.IntegerField(default=0, blank=False)
+    last_otp = models.IntegerField(blank=False, default=0)
+
+    def __str__(self):
+        return "First name: {0}".format(self.user)
+
+
+@receiver(post_save, sender=User)
+def user_created(sender, instance, created, **kwargs):
+    if created:
+        UserLogin.objects.create(user=instance)
