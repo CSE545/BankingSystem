@@ -6,9 +6,19 @@ GENDER = (
     ("F", "FEMALE"),
     ("O", "OTHER"),
 )
+
+USER_TYPE = (
+    ("T1", "TIER-1"),
+    ("T2", "TIER-2"),
+    ("T3", "TIER-3"),
+    ("CUSTOMER", "CUSTOMER"),
+    ("MERCHANT", "CORPORATE MERCHANT"),
+)
 # Create your models here.
 
 # Important to implement this for Django to Recognize
+
+
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, phone_number, password=None):
 
@@ -44,10 +54,13 @@ class MyAccountManager(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.is_active = True
         user.save(using=self._db)
         return user
 
 # created_at, last_login, is_admin, is_active, is_staff, is_superuser are mandatory fields.
+
+
 class User(AbstractBaseUser):
     user_id = models.AutoField(primary_key=True)
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
@@ -56,7 +69,7 @@ class User(AbstractBaseUser):
     last_login = models.DateTimeField(
         verbose_name='last login', auto_now=True)
     is_admin = models.BooleanField(default=False)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     first_name = models.CharField(max_length=100)
@@ -67,8 +80,10 @@ class User(AbstractBaseUser):
         max_length=6,
         choices=GENDER
     )
-    # add user type
-
+    user_type = models.CharField(
+        max_length=20,
+        choices=USER_TYPE
+    )
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name',
                        'last_name', 'password', 'phone_number']

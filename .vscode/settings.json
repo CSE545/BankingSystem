@@ -1,4 +1,7 @@
 {
     "python.linting.enabled": true,
-    "cornflakes.linter.executablePath": "//anaconda3/bin/flake8"
+    "python.linting.flake8Enabled": true,
+    "python.linting.pylintEnabled": false,
+    "python.linting.flake8Path": "//anaconda3/bin/flake8",
+    "python.formatting.provider": "autopep8"
 }

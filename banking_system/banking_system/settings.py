@@ -72,6 +72,10 @@ TEMPLATES = [
 AUTH_USER_MODEL = 'user_management.User'
 WSGI_APPLICATION = 'banking_system.wsgi.application'
 
+AUTHENTICATION_BACKENDS = [
+    'user_management.custom_backend.CustomAuthBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
+]
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
