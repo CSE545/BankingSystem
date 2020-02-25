@@ -13,6 +13,7 @@ A skeleton  secure  banking  system  (SBS) with  limited  functional, performanc
 - If everything is fine, you won't see any errors. Run `python manage.py makemigrations` now.
 - If the above step is successful, run `python manage.py migrate`.
 - You should now be able to see the table inside the **ss_project** schema.
+- Run `python manage.py runserver` 
 - To register a new user go to:  http://localhost:8000/accounts/register.
 - To login go to:  http://localhost:8000/accounts/login. (You might not be able to login immediately because the accounts are not active unless an admin makes them active). To make them active, follow the below steps.
   - Django provides an admin panel for super users.
