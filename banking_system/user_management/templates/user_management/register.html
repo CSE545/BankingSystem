@@ -1,41 +1,41 @@
 {% extends 'base_layout.html' %}
 {% block content %}
-
 <div class="container">
     <div class="row">
         <div class="modal-body" style="overflow-y: visible;">
             <div class="well">
-                <div id="myTabContent" class="tab-content">
+                <div id="myTabContent" class="tab-content">{% csrf_token %}
+                    {% if created %}
+                    <div class="alert" style="text-align: center;">
+                        <p>Request successfully submitted. An employee will soon activate the
+                            account</p>
+                        <form action="/accounts/login">
+                            <button class="btn btn-primary">Login</button>
+                        </form>
+                    </div>
+                    {% else %}
                     <div>
                         <div class="tab-pane active in" id="login">
                             <form method="POST">{% csrf_token %}
                                 <fieldset>
                                     <div id="legend">
-                                        <legend class="">Login</legend>
+                                        <legend class="">Register</legend>
                                     </div>
-                                    <!-- -> {{ login_form.as_p }} <- -->
-                                    {% for field in login_form %}
+                                    {% for field in registration_form %}
                                     <div class="control-group">
                                         <label class="control-label" for="username">{{ field.label_tag }}</label>
                                         {{ field }}
+                                        {% for error in field.errors %}
+                                        <p style="color: red;">{{ error }}</p>
+                                        {% endfor %}
                                     </div>
                                     {% endfor %}
-                                    {% if user_none %}
-                                    <div class="alert alert-danger">
-                                        <strong>Invalid credentials or user does not exist.</strong>
-                                    </div>
-                                    {% endif %}
-
-                                    {% if inactive %}
-                                    <div class="alert alert-danger">
-                                        <strong>The account is not active yet.</strong>
-                                    </div>
-                                    {% endif %}
                                 </fieldset>
-                                <button type="submit" class="btn btn-primary">Login</button>
+                                <button type="submit" class="btn btn-primary">Register</button>
                             </form>
                         </div>
                     </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

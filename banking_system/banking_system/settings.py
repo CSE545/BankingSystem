@@ -68,16 +68,25 @@ TEMPLATES = [
     },
 ]
 
+AUTH_USER_MODEL = 'user_management.User'
 WSGI_APPLICATION = 'banking_system.wsgi.application'
 
+AUTHENTICATION_BACKENDS = [
+    'user_management.custom_backend.CustomAuthBackend',
+    # 'django.contrib.auth.backends.ModelBackend',
+]
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'ss_project',
+        'USER': 'root',
+        'PASSWORD': 'ripu',
+        'HOST': 'localhost',
+        'PORT': '3306'
     }
 }
 
