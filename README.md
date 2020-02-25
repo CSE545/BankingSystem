@@ -8,6 +8,7 @@ A skeleton  secure  banking  system  (SBS) with  limited  functional, performanc
 - To ensure that Django was successfully installed: run `python -m django --version`
 - Ensure you have mysql environment setup on your system.
 - Once mysql setup is done, create a local connection with default settings for now.
+- Django needs a client to connect to mysql. Run `pip install mysqlclient`. This should do it for most of the systems.
 - Create a schema **ss_project**. If you want a different name, add that name in **settings.py**.
 - To create the tables in the database, go inside the **banking_system** directory (where manage.py is located). Then run `python manage.py check`.
 - If everything is fine, you won't see any errors. Run `python manage.py makemigrations` now.
