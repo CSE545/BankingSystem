@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.signals import user_logged_in, user_logged_out
+from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
 
 GENDER = (
     ("M", "MALE"),
@@ -121,3 +121,16 @@ class UserLogin(models.Model):
 def user_created(sender, instance, created, **kwargs):
     if created:
         UserLogin.objects.create(user=instance)
+
+
+@receiver(user_login_failed)
+def login_failed(sender, credentials, request, **kwargs):
+    print('login failed')
+    # user = User.objects.get(email=credentials['username'])
+    # user_login = UserLogin.objects.get(user=type(user))
+    # print(user_login)
+
+
+@receiver(user_logged_in)
+def login_successful(sender, user, request, **kwargs):
+    print('login successful')
