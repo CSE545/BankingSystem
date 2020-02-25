@@ -4,7 +4,7 @@ A skeleton  secure  banking  system  (SBS) with  limited  functional, performanc
 ## Steps to run this application:
 - Install python: if you are using mac and have brew installed, run: `brew install python`
 - Install [pip](https://pip.pypa.io/en/stable/installing/).
-- Install Django: run `pip install django`
+- Install python modules: run `pip install -r requirements.txt`
 - To ensure that Django was successfully installed: run `python -m django --version`
 - Ensure you have mysql environment setup on your system.
 - Once mysql setup is done, create a local connection with default settings for now.

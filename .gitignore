@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-migrations
-=======
 # Editors/IDE
 # ===========
 .vscode
@@ -22,4 +19,4 @@ venv/
 *.log
 local_settings.py
 db.sqlite3
->>>>>>> dev
+migrations
