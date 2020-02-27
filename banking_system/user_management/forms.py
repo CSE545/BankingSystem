@@ -16,6 +16,13 @@ class RegistrationForm(UserCreationForm):
     phone_number = forms.CharField(max_length=20)
     gender = forms.ChoiceField(choices=GENDER)
 
+    def __init__(self, *args, **kwargs):
+        super(RegistrationForm, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+
     class Meta:
         model = User
         fields = ("email", "first_name", "last_name", "password1",
@@ -23,6 +30,13 @@ class RegistrationForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super(LoginForm, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+
     class Meta:
         model = User
         fields = ("email", "password")

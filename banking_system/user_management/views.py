@@ -55,3 +55,8 @@ def register_view(request):
 def logout_user(request):
     logout(request)
     return render(request, 'user_management/login.html')
+
+
+def update_user(request):
+    print('current user: ', request.user)
+    return 'hey'

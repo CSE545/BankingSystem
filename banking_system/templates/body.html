@@ -1,0 +1,15 @@
+{% extends 'head.html' %}
+
+{% block body %}
+
+<body>
+    <div class="jumbotron jumbotron-fluid">
+        <h1>Welcome to our banking system</h1>
+    </div>
+    <div>
+        {% block content %}
+        {% endblock %}
+    </div>
+</body>
+
+{% endblock %}
