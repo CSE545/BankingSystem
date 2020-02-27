@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from user_management.forms import RegistrationForm, LoginForm
+from user_management.forms import RegistrationForm, LoginForm, EditForm
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
@@ -57,6 +59,21 @@ def logout_user(request):
     return render(request, 'user_management/login.html')
 
 
-def update_user(request):
-    print('current user: ', request.user)
-    return 'hey'
+@login_required
+def view_profile(request):
+    context = {'user': request.user}
+    return render(request, 'user_management/profile.html', context)
+
+
+@login_required
+def edit_profile(request):
+    if request.POST:
+        form = EditForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            return redirect('/accounts/profile')
+    else:
+        context = {}
+        form = EditForm(instance=request.user)
+        context['edit_form'] = form
+        return render(request, 'user_management/edit_profile.html', context)

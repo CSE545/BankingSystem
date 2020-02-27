@@ -1,0 +1,42 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    View
+                </div>
+                <div class="card-body">
+                    <form>
+                        <fieldset disabled>
+                            <div class="form-group">
+                                <label class="control-label">Email: </label>
+                                <input type="email" id="disabledTextInput" class="form-control" placeholder="{{ user.email }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Email: </label>
+                                <input type="text" id="disabledTextInput" class="form-control" placeholder="{{ user.first_name }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Email: </label>
+                                <input type="text" id="disabledTextInput" class="form-control" placeholder="{{ user.last_name }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Email: </label>
+                                <input type="text" id="disabledTextInput" class="form-control" placeholder="{{ user.phone_number }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Email: </label>
+                                <input type="text" id="disabledTextInput" class="form-control" placeholder="{{ user.gender }}">
+                            </div>
+                        </fieldset>
+                        <a class="btn btn-primary" href="/accounts/profile/edit/" role="button">Edit</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

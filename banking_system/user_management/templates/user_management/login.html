@@ -9,11 +9,10 @@
                     Login
                 </div>
                 <div class="card-body">
-                    <div class="tab-pane active in" id="login">
                         <form method="POST">{% csrf_token %}
-                            {% for field in login_form %}
+                            {% for field in user %}
                             <div class="form-group">
-                                <label class="control-label" for="username">{{ field.label_tag }}</label>
+                                <label class="control-label">{{ field.label_tag }}</label>
                                 {{ field }}
                             </div>
                             {% endfor %}
@@ -31,7 +30,6 @@
 
                             <button type="submit" class="btn btn-primary">Login</button>
                         </form>
-                    </div>
                 </div>
             </div>
         </div>
