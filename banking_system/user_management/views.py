@@ -56,7 +56,10 @@ def register_view(request):
 
 def logout_user(request):
     logout(request)
-    return render(request, 'user_management/login.html')
+    context = {}
+    form = LoginForm()
+    context['login_form'] = form
+    return redirect(request, 'user_management/login.html')
 
 
 @login_required
