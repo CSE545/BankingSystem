@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.signals import user_logged_in, user_logged_out, user_login_failed
+from django.contrib.auth.signals import user_logged_in, user_login_failed
 
 GENDER = (
     ("M", "MALE"),
@@ -93,11 +93,11 @@ class User(AbstractBaseUser):
     objects = MyAccountManager()
 
     def __str__(self):
-        return "First name: " + self.first_name \
-            + " Last name: " + self.last_name \
-            + " Email: " + self.email \
-            + " Phone number: " + self.phone_number \
-            + " Gender: " + self.gender
+        return "First name: {0},  Last name: {1},  \
+                Email: {2},  Phone number: {3},  Gender: {4}" \
+                .format(self.first_name, self.last_name,
+                        self.email, self.phone_number,
+                        self.gender)
 
     # For checking permissions. to keep it simple all admin have ALL permissons
     def has_perm(self, perm, obj=None):
@@ -125,12 +125,10 @@ def user_created(sender, instance, created, **kwargs):
 
 @receiver(user_login_failed)
 def login_failed(sender, credentials, request, **kwargs):
-    print('login failed')
-    # user = User.objects.get(email=credentials['username'])
-    # user_login = UserLogin.objects.get(user=type(user))
-    # print(user_login)
-
-
-@receiver(user_logged_in)
-def login_successful(sender, user, request, **kwargs):
-    print('login successful')
+    try:
+        if 'username' in credentials:
+            user = User.objects.get(email=credentials['username'])
+            user.userlogin.failed_attempts = user.userlogin.failed_attempts + 1
+            user.userlogin.save()
+    except User.DoesNotExist:
+        print('Login failed: User does not exist')

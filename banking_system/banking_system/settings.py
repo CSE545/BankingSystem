@@ -25,6 +25,7 @@ SECRET_KEY = 'joq^zb4q3j+k_t8l9(4$3c%g%y$cvvlg#rr#@il1(xicu0q@lo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+LOGOUT_REDIRECT_URL = "/accounts/login"
 ALLOWED_HOSTS = ["cse545.zlmonroe.com"]
 
 # Application definition
@@ -127,3 +128,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# For email backend to send forgot password link
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'bankingsystem545@gmail.com'
+EMAIL_HOST_PASSWORD = 'cse545project'
