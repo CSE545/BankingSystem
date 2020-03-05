@@ -25,9 +25,8 @@ SECRET_KEY = 'joq^zb4q3j+k_t8l9(4$3c%g%y$cvvlg#rr#@il1(xicu0q@lo'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
 LOGOUT_REDIRECT_URL = "/accounts/login"
+ALLOWED_HOSTS = ["cse545.zlmonroe.com"]
 
 # Application definition
 
@@ -56,7 +55,7 @@ ROOT_URLCONF = 'banking_system.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [os.path.join(BASE_DIR, './templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -84,8 +83,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ss_project',
-        'USER': 'root',
-        'PASSWORD': '',
+        'USER': 'bank_admin',
+        'PASSWORD': 'Password#0',
         'HOST': 'localhost',
         'PORT': '3306'
     }
