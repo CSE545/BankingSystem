@@ -71,10 +71,15 @@ def view_profile(request):
 @login_required
 def edit_profile(request):
     if request.POST:
-        form = EditForm(request.POST, instance=request.user)
+        form = EditForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('/accounts/profile')
+            instance = form.save(commit=False)
+            instance.created_by = request.user
+            instance.save()
+            context = {}
+            context['request_received'] = True
+            print('request_received')
+            return redirect('/accounts/profile', context)
     else:
         context = {}
         form = EditForm(instance=request.user)

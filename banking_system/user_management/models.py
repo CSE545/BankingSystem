@@ -17,6 +17,12 @@ USER_TYPE = (
     ("CUSTOMER", "CUSTOMER"),
     ("MERCHANT", "CORPORATE MERCHANT"),
 )
+
+REQUEST_STATUS = (
+    ("NEW", "NEW"),
+    ("APPROVED", "APPROVED"),
+    ("REJECTED", "REJECTED"),
+)
 # Create your models here.
 
 # Important to implement this for Django to Recognize
@@ -115,6 +121,51 @@ class UserLogin(models.Model):
 
     def __str__(self):
         return "First name: {0}".format(self.user)
+
+
+class UserPendingApproval(models.Model):
+    created_by = models.ForeignKey(
+        User, default=None, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
+    email = models.EmailField(verbose_name="email",
+                              max_length=60, null=True, blank=True)
+    first_name = models.CharField(max_length=100, null=True, blank=True)
+    last_name = models.CharField(max_length=100, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    gender = models.CharField(
+        max_length=6,
+        choices=GENDER,
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return "Created by: {0}, Status: {1}".format(self.created_by, self.status)
+
+    def __init__(self, *args, **kwargs):
+        super(UserPendingApproval, self).__init__(*args, **kwargs)
+        self.old_status = self.status
+
+    def save(self, force_insert=False, force_update=False):
+        if self.old_status == 'NEW':
+            print('Status changed from NEW to {0}'.format(self.status))
+            if self.status == 'APPROVED':
+                User.objects.filter(user_id=self.created_by.user_id).update(
+                    email=self.email,
+                    phone_number=self.phone_number,
+                    first_name=self.first_name,
+                    last_name=self.last_name,
+                    gender=self.gender
+                )
+                self.delete()
+        else:
+            super(UserPendingApproval, self).save(force_insert, force_update)
+            self.old_status = self.status
 
 
 @receiver(post_save, sender=User)
