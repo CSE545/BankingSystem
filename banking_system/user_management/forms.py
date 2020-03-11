@@ -53,3 +53,7 @@ class EditForm(forms.ModelForm):
     class Meta:
         model = UserPendingApproval
         fields = ("email", "first_name", "last_name", "phone_number", "gender")
+
+
+class OTPForm():
+    pass

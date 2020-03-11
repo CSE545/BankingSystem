@@ -1,0 +1,6 @@
+{% extends 'body.html' %} {% block content %}
+OTP
+{% for field in login_form %}
+{{ field.label_tag }} {{ field }}
+{% endfor %}
+{% endblock %}
