@@ -1,0 +1,12 @@
+{% extends 'body.html' %}
+
+{% block content %}
+<p>
+    <h3>Welcome! What Transaction would like to create today?</h3> 
+</p>
+<trans>{{trans_c.as_p}}
+
+
+<input type='submit' value='save'/> <a href ='/trans/'>Cancel</a></p>
+</trans>
+{%endblock%}

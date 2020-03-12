@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from user_management.models import User, UserPendingApproval
+from user_management.models import User, UserPendingApproval,  EMP_Transaction
+
 
 GENDER = (
     ("M", "MALE"),
@@ -53,3 +54,18 @@ class EditForm(forms.ModelForm):
     class Meta:
         model = UserPendingApproval
         fields = ("email", "first_name", "last_name", "phone_number", "gender")
+
+class OTPForm():
+    pass
+
+class Transaction_main(forms.ModelForm):
+    class Meta:
+        model=EMP_Transaction
+        fields={'action'}
+
+class Trans_Create(forms.ModelForm):
+    class Meta:
+        model=EMP_Transaction
+        fields={
+            'cust_name','transaction_ammount','to'
+        }

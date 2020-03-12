@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from user_management.forms import RegistrationForm, LoginForm, EditForm
+from user_management.forms import RegistrationForm, LoginForm, EditForm, Transaction_main,Trans_Create
 from django.contrib.auth.decorators import login_required
 
 
@@ -85,3 +85,29 @@ def edit_profile(request):
         form = EditForm(instance=request.user)
         context['edit_form'] = form
         return render(request, 'user_management/edit_profile.html', context)
+
+
+def otp_view(request):
+    context = {}
+    return render(request, 'user_management/2fa.html', context)
+
+
+def transaction_main(request):
+    trans=Transaction_main(request.POST or None)
+    if trans.is_valid():
+        trans.save()
+        return redirect('../')
+    context={
+        'trans':trans
+    }
+    return render(request,'user_management/trans_main.html',context)
+
+def trans_create(request):
+    trans_c=Trans_Create(request.POST or None)
+    if trans_c.is_valid():
+        trans_c.save()
+        return redirect('/trans')
+    content={
+            "trans_c":trans_c
+        }
+    return render(request,'user_management/trans_create.html',content)

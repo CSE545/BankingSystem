@@ -18,6 +18,7 @@ from django.urls import path, include
 from . import views
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
+from user_management.views import transaction_main,trans_create
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,5 +28,7 @@ urlpatterns = [
     path('accounts/password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='user_management/password_reset_done.html'), name='password_reset_done'),
     path('accounts/reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(template_name='user_management/password_reset_confirm.html'), name='password_reset_confirm'),
     path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='user_management/password_reset_complete.html'), name='password_reset_complete'),
-    path('', views.homepage, name='home')
+    path('', views.homepage, name='home'),
+    path('trans/',transaction_main, name="trans_main"),
+    path('trans/create',trans_create, name="trans_create"),
 ]

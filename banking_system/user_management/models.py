@@ -183,3 +183,17 @@ def login_failed(sender, credentials, request, **kwargs):
             user.userlogin.save()
     except User.DoesNotExist:
         print('Login failed: User does not exist')
+
+class EMP_Transaction(models.Model):
+    Action = (
+       ('create','Creating a Transaction'),
+       ('Authorize','Authorizing a transaction'),
+       ('view','viewing specific transaction'),
+    )
+
+    action=models.CharField(max_length=32,choices=Action,default='view')
+    cust_name= models.TextField(max_length=32,default=None)
+    to= models.TextField(max_length=32,default=None)
+    transaction_ammount=models.DecimalField(decimal_places=2 ,max_digits=10,default=None)
+
+
