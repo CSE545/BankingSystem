@@ -192,8 +192,13 @@ class EMP_Transaction(models.Model):
     )
 
     action=models.CharField(max_length=32,choices=Action,default='view')
-    cust_name= models.TextField(max_length=32,default=None)
-    to= models.TextField(max_length=32,default=None)
-    transaction_ammount=models.DecimalField(decimal_places=2 ,max_digits=10,default=None)
+    
 
+class EMP_Transaction_Create(models.Model):
 
+    name= models.CharField(max_length=32,default=None)
+    to  = models.CharField(max_length=32,default=None)
+    transaction_amount=models.DecimalField(decimal_places=2 ,max_digits=10,default=None)
+
+    def get_absolute_url(self):
+        return f"/trans/list/view/{self.id}/"

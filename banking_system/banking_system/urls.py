@@ -18,7 +18,7 @@ from django.urls import path, include
 from . import views
 from django.conf.urls import url
 from django.contrib.auth import views as auth_views
-from user_management.views import transaction_main,trans_create
+from user_management.views import transaction_main,trans_create, transaction_view,trans_list_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -30,5 +30,7 @@ urlpatterns = [
     path('accounts/reset/done/', auth_views.PasswordResetCompleteView.as_view(template_name='user_management/password_reset_complete.html'), name='password_reset_complete'),
     path('', views.homepage, name='home'),
     path('trans/',transaction_main, name="trans_main"),
-    path('trans/create',trans_create, name="trans_create"),
+    path('trans/create/',trans_create, name="create"),
+    path('trans/list/view/<int:id>/',transaction_view, name="trans_view"),
+    path('trans/list/',trans_list_view,name="list")
 ]

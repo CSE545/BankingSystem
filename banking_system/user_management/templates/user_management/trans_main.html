@@ -2,11 +2,15 @@
 
 {% block content %}
 <p>
-    <h3>What action are you willing to do?</h3> 
+   <h2>Hello {{request.user}}</h2> <br>
+    <h2>What would you like to do today?</h2>
 </p>
-<trans>{{trans.as_p}}
+<form action="/trans/list/" method ='GET'>{%csrf_token%} 
+<button type='submit'>View_Transactions</button>
+</form>
+<br>
+<form method="get" action="/trans/create/">{%csrf_token%}
+    <button type="submit">Create_Transactions</button>
+</form>
 
-
-<input type='submit' value='save'/> <a href ='/profile/'>Cancel</a></p>
-</trans>
 {%endblock%}

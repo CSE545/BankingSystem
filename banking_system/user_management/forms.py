@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from user_management.models import User, UserPendingApproval,  EMP_Transaction
+from user_management.models import User, UserPendingApproval,  EMP_Transaction, EMP_Transaction_Create
 
 
 GENDER = (
@@ -65,7 +65,9 @@ class Transaction_main(forms.ModelForm):
 
 class Trans_Create(forms.ModelForm):
     class Meta:
-        model=EMP_Transaction
+        model=EMP_Transaction_Create
         fields={
-            'cust_name','transaction_ammount','to'
+            'name',
+            'to',
+            'transaction_amount'
         }

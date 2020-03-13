@@ -2,11 +2,14 @@
 
 {% block content %}
 <p>
-    <h3>Welcome! What Transaction would like to create today?</h3> 
+    <h3>Welcome to the Transaction_creation page {{request.user}}</h3> 
+    <br>
+    <h4>Please enter the details of the transaction</h4>
 </p>
-<trans>{{trans_c.as_p}}
+<form method="POST">{%csrf_token%}
+    {{trans_c.as_p}}
 
 
 <input type='submit' value='save'/> <a href ='/trans/'>Cancel</a></p>
-</trans>
+</form>
 {%endblock%}
