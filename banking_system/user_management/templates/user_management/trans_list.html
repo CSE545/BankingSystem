@@ -3,9 +3,27 @@
 {% block content %}
 
 
-{%for instance in object_list%}
-   <p>{{instance.id}}-<a href='{{ instance.get_absolute_url }}'>{{instance.name}}</a></p>
-{%endfor%}
-
+<div class="container">
+   <div class="row">
+      <div class="col">
+         <div class="card">
+            <div class="card-header">
+               Welcome, {{request.user}}. Here are all of the current transactions.
+            </div>
+            <div class="card-body">
+               <table class="table table-striped">
+                  <tr><th>Transaction ID</th><th>From Account</th></tr>
+                  {%for instance in object_list%}
+                     <tr class='clickable-row'>
+                        <td><a href='{{ instance.get_absolute_url }}'>{{instance.id}}</a></td>
+                        <td>{{instance.name}}</td>
+                     </tr>
+                  {%endfor%}
+               </table>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
 
 {%endblock%}

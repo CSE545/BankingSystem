@@ -1,15 +1,23 @@
 {% extends 'body.html' %}
 
 {% block content %}
-<p>
-    <h3>Welcome to the Transaction_creation page {{request.user}}</h3> 
-    <br>
-    <h4>Please enter the details of the transaction</h4>
-</p>
-<form method="POST">{%csrf_token%}
-    {{trans_c.as_p}}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Welcome, {{request.user}}. Please use the form to create a new transaction.
+                </div>
+                <div class="card-body">
+                    <form method="POST">{%csrf_token%}
+                        <label class="control-label">{{trans_c.as_p}}
+                            <input type='submit' value='Save'/> <a href ='/trans/'>Cancel</a></p>
+                        </label>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-
-<input type='submit' value='save'/> <a href ='/trans/'>Cancel</a></p>
-</form>
 {%endblock%}
