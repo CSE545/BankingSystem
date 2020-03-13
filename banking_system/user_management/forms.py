@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from user_management.models import User, UserPendingApproval,  EMP_Transaction, EMP_Transaction_Create
-
+from user_management.models import User, UserPendingApproval, EMP_Transaction, EMP_Transaction_Create
 
 GENDER = (
     ("M", "MALE"),
@@ -62,14 +61,14 @@ class OTPForm():
 
 class Transaction_main(forms.ModelForm):
     class Meta:
-        model=EMP_Transaction
-        fields={'action'}
+        model = EMP_Transaction
+        fields = {'action'}
 
 
 class Trans_Create(forms.ModelForm):
     class Meta:
-        model=EMP_Transaction_Create
-        fields={
+        model = EMP_Transaction_Create
+        fields = {
             'name',
             'to',
             'transaction_amount'

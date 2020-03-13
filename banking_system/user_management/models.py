@@ -205,4 +205,3 @@ class EMP_Transaction_Create(models.Model):
 
     def get_absolute_url(self):
         return f"/trans/list/view/{self.id}/"
-
