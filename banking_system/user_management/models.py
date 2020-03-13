@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.signals import user_login_failed
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.signals import user_logged_in, user_login_failed
 
 GENDER = (
     ("M", "MALE"),
@@ -23,6 +23,8 @@ REQUEST_STATUS = (
     ("APPROVED", "APPROVED"),
     ("REJECTED", "REJECTED"),
 )
+
+
 # Create your models here.
 
 # Important to implement this for Django to Recognize
@@ -67,6 +69,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
 # created_at, last_login, is_admin, is_active, is_staff, is_superuser are mandatory fields.
 
 
@@ -101,9 +104,9 @@ class User(AbstractBaseUser):
     def __str__(self):
         return "First name: {0},  Last name: {1},  \
                 Email: {2},  Phone number: {3},  Gender: {4}" \
-                .format(self.first_name, self.last_name,
-                        self.email, self.phone_number,
-                        self.gender)
+            .format(self.first_name, self.last_name,
+                    self.email, self.phone_number,
+                    self.gender)
 
     # For checking permissions. to keep it simple all admin have ALL permissons
     def has_perm(self, perm, obj=None):
@@ -184,21 +187,21 @@ def login_failed(sender, credentials, request, **kwargs):
     except User.DoesNotExist:
         print('Login failed: User does not exist')
 
+
 class EMP_Transaction(models.Model):
     Action = (
-       ('create','Creating a Transaction'),
-       ('Authorize','Authorizing a transaction'),
-       ('view','viewing specific transaction'),
+        ('create', 'Creating a Transaction'),
+        ('Authorize', 'Authorizing a transaction'),
+        ('view', 'viewing specific transaction'),
     )
 
-    action=models.CharField(max_length=32,choices=Action,default='view')
-    
+    action = models.CharField(max_length=32, choices=Action, default='view')
+
 
 class EMP_Transaction_Create(models.Model):
-
-    name= models.CharField(max_length=32,default=None)
-    to  = models.CharField(max_length=32,default=None)
-    transaction_amount=models.DecimalField(decimal_places=2 ,max_digits=10,default=None)
+    name = models.CharField(max_length=32, default=None)
+    to = models.CharField(max_length=32, default=None)
+    transaction_amount = models.DecimalField(decimal_places=2, max_digits=10, default=None)
 
     def get_absolute_url(self):
         return f"/trans/list/view/{self.id}/"

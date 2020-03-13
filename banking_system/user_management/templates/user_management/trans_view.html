@@ -1,19 +1,40 @@
 {% extends 'body.html' %}
 
 {% block content %}
-<h1>
-    Hello {{request.user}}
-</h1>
-<p>
-    Below is the transaction details you asked for
-</p>
-<p>
-   Name - {{obj.name}}
-<br>
-   To - {{obj.to}}
-<br>
-   Transaction Ammount - {{obj.transaction_ammount}}
 
-</p>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Welcome, {{request.user}}. Here are the details for the requested transaction.
+                </div>
+                <div class="card-body">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm-6">From:</div>
+                            <div class="col-sm-6">{{obj.name}}</div>
+                        </div>
+
+ HEAD
+{%endblock%}
+
+                        <div class="row">
+                            <div class="col-sm-6">To:</div>
+                            <div class="col-sm-6">{{obj.to}}</div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-6">Transaction Amount:</div>
+                            <div class="col-sm-6">{{obj.transaction_amount}}</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {%endblock%}
+
