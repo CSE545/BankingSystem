@@ -55,13 +55,16 @@ class EditForm(forms.ModelForm):
         model = UserPendingApproval
         fields = ("email", "first_name", "last_name", "phone_number", "gender")
 
+
 class OTPForm():
     pass
+
 
 class Transaction_main(forms.ModelForm):
     class Meta:
         model=EMP_Transaction
         fields={'action'}
+
 
 class Trans_Create(forms.ModelForm):
     class Meta:
