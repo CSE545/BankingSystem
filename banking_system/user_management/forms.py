@@ -73,3 +73,8 @@ class Trans_Create(forms.ModelForm):
             'to',
             'transaction_amount'
         }
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "to": forms.TextInput(attrs={"class": "form-control"}),
+            "transaction_amount": forms.NumberInput(attrs={"class": "form-control"})
+        }
