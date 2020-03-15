@@ -1,7 +1,7 @@
 import boto3
 import math
 import random
-from user_management.models import User
+from user_management.models import User, UserLogin
 
 
 def send_otp(otp, phone_number):
@@ -34,4 +34,10 @@ def generate_otp():
 
 def get_user_phone_number(email):
     user = User.objects.get(email=email)
-    return user.phone_number
+    return user
+
+
+def save_otp_in_db(otp, user):
+    user = User.objects.get(email=user.email)
+    user.userlogin.last_otp = otp
+    user.userlogin.save()

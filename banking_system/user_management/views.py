@@ -138,7 +138,6 @@ def edit_profile(request):
             instance.save()
             context = {}
             context['request_received'] = True
-            print('request_received')
             return redirect('/accounts/profile', context)
     else:
         context = {}
