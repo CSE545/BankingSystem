@@ -6,7 +6,6 @@ app_name = 'user_management'
 
 urlpatterns = [
     path('login/', views.login_view, name="login"),
-    path('2fa/', views.otp_view, name="otp_view"),
     path('register/', views.register_view, name="register"),
     path('logout/', LogoutView.as_view(), name="logout"),
     path('profile/', views.view_profile, name="view_profile"),
