@@ -38,7 +38,8 @@ class LoginForm(AuthenticationForm):
         print('otp', otp)
         cleaned_data = super().clean()
         phone = get_user_phone_number(cleaned_data['username'])
-        send_otp(otp, phone)
+        # Uncomment this once the sns credentials are added in twofa.py file
+        # send_otp(otp, phone)
         if '_otp' in self.request.session:
             if str(self.request.session['_otp']) != str(self.cleaned_data['otp']):
                 raise forms.ValidationError("Invalid OTP.")
@@ -84,3 +85,4 @@ class FundTransferForm(forms.ModelForm):
         model = FundTransferRequest
         fields = ("from_account", "to_account", "amount", "status")
         widgets = {'status': forms.HiddenInput()}
+        fields = ("email", "first_name", "last_name", "phone_number", "gender")
