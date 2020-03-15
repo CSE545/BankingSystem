@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.signals import user_logged_in, user_login_failed
+from django.contrib.auth.signals import user_login_failed
 
 GENDER = (
     ("M", "MALE"),
@@ -125,10 +125,11 @@ class UserLogin(models.Model):
     def __str__(self):
         return "First name: {0}".format(self.user)
 
+
 class FundTransferRequest(models.Model):
     request_id = models.AutoField(primary_key=True)
-    from_account = models.ForeignKey(User, default = None, on_delete=models.CASCADE, related_name='from_account')
-    to_account = models.ForeignKey(User, default = None, on_delete=models.CASCADE, related_name='to_account')
+    from_account = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name='from_account')
+    to_account = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name='to_account')
     amount = models.FloatField(blank=False, null=False)
     status = models.CharField(
         max_length=10,
@@ -152,6 +153,7 @@ class FundTransferRequest(models.Model):
             self.delete()
         else:
             super(FundTransferRequest, self).save(force_insert, force_update)
+
 
 class UserPendingApproval(models.Model):
     created_by = models.ForeignKey(

@@ -97,15 +97,15 @@ def pendingFundTransfers(request):
         return render(request, 'user_management/pendingFundTransfers.html')
     context = {}
     context['pendingFundTransfersData'] = {
-    'headers': [u'transactionId', u'from_name', u'to_name', u'amount', u'status', u'approve', u'reject'],
-    'rows': []
+        'headers': [u'transactionId', u'from_name', u'to_name', u'amount', u'status', u'approve', u'reject'],
+        'rows': []
     }
     for e in FundTransferRequest.objects.filter(status="NEW"):
         context['pendingFundTransfersData']['rows'].append([e.request_id,
-            e.from_account.first_name + " " + e.from_account.last_name,
-            e.to_account.first_name +" " + e.to_account.last_name,
-            e.amount,
-            e.status])
+                                                            e.from_account.first_name + " " + e.from_account.last_name,
+                                                            e.to_account.first_name + " " + e.to_account.last_name,
+                                                            e.amount,
+                                                            e.status])
     return render(request, 'user_management/pendingFundTransfers.html', context)
 
 @login_required

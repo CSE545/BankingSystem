@@ -61,8 +61,7 @@ class FundTransferForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-       
-
+            
     class Meta:
         model = FundTransferRequest
         fields = ("from_account", "to_account", "amount", "status")
