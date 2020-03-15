@@ -23,10 +23,15 @@ REQUEST_STATUS = (
     ("APPROVED", "APPROVED"),
     ("REJECTED", "REJECTED"),
 )
+
+ACCOUNT_TYPE = (
+    ("SAVINGS", "SAVINGS"),
+    ("CREDIT", "CREDIT"),
+    ("CHECKING", "CHECKING")
+)
+
 # Create your models here.
-
 # Important to implement this for Django to Recognize
-
 
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, phone_number, password=None):
@@ -124,6 +129,19 @@ class UserLogin(models.Model):
 
     def __str__(self):
         return "First name: {0}".format(self.user)
+
+class Bank_Account(models.Model):
+    account_id = models.AutoField(primary_key=True)
+    account_type = models.CharField(
+        max_length=15,
+        choices=ACCOUNT_TYPE
+    )
+    account_balance = models.FloatField(default=0.0)
+    approved_by = models.OneToOneField(User, on_delete=models.CASCADE, related_name='approved_by')
+    user_id = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name='userid')
+
+    def __init__(self, *args, **kwargs):
+        super(Bank_Account, self).__init__(*args, **kwargs)
 
 
 class FundTransferRequest(models.Model):

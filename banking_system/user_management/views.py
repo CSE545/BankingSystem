@@ -64,7 +64,11 @@ def logout_user(request):
 
 @login_required
 def view_profile(request):
-    context = {'user': request.user}
+    if request.user.user_type == 'CUSTOMER':
+        base_template_name = 'homepage.html'
+    else:
+        base_template_name = 'employee_home.html'
+    context = {'user': request.user, 'base_template_name': base_template_name}
     return render(request, 'user_management/profile.html', context)
 
 @login_required
