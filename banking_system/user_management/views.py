@@ -20,7 +20,7 @@ def login_view(request):
                 try:
                     login(request, user)
                     create_user_log(user_id=user.user_id, log_str="Login Successful", log_type="info")
-                except:
+                except Exception as ex:
                     create_user_log(user_id=user.user_id, log_str="Login Failed", log_type="error")
                 finally:
                     return redirect('home')
