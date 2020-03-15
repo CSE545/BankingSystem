@@ -183,3 +183,33 @@ def login_failed(sender, credentials, request, **kwargs):
             user.userlogin.save()
     except User.DoesNotExist:
         print('Login failed: User does not exist')
+
+
+class UserLog(models.Model):
+    CRITICAL = "critical"
+    INFO = "info"
+    WARN = "warn"
+    DEBUG = "debug"
+    ERROR = "error"
+    TYPES = [
+        (CRITICAL, 'critical'),
+        (INFO, 'info'),
+        (WARN, 'warn'),
+        (DEBUG, 'debug'),
+        (ERROR, 'error')
+    ]
+    log_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(
+        User, default=None, on_delete=models.CASCADE)
+    log = models.CharField(
+        max_length=2000,
+        default="",
+        null=False
+    )
+    log_type = models.CharField(
+        max_length=9,
+        choices=TYPES
+    )
+    created = models.DateTimeField(auto_now_add=True)
+
+
