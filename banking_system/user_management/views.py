@@ -22,7 +22,8 @@ def login_view(request):
                     create_user_log(user_id=user.user_id, log_str="Login Successful", log_type="info")
                 except:
                     create_user_log(user_id=user.user_id, log_str="Login Failed", log_type="error")
-                return redirect('home')
+                finally:
+                    return redirect('home')
             else:
                 context['inactive'] = True
                 create_user_log(user_id=user.user_id, log_str="Login Failed: User Inactive", log_type="debug")
@@ -87,7 +88,7 @@ def edit_profile(request):
             context = {}
             context['request_received'] = True
             print('request_received')
-            create_user_log(user_id=request.user.user_id,log_str="Profile Edit Successful",log_type="info")
+            create_user_log(user_id=request.user.user_id, log_str="Profile Edit Successful", log_type="info")
             return redirect('/accounts/profile', context)
     else:
         context = {}
@@ -102,10 +103,10 @@ def view_user_log(request):
     # check if user is admin then only view logs.
     # check the type of logs to be send: info, debug, warning, error, critical. Send the type using query parameter
     # Read for database and send the logs.
-    #return
+    # return
     pass
 
-#use this function only in POST calls. Writing in db is not recommended in GET calls.
+# use this function only in POST calls. Writing in db is not recommended in GET calls.
 def create_user_log(user_id, log_str, log_type):
     user_log = UserLog.objects.create(user_id=User.objects.get(user_id=user_id), log=log_str, log_type=log_type)
     user_log.save()
