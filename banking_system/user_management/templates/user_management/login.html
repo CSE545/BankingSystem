@@ -20,7 +20,7 @@
                         {% endif %}
 
                         {% endfor %}
-                        {% if form_invalid_otp %}
+                        {% if otp_sent %}
                         <div class="form-group">
                             <label for="{{ login_form.otp.id_for_label }}" class="control-label">{{ login_form.otp.label }}</label>
                             {{ login_form.otp }}
@@ -41,7 +41,9 @@
 
                         {% for error in login_form.non_field_errors %}
                             {% if error == "Invalid OTP." %}
-                                <strong>Invalid OTP.</strong>
+                            <div class="alert alert-error">
+                                <strong>Invalid OTP.</strong> <br/>
+                            </div>
                             {% endif %}
                             {% if error == "Enter OTP you received via text" %}
                             <div class="alert alert-success">
