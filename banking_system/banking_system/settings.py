@@ -26,7 +26,7 @@ SECRET_KEY = 'joq^zb4q3j+k_t8l9(4$3c%g%y$cvvlg#rr#@il1(xicu0q@lo'
 DEBUG = True
 
 LOGOUT_REDIRECT_URL = "/accounts/login"
-ALLOWED_HOSTS = ["cse545.zlmonroe.com"]
+ALLOWED_HOSTS = ["localhost"]
 
 # Application definition
 
@@ -83,8 +83,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ss_project',
-        'USER': 'bank_admin',
-        'PASSWORD': 'Password#0',
+        'USER': 'root',
+        'PASSWORD': 'ripu',
         'HOST': 'localhost',
         'PORT': '3306'
     }

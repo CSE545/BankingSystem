@@ -15,8 +15,16 @@ def login_view(request):
         user = authenticate(username=email, password=password)
         if user is not None:
             if user.is_active:
-                login(request, user)
-                return redirect('home')
+                form = LoginForm(request, data=request.POST)
+                context['login_form'] = form
+                is_valid_form = form.is_valid()
+                print('is_valid_form', is_valid_form)
+                if is_valid_form:
+                    login(request, user)
+                    return redirect('home')
+                else:
+                    context['form_invalid_otp'] = True
+                    return render(request, 'user_management/login.html', context)
             else:
                 context['inactive'] = True
                 form = LoginForm(request, data=request.POST)
@@ -85,3 +93,8 @@ def edit_profile(request):
         form = EditForm(instance=request.user)
         context['edit_form'] = form
         return render(request, 'user_management/edit_profile.html', context)
+
+
+def otp_view(request):
+    context = {}
+    return render(request, 'user_management/2fa.html', context)

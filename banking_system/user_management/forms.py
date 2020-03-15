@@ -30,6 +30,19 @@ class RegistrationForm(UserCreationForm):
 
 
 class LoginForm(AuthenticationForm):
+    otp = forms.CharField(required=False, widget=forms.PasswordInput)
+
+    def clean(self):
+        otp = '1234'
+        cleaned_data = super().clean()
+        if '_otp' in self.request.session:
+            if str(self.request.session['_otp']) != str(self.cleaned_data['otp']):
+                raise forms.ValidationError("Invalid OTP.")
+            del self.request.session['_otp']
+        else:
+            self.request.session['_otp'] = otp
+            raise forms.ValidationError("Enter OTP you received via text")
+
     def __init__(self, *args, **kwargs):
         super(LoginForm, self).__init__(*args, **kwargs)
         for field in iter(self.fields):
@@ -39,7 +52,7 @@ class LoginForm(AuthenticationForm):
 
     class Meta:
         model = User
-        fields = ("email", "password")
+        fields = ("email", "password", "otp")
 
 
 class EditForm(forms.ModelForm):
@@ -53,3 +66,7 @@ class EditForm(forms.ModelForm):
     class Meta:
         model = UserPendingApproval
         fields = ("email", "first_name", "last_name", "phone_number", "gender")
+
+
+class OTPForm():
+    pass
