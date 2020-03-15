@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from user_management.models import User, UserPendingApproval
+from user_management.utility.twofa import generate_otp, send_otp, get_user_phone_number
 
 GENDER = (
     ("M", "MALE"),
@@ -33,8 +34,11 @@ class LoginForm(AuthenticationForm):
     otp = forms.CharField(required=False, widget=forms.PasswordInput)
 
     def clean(self):
-        otp = '1234'
+        otp = generate_otp()
+        print('otp', otp)
         cleaned_data = super().clean()
+        phone = get_user_phone_number(cleaned_data['username'])
+        send_otp(otp, phone)
         if '_otp' in self.request.session:
             if str(self.request.session['_otp']) != str(self.cleaned_data['otp']):
                 raise forms.ValidationError("Invalid OTP.")

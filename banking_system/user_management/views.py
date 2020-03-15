@@ -18,12 +18,11 @@ def login_view(request):
                 form = LoginForm(request, data=request.POST)
                 context['login_form'] = form
                 is_valid_form = form.is_valid()
-                print('is_valid_form', is_valid_form)
                 if is_valid_form:
                     login(request, user)
                     return redirect('home')
                 else:
-                    context['form_invalid_otp'] = True
+                    context['otp_sent'] = True
                     return render(request, 'user_management/login.html', context)
             else:
                 context['inactive'] = True
