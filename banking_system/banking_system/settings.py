@@ -74,7 +74,7 @@ WSGI_APPLICATION = 'banking_system.wsgi.application'
 
 AUTHENTICATION_BACKENDS = [
     'user_management.custom_backend.CustomAuthBackend',
-    # 'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend'
 ]
 
 # Database
