@@ -92,8 +92,3 @@ def edit_profile(request):
         form = EditForm(instance=request.user)
         context['edit_form'] = form
         return render(request, 'user_management/edit_profile.html', context)
-
-
-def otp_view(request):
-    context = {}
-    return render(request, 'user_management/2fa.html', context)

@@ -13,6 +13,8 @@ def send_otp(otp, phone_number):
     )
     msg = 'Your otp for login is {0}'.format(otp)
     phone_number = '+1' + str(phone_number)
+    print('msg', msg)
+    print('phone_number', phone_number)
     client.publish(
         PhoneNumber=phone_number,
         Message=msg
