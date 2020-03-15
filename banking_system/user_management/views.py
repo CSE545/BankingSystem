@@ -98,14 +98,6 @@ def edit_profile(request):
         return render(request, 'user_management/edit_profile.html', context)
 
 
-@login_required
-def view_user_log(request):
-    # check if user is admin then only view logs.
-    # check the type of logs to be send: info, debug, warning, error, critical. Send the type using query parameter
-    # Read for database and send the logs.
-    # return
-    pass
-
 # use this function only in POST calls. Writing in db is not recommended in GET calls.
 def create_user_log(user_id, log_str, log_type):
     user_log = UserLog.objects.create(user_id=User.objects.get(user_id=user_id), log=log_str, log_type=log_type)
