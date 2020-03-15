@@ -7,8 +7,8 @@ from user_management.models import User
 def send_otp(otp, phone_number):
     client = boto3.client(
         "sns",
-        aws_access_key_id="AKIAYHX35C2IYZXEK27I",
-        aws_secret_access_key="vDt0u1ES0ZERzKhRq0PZLl9oveDXtv12k8/O3vJu",
+        aws_access_key_id="",
+        aws_secret_access_key="",
         region_name="eu-west-1"
     )
     msg = 'Your otp for login is {0}'.format(otp)
