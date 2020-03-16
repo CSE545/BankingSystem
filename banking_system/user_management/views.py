@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from user_management.forms import RegistrationForm, LoginForm, EditForm, FundTransferForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from user_management.models import User, FundTransferRequest
+from user_management.models import User, FundTransferRequest, employee_info_update
 
 # Create your views here.
 def login_view(request):
@@ -129,3 +129,18 @@ def edit_profile(request):
         form = EditForm(instance=request.user)
         context['edit_form'] = form
         return render(request, 'user_management/edit_profile.html', context)
+
+@login_required
+def show_pending_employee_requests(request):
+    context = {}
+    context['employee_info_update_request'] = {
+        'headers': [u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve', u'reject'],
+        'rows': []
+    }
+
+    for e in employee_info_update.objects.filter(status="NEW"):
+        context['employee_info_update_request']['rows'].append([e.email,
+                                                            e.first_name, e.last_name,
+                                                            e.phone_number,
+                                                            e.gender])
+    return render(request, 'user_management/pendingEmployeeRequests.html', context)
