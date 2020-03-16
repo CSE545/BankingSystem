@@ -1,0 +1,67 @@
+{% extends 'employee_home.html' %}
+{% block info %}
+<style>
+    th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  background-color: gray;
+  color: white;
+}
+td, th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Pending Fund Transfers
+                </div>
+                <div class="card-body">
+                    <table>
+                        <tr>
+                            {% for header in pendingFundTransfersData.headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                            </tr>
+                            {% for row in pendingFundTransfersData.rows %}
+                            <tr>
+                                {% for value in row %}
+                                    <td>{{value}}</td>
+                                {% endfor %}
+                                <td><button class="action">Approve</button></td>
+                                <td><button class="action">Reject</button></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+<script>
+(function test(){
+    var statusMap = {"Approve": "APPROVE","Reject": "REJECT"};
+    debugger
+    console.log("hi")
+    $(".action").click(function(e) {
+        var status = statusMap[e.target.textContent]
+    var request_id = $(e.target).parents('tr').children(":first").text()
+        console.log(e)
+        $.ajax({
+   type: "POST",
+   url: "",
+   data: { csrfmiddlewaretoken: '{{ csrf_token }}', request_id, status} ,
+   success: function callback(response){
+               console.log(response);
+               location.reload();
+            }
+});
+    })
+})()
+</script>
+{% endblock %}
