@@ -4,9 +4,8 @@ from user_management.utility.twofa import generate_otp, send_otp, get_user_phone
 from user_management.models import User, UserPendingApproval, FundTransferRequest
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-<< << << < HEAD
-== == == =
->>>>>> > Saving otp into db
+from user_management.models import User, UserPendingApproval
+from user_management.utility.twofa import generate_otp, send_otp, get_user_phone_number, save_otp_in_db
 
 GENDER = (
     ("M", "MALE"),
