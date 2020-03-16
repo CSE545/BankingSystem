@@ -12,4 +12,5 @@ urlpatterns = [
     path('transfers/', views.transfers, name="transfers"),
     path('pendingFundTransfers/', views.pendingFundTransfers, name="pendingFundTransfers"),
     path('profile/edit/', views.edit_profile, name="edit_profile"),
+    path('pendingEmployeeRequests/', views.show_pending_employee_requests, name="pendingEmployeeRequests")
 ]
