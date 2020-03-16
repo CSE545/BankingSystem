@@ -1,3 +1,2 @@
 django
 mysqlclient
-boto3
