@@ -132,6 +132,7 @@ def edit_profile(request):
 
 @login_required
 def show_pending_employee_requests(request):
+<<<<<<< HEAD
     if request.POST:
         employee_info_update.objects.filter(user_id=int(
             request.POST['user_id']), status = 'NEW').update(status=request.POST['status'])
@@ -149,12 +150,24 @@ def show_pending_employee_requests(request):
     context = {}
     context['employee_info_update_request'] = {
         'headers': [u'user_id', u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve', u'reject'],
+=======
+    context = {}
+    context['employee_info_update_request'] = {
+        'headers': [u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve', u'reject'],
+>>>>>>> f2f719f06f717875d451f6af589bbf4412a21ad0
         'rows': []
     }
 
     for e in employee_info_update.objects.filter(status="NEW"):
+<<<<<<< HEAD
         context['employee_info_update_request']['rows'].append([e.user_id_id, e.email,
                                                                 e.first_name, e.last_name,
                                                                 e.phone_number,
                                                                 e.gender])
+=======
+        context['employee_info_update_request']['rows'].append([e.email,
+                                                            e.first_name, e.last_name,
+                                                            e.phone_number,
+                                                            e.gender])
+>>>>>>> f2f719f06f717875d451f6af589bbf4412a21ad0
     return render(request, 'user_management/pendingEmployeeRequests.html', context)
