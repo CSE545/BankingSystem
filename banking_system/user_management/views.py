@@ -23,6 +23,9 @@ def login_view(request):
                     return redirect('home')
                 except Exception as ex:
                     create_user_log(user_id=user.user_id, log_str="Login Failed", log_type="error")
+                    form = LoginForm()
+                    context['login_form'] = form
+                    return render(request, 'user_management/login.html', context)
             else:
                 context['inactive'] = True
                 create_user_log(user_id=user.user_id, log_str="Login Failed: User Inactive", log_type="debug")
