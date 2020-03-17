@@ -7,7 +7,6 @@ class CustomAuthBackend(ModelBackend):
         try:
             user = User.objects.get(email=email)
             success = user.check_password(password)
-            return user
             if success:
                 return user
             else:
