@@ -1,0 +1,33 @@
+{% extends 'body.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Welcome, {{request.user}}. What would you like to do today?
+                </div>
+                <div class="card-body">
+
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-sm">
+                                <form action="/trans/list/" method ='GET'>{%csrf_token%}
+                                    <button type='submit' class="btn btn-outline-primary">View all transactions</button>
+                                </form>
+                            </div>
+                            <div class="col-sm">
+                                <form method="get" action="/trans/create/">{%csrf_token%}
+                                    <button type="submit" class="btn btn-outline-primary">Create a new transaction</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{%endblock%}

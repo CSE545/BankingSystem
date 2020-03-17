@@ -16,7 +16,8 @@ Including another URLconf
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
-from user_management.views import transaction_main, trans_create, transaction_view, trans_list_view
+#from user_management.views import transaction_main, trans_create, transaction_view, trans_list_view
+from transactions.views import transaction_main, trans_create, transaction_view, trans_list_view
 
 from . import views
 
