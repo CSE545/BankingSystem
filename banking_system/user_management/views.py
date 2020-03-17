@@ -132,14 +132,28 @@ def edit_profile(request):
 
 @login_required
 def show_pending_employee_requests(request):
+    if request.POST:
+        employee_info_update.objects.filter(user_id=int(
+            request.POST['user_id']), status = 'NEW').update(status=request.POST['status'])
+
+        if request.POST['status'] == 'APPROVE':
+            user_object = User.objects.get(user_id = int(request.POST['user_id']))
+            user_object.email = request.POST['email_id']
+            user_object.first_name = request.POST['first_name']
+            user_object.last_name = request.POST['last_name']
+            user_object.phone_number = request.POST['phone_number']
+            user_object.gender = request.POST['gender']
+            user_object.save()
+
+        return render(request, 'user_management/pendingEmployeeRequests.html')
     context = {}
     context['employee_info_update_request'] = {
-        'headers': [u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve', u'reject'],
+        'headers': [u'user_id', u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve', u'reject'],
         'rows': []
     }
 
     for e in employee_info_update.objects.filter(status="NEW"):
-        context['employee_info_update_request']['rows'].append([e.email,
+        context['employee_info_update_request']['rows'].append([e.user_id_id, e.email,
                                                                 e.first_name, e.last_name,
                                                                 e.phone_number,
                                                                 e.gender])
