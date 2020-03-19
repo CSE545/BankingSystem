@@ -1,11 +1,12 @@
-#from django.contrib.auth import login, authenticate, logout
-#from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from transactions.forms import  Trans_Create, Transaction_main
+from transactions.forms import Trans_Create, Transaction_main
 
 from .models import EMP_Transaction_Create
 
 
+@login_required
 def transaction_main(request):
     if request.user.is_authenticated:
         """trans=Transaction_main()
@@ -26,6 +27,7 @@ def transaction_main(request):
         return render(request, 'user_management/login.html')
 
 
+@login_required
 def trans_create(request):
     if request.user.is_authenticated:
         trans_c = Trans_Create()
@@ -44,7 +46,7 @@ def trans_create(request):
         return render(request, 'user_management/login.html')
 
 
-
+@login_required
 def transaction_view(request, id):
     if request.user.is_authenticated:
         obj = EMP_Transaction_Create.objects.get(id=id)
@@ -56,6 +58,7 @@ def transaction_view(request, id):
         return render(request, 'user_management/login.html')
 
 
+@login_required
 def trans_list_view(request):
     if request.user.is_authenticated:
         object_list = EMP_Transaction_Create.objects.all()
