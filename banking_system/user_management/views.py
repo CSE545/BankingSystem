@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from user_management.forms import RegistrationForm, LoginForm, EditForm, FundTransferForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from user_management.models import User, FundTransferRequest
+from user_management.models import User, FundTransferRequest, employee_info_update
 
 # Create your views here.
 
@@ -144,3 +144,32 @@ def edit_profile(request):
         form = EditForm(instance=request.user)
         context['edit_form'] = form
         return render(request, 'user_management/edit_profile.html', context)
+
+@login_required
+def show_pending_employee_requests(request):
+    if request.POST:
+        employee_info_update.objects.filter(user_id=int(
+            request.POST['user_id']), status='NEW').update(status=request.POST['status'])
+
+        if request.POST['status'] == 'APPROVE':
+            user_object = User.objects.get(user_id=int(request.POST['user_id']))
+            user_object.email = request.POST['email_id']
+            user_object.first_name = request.POST['first_name']
+            user_object.last_name = request.POST['last_name']
+            user_object.phone_number = request.POST['phone_number']
+            user_object.gender = request.POST['gender']
+            user_object.save()
+
+        return render(request, 'user_management/pendingEmployeeRequests.html')
+    context = {}
+    context['employee_info_update_request'] = {
+        'headers': [u'user_id', u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve', u'reject'],
+        'rows': []
+    }
+
+    for e in employee_info_update.objects.filter(status="NEW"):
+        context['employee_info_update_request']['rows'].append([e.user_id_id, e.email,
+                                                                e.first_name, e.last_name,
+                                                                e.phone_number,
+                                                                e.gender])
+    return render(request, 'user_management/pendingEmployeeRequests.html', context)

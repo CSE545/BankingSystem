@@ -90,4 +90,3 @@ class FundTransferForm(forms.ModelForm):
         model = FundTransferRequest
         fields = ("from_account", "to_account", "amount", "status")
         widgets = {'status': forms.HiddenInput()}
-        fields = ("email", "first_name", "last_name", "phone_number", "gender")
