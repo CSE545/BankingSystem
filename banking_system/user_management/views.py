@@ -136,7 +136,7 @@ def edit_profile(request):
             data = request.POST.copy()
             user_id = int(request.user.user_id)
             
-            num_results  = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
+            num_results = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
             if num_results > 0:
                 return render(request, 'employee_request_already_exists.html')
 
