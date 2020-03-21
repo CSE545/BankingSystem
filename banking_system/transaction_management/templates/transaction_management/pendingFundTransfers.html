@@ -21,6 +21,7 @@ td, th {
                     Pending Fund Transfers
                 </div>
                 <div class="card-body">
+                    <p id="error_msg" style="display:none"> {{pendingFundTransfersData.error}} </p>
                     <table>
                         <tr>
                             {% for header in pendingFundTransfersData.headers %}
@@ -68,18 +69,21 @@ td, th {
 <script>
 (function test(){
     var statusMap = {"Approve": "APPROVED","Reject": "REJECTD"};
-    debugger
     console.log("hi")
     $(".action").click(function(e) {
         var status = statusMap[e.target.textContent]
     var request_id = $(e.target).parents('tr').children(":first").text()
-    var from_account = $(e.target).parents('tr').children[2].text()
         console.log(e)
         $.ajax({
    type: "POST",
    url: "",
-   data: { csrfmiddlewaretoken: '{{ csrf_token }}', request_id, status, from_account} ,
-   success: function callback(response){
+   data: { csrfmiddlewaretoken: '{{ csrf_token }}', request_id, status} ,
+   success: function callback(response, context, test, test2){
+               var s = $(response)
+               var error_text = s.find("#error_msg").text().trim()
+               if(error_text){
+                   alert(error_text);
+               }
                location.reload();
             }
 });

@@ -44,16 +44,27 @@ def employee_check(user):
 @user_passes_test(employee_check)
 def pendingFundTransfers(request):
     if request.POST:
-        if(request.POST['status'] == "APPROVE"):
-            pass
-            # accountBalance = Account.objects.filter(account_id = request.POST[])
-        FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(status=request.POST['status'])
-        return render(request, 'transaction_management/pendingFundTransfers.html')
+        context = {"pendingFundTransfersData": {"error": ""}}
+        curFundObj = FundTransfers.objects.get(request_id=int(request.POST['request_id']))
+        if(request.POST['status'] == "APPROVED"):
+            curBal = Account.objects.get(account_id=curFundObj.from_account_id).account_balance
+            if curBal >= curFundObj.amount:
+                FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(status=request.POST['status'])
+                Account.objects.filter(account_id=curFundObj.from_account_id).update(account_balance=curBal - curFundObj.amount)
+                Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
+            else:
+                context["pendingFundTransfersData"]["error"] = "Rejected: Insufficient funds"
+                FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(status="REJECTED")
+
+        else:
+            FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(status=request.POST['status'])
+        return render(request, 'transaction_management/pendingFundTransfers.html', context)
     else:
         context = {}
         context['pendingFundTransfersData'] = {
             'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status', u'Approve', u'Reject'],
-            'rows': []
+            'rows': [],
+            'error': ""
         }
         for e in FundTransfers.objects.filter(status="NEW"):
             context['pendingFundTransfersData']['rows'].append([e.request_id,
