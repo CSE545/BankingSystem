@@ -133,12 +133,24 @@ def edit_profile(request):
     if request.POST:
         form = EditForm(request.POST)
         if form.is_valid():
+            data = request.POST.copy()
+            user_id = int(request.user.user_id)
+            
+            num_results  = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
+            if num_results > 0:
+                return render(request, 'employee_request_already_exists.html')
+
+            new_entry = employee_info_update(user_id=user_id, email=data.get('email'), first_name=data.get('first_name'),
+                                             last_name=data.get('last_name'), phone_number=data.get('phone_number'),
+                                             gender=data.get('gender'), status='NEW')
+            new_entry.save()
+
             instance = form.save(commit=False)
             instance.created_by = request.user
             instance.save()
             context = {}
             context['request_received'] = True
-            return redirect('/accounts/profile', context)
+            return render(request, 'employee_edit_request_submitted.html', context)
     else:
         context = {}
         form = EditForm(instance=request.user)
@@ -168,7 +180,7 @@ def show_pending_employee_requests(request):
     }
 
     for e in employee_info_update.objects.filter(status="NEW"):
-        context['employee_info_update_request']['rows'].append([e.user_id_id, e.email,
+        context['employee_info_update_request']['rows'].append([e.user_id, e.email,
                                                                 e.first_name, e.last_name,
                                                                 e.phone_number,
                                                                 e.gender])
