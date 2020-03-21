@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from user_management.models import User, UserPendingApproval, FundTransferRequest
+from user_management.models import User, UserPendingApproval
 
 GENDER = (
     ("M", "MALE"),
@@ -53,16 +53,3 @@ class EditForm(forms.ModelForm):
     class Meta:
         model = UserPendingApproval
         fields = ("email", "first_name", "last_name", "phone_number", "gender")
-
-class FundTransferForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super(FundTransferForm, self).__init__(*args, **kwargs)
-        for field in iter(self.fields):
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
-            
-    class Meta:
-        model = FundTransferRequest
-        fields = ("from_account", "to_account", "amount", "status")
-        widgets = {'status': forms.HiddenInput()}

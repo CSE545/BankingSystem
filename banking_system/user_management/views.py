@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from user_management.forms import RegistrationForm, LoginForm, EditForm, FundTransferForm
+from user_management.forms import RegistrationForm, LoginForm, EditForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from user_management.models import User, FundTransferRequest
+from user_management.models import User
 
 # Create your views here.
 def login_view(request):
@@ -70,47 +70,6 @@ def view_profile(request):
         base_template_name = 'employee_home.html'
     context = {'user': request.user, 'base_template_name': base_template_name}
     return render(request, 'user_management/profile.html', context)
-
-@login_required
-def transfers(request):
-    if request.POST:
-        form = FundTransferForm(request.POST, request.user)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            context = {}
-            context['request_received'] = True
-            print('request_received')
-            return redirect('home')
-    else:
-        context = {}
-        form = FundTransferForm(instance=request.user)
-        form.fields['from_account'].queryset = User.objects.filter(user_id=request.user.user_id)
-        form.fields['to_account'].queryset = User.objects.exclude(user_id=request.user.user_id)
-        context['transfer_form'] = form
-        return render(request, 'user_management/transfers.html', context)
-
-def employee_check(user):
-    return user.user_type in ["T1", "T2", "T3"]
-
-@login_required
-@user_passes_test(employee_check)
-def pendingFundTransfers(request):
-    if request.POST:
-        FundTransferRequest.objects.filter(request_id=int(request.POST['request_id'])).update(status=request.POST['status'])
-        return render(request, 'user_management/pendingFundTransfers.html')
-    context = {}
-    context['pendingFundTransfersData'] = {
-        'headers': [u'transactionId', u'from_name', u'to_name', u'amount', u'status', u'approve', u'reject'],
-        'rows': []
-    }
-    for e in FundTransferRequest.objects.filter(status="NEW"):
-        context['pendingFundTransfersData']['rows'].append([e.request_id,
-                                                            e.from_account.first_name + " " + e.from_account.last_name,
-                                                            e.to_account.first_name + " " + e.to_account.last_name,
-                                                            e.amount,
-                                                            e.status])
-    return render(request, 'user_management/pendingFundTransfers.html', context)
 
 @login_required
 def edit_profile(request):

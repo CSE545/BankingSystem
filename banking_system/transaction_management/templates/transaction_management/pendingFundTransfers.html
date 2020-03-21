@@ -39,25 +39,47 @@ td, th {
                     </table>
                 </div>
             </div>
+        </br>
+            <div class="card">
+                <div class="card-header">
+                    Approved/Rejected Fund Transfers
+                </div>
+                <div class="card-body">
+                    <table>
+                        <tr>
+                            {% for header in actionedFundTransfersData.headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                            </tr>
+                            {% for row in actionedFundTransfersData.rows %}
+                            <tr>
+                                {% for value in row %}
+                                    <td>{{value}}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
 <script>
 (function test(){
-    var statusMap = {"Approve": "APPROVE","Reject": "REJECT"};
+    var statusMap = {"Approve": "APPROVED","Reject": "REJECTD"};
     debugger
     console.log("hi")
     $(".action").click(function(e) {
         var status = statusMap[e.target.textContent]
     var request_id = $(e.target).parents('tr').children(":first").text()
+    var from_account = $(e.target).parents('tr').children[2].text()
         console.log(e)
         $.ajax({
    type: "POST",
    url: "",
-   data: { csrfmiddlewaretoken: '{{ csrf_token }}', request_id, status} ,
+   data: { csrfmiddlewaretoken: '{{ csrf_token }}', request_id, status, from_account} ,
    success: function callback(response){
-               console.log(response);
                location.reload();
             }
 });
