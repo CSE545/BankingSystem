@@ -15,6 +15,7 @@ urlpatterns = [
     path('pendingFundTransfers/', views.pendingFundTransfers, name="pendingFundTransfers"),
     path('profile/edit/', views.edit_profile, name="edit_profile"),
     path('pendingEmployeeRequests/', views.show_pending_employee_requests, name="pendingEmployeeRequests"),
+    path('technicalSupport/', views.technicalSupport, name='technicalSupport'),
     url(r'^$', TemplateView.as_view(template_name="employee_edit_request_submitted.html"), name='employee_edit_request_submitted'),
     url(r'^$', TemplateView.as_view(template_name="employee_request_already_exists.html"), name='employee_request_already_exists')
 ]

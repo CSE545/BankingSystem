@@ -135,7 +135,7 @@ def edit_profile(request):
         if form.is_valid():
             data = request.POST.copy()
             user_id = int(request.user.user_id)
-            
+
             num_results = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
             if num_results > 0:
                 return render(request, 'employee_request_already_exists.html')
@@ -185,3 +185,20 @@ def show_pending_employee_requests(request):
                                                                 e.phone_number,
                                                                 e.gender])
     return render(request, 'user_management/pendingEmployeeRequests.html', context)
+
+
+@login_required
+def technicalSupport(request):
+    headers = [u"user_id", u"email", u"first_name", u"last_name", u"user_type"]
+
+    users = [[getattr(user, header) for header in headers] for user in User.objects.all()
+             if user.user_type in ["T1", "T2", "T3"]]
+
+    context = {
+        "users": {
+            "headers": headers + ["Account Override"],
+            "rows": users
+        }
+    }
+
+    return render(request, 'user_management/technicalSupport.html', context)
