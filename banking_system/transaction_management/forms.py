@@ -9,8 +9,8 @@ class FundTransferForm(forms.ModelForm):
             self.fields[field].widget.attrs.update({
                 'class': 'form-control'
             })
-
-        # self.fields["to_account"].queryset = Account.objects.none()
+        self.fields['to_account'].queryset = Account.objects.all().defer('account_balance')
+        
     def clean(self): 
   
         # data from the form is fetched using super function 
@@ -20,7 +20,9 @@ class FundTransferForm(forms.ModelForm):
         from_account_id = self.cleaned_data.get('from_account') 
         amount = self.cleaned_data.get('amount') 
         balance = Account.objects.get(account_id=from_account_id.account_id).account_balance
-  
+
+        if amount < 0:
+            self._errors['amount'] = self.error_class(['Invalid amount'])
         # conditions to be met for the username length 
         if amount > balance: 
             self._errors['amount'] = self.error_class([ 
@@ -33,7 +35,6 @@ class FundTransferForm(forms.ModelForm):
         model = FundTransfers
         fields = ("from_account", "to_account", "amount", "status")
         widgets = {'status': forms.HiddenInput()}
-    
     
 
 

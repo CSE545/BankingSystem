@@ -8,10 +8,10 @@ from account_management.models import Account
 
 # Create your views here.
 
-def load_to_accounts(request):
-    from_account_id = request.GET.get('from_account_id')
-    to_account = Account.objects.exclude(account_id=int(from_account_id))
-    return render(request, 'transaction_management/to_account_dropdown_list_options.html', {'to_account': to_account})
+# def load_to_accounts(request):
+#     from_account_id = request.GET.get('from_account_id')
+#     to_account = Account.objects.exclude(account_id=int(from_account_id))
+#     return render(request, 'transaction_management/to_account_dropdown_list_options.html', {'to_account': to_account})
 
 @login_required
 def transfers(request):
@@ -33,7 +33,7 @@ def transfers(request):
         context = {}
         form = FundTransferForm(instance=request.user)
         form.fields['from_account'].queryset = Account.objects.filter(user_id=request.user.user_id)
-        form.fields['to_account'].queryset = Account.objects.exclude(user_id=request.user.user_id)
+        # form.fields['to_account'].queryset = Account.objects.only('account_balance')
         context['transfer_form'] = form
         return render(request, 'transaction_management/transfers.html', context)
 

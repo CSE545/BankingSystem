@@ -1,6 +1,10 @@
 {% extends 'homepage.html' %}
 {% block info %}
-
+<style>
+  select option[disabled] {
+    display: none;
+}
+</style>
 <div class="container">
     <div class="row">
         <div class="col">
@@ -18,7 +22,7 @@
                     {% endfor %}
                 {% endif %}
                 <div class="card-body">
-                    <form method="POST" id="TransferForm" data-to_account-url="ajax/load_to_accounts">
+                    <form method="POST" id="TransferForm">
                         {% csrf_token %}
                         <div class="form-group">
                             {{ transfer_form.as_p }}
@@ -34,21 +38,22 @@
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
   <script>
     $("#id_from_account").change(function () {
-      var url = $("#TransferForm").attr("data-to_account-url");  // get the url of the `load_cities` view
-      var from_account = $(this).val();  // get the selected country ID from the HTML input
-
-      $.ajax({                       // initialize an AJAX request
-        url: url,                    // set the url of the request (= localhost:8000/hr/ajax/load-cities/)
-        data: {
-          'from_account_id': from_account       // add the country id to the GET parameters
-        },
-        success: function (data) {   // `data` is the return of the `load_cities` view function
-          $("#id_to_account").html(data);  // replace the contents of the city input with the data that came from the server
-          
-        }
-      });
-
+      var from_account = $(this).val();
+      updateToAccount(from_account);
+      $('#id_to_account').val('');
     });
+    function updateToAccount(from_account){
+      $('#id_to_account option').prop("disabled", false);
+      $('#id_to_account option[value="' + from_account + '"]').prop('disabled', true);
+      $('#id_to_account option').each(function() {
+        $(this).text($(this).text().replace(/Account Balance:(?:.*),/, ""));
+      });
+    }
+    var from_account = $('#id_from_account').val();
+    if(from_account) {
+      updateToAccount(from_account);
+    }
+
   </script>
 
 {% endblock %}
