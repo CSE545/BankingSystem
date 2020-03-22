@@ -5,6 +5,8 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from user_management.models import User
 
 # Create your views here.
+
+
 def login_view(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -71,6 +73,7 @@ def view_profile(request):
     context = {'user': request.user, 'base_template_name': base_template_name}
     return render(request, 'user_management/profile.html', context)
 
+
 @login_required
 def edit_profile(request):
     if request.POST:
@@ -81,7 +84,6 @@ def edit_profile(request):
             instance.save()
             context = {}
             context['request_received'] = True
-            print('request_received')
             return redirect('/accounts/profile', context)
     else:
         context = {}
