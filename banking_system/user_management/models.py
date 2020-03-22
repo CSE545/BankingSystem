@@ -154,7 +154,6 @@ class UserPendingApproval(models.Model):
 
     def save(self, force_insert=False, force_update=False):
         if self.old_status == 'NEW':
-            print('Status changed from NEW to {0}'.format(self.status))
             if self.status == 'APPROVED':
                 User.objects.filter(user_id=self.created_by.user_id).update(
                     email=self.email,
