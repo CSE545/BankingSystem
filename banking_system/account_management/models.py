@@ -66,6 +66,9 @@ class AccountRequests(models.Model):
                     user_id=self.user_id
                 )
                 self.delete()
+            else:
+                super(AccountRequests, self).save(force_insert, force_update)
+                self.old_status = self.status
         else:
             super(AccountRequests, self).save(force_insert, force_update)
             self.old_status = self.status
