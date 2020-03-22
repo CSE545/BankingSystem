@@ -1,0 +1,30 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Open bank account
+                </div>
+                <div class="card-body">
+                    <form method="POST">{% csrf_token %}
+                        {% for field in bank_form %}
+                            <div class="control-group">
+                                <label class="control-label" for="username">{{ field.label_tag }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                <p style="color: red;">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+
+                            {% endfor %}
+                            <button style="margin-top: 10px" type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

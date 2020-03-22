@@ -81,6 +81,7 @@ def view_profile(request):
     context = {'user': request.user, 'base_template_name': base_template_name}
     return render(request, 'user_management/profile.html', context)
 
+
 @login_required
 def edit_profile(request):
     if request.POST:
@@ -88,8 +89,9 @@ def edit_profile(request):
         if form.is_valid():
             data = request.POST.copy()
             user_id = int(request.user.user_id)
-            
-            num_results = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
+
+            num_results = employee_info_update.objects.filter(
+                user_id=user_id, status='NEW').count()
             if num_results > 0:
                 return render(request, 'employee_request_already_exists.html')
 
@@ -110,6 +112,7 @@ def edit_profile(request):
         context['edit_form'] = form
         return render(request, 'user_management/edit_profile.html', context)
 
+
 @login_required
 def show_pending_employee_requests(request):
     if request.POST:
@@ -117,7 +120,8 @@ def show_pending_employee_requests(request):
             request.POST['user_id']), status='NEW').update(status=request.POST['status'])
 
         if request.POST['status'] == 'APPROVE':
-            user_object = User.objects.get(user_id=int(request.POST['user_id']))
+            user_object = User.objects.get(
+                user_id=int(request.POST['user_id']))
             user_object.email = request.POST['email_id']
             user_object.first_name = request.POST['first_name']
             user_object.last_name = request.POST['last_name']
