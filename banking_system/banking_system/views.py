@@ -11,4 +11,6 @@ def homepage(request):
     if user.user_type == 'CUSTOMER':
         return render(request, 'homepage.html')
     else:
+        if user.user_type == 'T3':
+            return render(request, 't3_employee_home.html')    
         return render(request, 'employee_home.html')
