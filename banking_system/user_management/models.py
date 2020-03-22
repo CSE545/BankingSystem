@@ -235,8 +235,7 @@ def login_failed(sender, credentials, request, **kwargs):
         print('Login failed: User does not exist')
 
 class employee_info_update(models.Model):
-    user_id = models.ForeignKey(
-        User, default=None, on_delete=models.CASCADE)
+    user_id = models.IntegerField(blank=False, default=0)
     email = models.EmailField(verbose_name="email",
                               max_length=60, null=True, blank=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)
