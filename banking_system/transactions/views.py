@@ -26,26 +26,6 @@ def transaction_main(request):
     else:
         return render(request, 'user_management/login.html')
 
-@login_required
-def transaction_details(request):
-    if request.user.is_authenticated:
-        """trans=Transaction_main()
-        if request.method=="POST":
-            trans = Transaction_main(request.POST)
-            if trans.is_valid():
-                trans.save()
-                return redirect('/trans/create')
-            else:
-                print(trans.errors)
-        context={
-            'trans':trans
-        }"""
-        request.method == "POST"
-        context = {}
-        return render(request, 'user_management/trans_details.html', context)
-    else:
-        return render(request, 'user_management/login.html')
-
 
 @login_required
 def trans_create(request):
