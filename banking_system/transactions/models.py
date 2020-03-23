@@ -24,8 +24,5 @@ class EMP_Transaction_Create(models.Model):
     transaction_amount = models.DecimalField(decimal_places=2, max_digits=10, default=None,
                                              verbose_name=u"Amount", help_text=u"Choose an amount to send...")
 
-    transaction_amount_credit=models.DecimalField(decimal_places=2, max_digits=7, default=None, 
-                                             ,verbose_name=u"Amount", help_text=u"Choose an amount to send...")
-    
     def get_absolute_url(self):
         return f"/trans/list/view/{self.id}/"

@@ -17,7 +17,7 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 from django.urls import path, include
 #from user_management.views import transaction_main, trans_create, transaction_view, trans_list_view
-from transactions.views import transaction_main, trans_create, transaction_view, trans_list_view,transaction_details, trans_create_credit
+from transactions.views import transaction_main, trans_create, transaction_view, trans_list_view,transaction_details
 
 from . import views
 
@@ -43,8 +43,6 @@ urlpatterns = [
     path('trans/create/', trans_create, name="create"),
     path('trans/list/view/<int:id>/', transaction_view, name="trans_view"),
     path('trans/list/', trans_list_view, name="list"),
-    path('trans/details/', transaction_details, name="list"),
-    path('trans/create_credit/', trans_create_credit, name="create_credit"),
-
+    path('trans/details/', transaction_details, name="list")
 
 ]
