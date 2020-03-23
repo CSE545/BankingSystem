@@ -14,7 +14,7 @@
         padding: 8px;
     }
 </style>
-<div class="container">
+<div class="container" style="margin-left: 200px">
     <div class="row">
         <div class="col">
             <div class="card">
@@ -23,7 +23,7 @@
                 </div>
                 <div class="card-body">
                     <h1>Request an Override</h1>
-                    <table>
+                    <table class="table">
                         <tr>
                             {% for header in users.headers %}
                             <th>{{ header }}</th>
@@ -35,8 +35,34 @@
                             <td>{{value}}</td>
                             {% endfor %}
                             <td>
-                                <button class="action">Request</button>
+                                <button class="action btn btn-outline-primary">Request</button>
                             </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <h1>Current Override Requests</h1>
+                    <table class="table">
+                        <tr>
+                            {% for header in override.headers %}
+                            <th>{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for row in override.rows %}
+                        <tr>
+                            {% for value in row %}
+                            <td>{{value}}</td>
+                            {% endfor %}
+                            {% with row|last as last %}
+                                {% if last == 'NEW' %}
+                                <td>
+                                    <button class="action btn btn-outline-primary">Delete</button>
+                                </td>
+                                {% else %}
+                                <td>
+                                    <button class="action btn btn-outline-primary">Login</button>
+                                </td>
+                                {% endif %}
+                            {% endwith %}
                         </tr>
                         {% endfor %}
                     </table>
@@ -48,15 +74,16 @@
 <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
 <script>
     (function request() {
+        let action_map = {Request: "REQUEST_ACCESS", Delete: "DELETE", Login: "LOGIN"};
         $(".action").click(function (e) {
-            console.log("hello 1");
-            let action = "REQUEST_ACCESS";
+            let action = action_map[e.target.textContent];
             let user_id = $(e.target).parents('tr').children(":first").text();
             $.ajax({
                 type: "POST",
                 url: "",
                 data: {csrfmiddlewaretoken: '{{ csrf_token }}', user_id, action},
                 success: function callback(response) {
+                    location.reload();
                 }
             });
         })

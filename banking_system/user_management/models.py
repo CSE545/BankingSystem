@@ -212,8 +212,8 @@ class employee_info_update(models.Model):
     )
 
 class OverrideRequest(models.Model):
-    requesting_id = models.IntegerField(null=False, blank=False)
     for_id = models.IntegerField(null=False, blank=False)
+    requesting_id = models.IntegerField(null=False, blank=False)
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,

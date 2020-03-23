@@ -148,25 +148,62 @@ def show_pending_employee_requests(request):
 def technicalSupport(request):
     headers = [u"user_id", u"email", u"first_name", u"last_name", u"user_type"]
 
-    users = [[getattr(user, header) for header in headers] for user in User.objects.all()
+    users = [[getattr(user, header) for header in headers] for user in User.objects.exclude(user_id=request.user.user_id)
              if user.user_type in ["T1", "T2", "T3"]]
+
+    req_headers = [u"for_id", u"requesting_id", u"status"]
+    overrides = [[getattr(req, header) for header in req_headers] for req
+                 in OverrideRequest.objects.exclude(status="DENIED") if req.requesting_id == request.user.user_id]
 
     context = {
         "users": {
             "headers": headers + ["Account Override"],
             "rows": users
+        },
+        "override": {
+            "headers": req_headers + ["Action"],
+            "rows": overrides
         }
     }
 
     if request.POST:
+        requesting_id = request.user.user_id
+        for_id = request.POST['user_id']
         if request.POST["action"] == "REQUEST_ACCESS":
-            from_id = request.user.user_id
-            for_id = request.POST['user_id']
-            print(OverrideRequest.objects.filter(requesting_id=from_id, for_id=for_id, status="NEW").count())
-            if OverrideRequest.objects.filter(requesting_id=from_id, for_id=for_id, status="NEW").count() > 0:
+            if OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").count() > 0:
                 return render(request, 'employee_request_already_exists.html')
             else:
-                new_request = OverrideRequest(requesting_id=from_id, for_id=for_id)
+                new_request = OverrideRequest(requesting_id=requesting_id, for_id=for_id)
                 new_request.save()
+        elif request.POST["action"] == "DELETE":
+            print(requesting_id, for_id)
+            OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").delete()
 
     return render(request, 'user_management/technicalSupport.html', context)
+
+
+def override_request(request):
+    override_requests_for_user = OverrideRequest.objects.filter(for_id=request.user.user_id, status="NEW")
+    requesting_users = [{"name": "No Name", "id": req.requesting_id} for req in override_requests_for_user]
+    for user in requesting_users:
+        corresponding_user = User.objects.filter(user_id=user["id"])[0]
+        user["name"] = corresponding_user.first_name + " " + corresponding_user.last_name
+
+    context = {
+        "override_requests": requesting_users
+    }
+
+    if request.POST:
+        for_id = request.user.user_id
+        requesting_id = request.POST['user_id']
+        override = OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW")[0]
+
+        if request.POST["action"] == "ACCEPTED":
+            override.status = "ACCEPTED"
+            override.save()
+        elif request.POST["action"] == "DENIED":
+            override.status = "DENIED"
+            override.save()
+
+
+    return render(request, "user_management/overrideRequests.html", context)
