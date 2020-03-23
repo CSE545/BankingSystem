@@ -83,7 +83,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20, unique=True)
     gender = models.CharField(
         max_length=6,
         choices=GENDER
@@ -92,6 +92,7 @@ class User(AbstractBaseUser):
         max_length=20,
         choices=USER_TYPE
     )
+    primary_account = models.ForeignKey('account_management.Account', default=None, on_delete=models.CASCADE, null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name',
                        'last_name', 'password', 'phone_number']

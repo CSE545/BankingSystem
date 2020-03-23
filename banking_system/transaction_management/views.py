@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.db.models import Q
 from django.contrib.auth.decorators import login_required, user_passes_test
-from transaction_management.forms import FundTransferForm
+from transaction_management.forms import FundTransferForm, FundTransferFormEmail, FundTransferFormPhone
 from user_management.models import User
 from transaction_management.models import FundTransfers
 from account_management.models import Account
@@ -13,12 +13,24 @@ from account_management.models import Account
 #     to_account = Account.objects.exclude(account_id=int(from_account_id))
 #     return render(request, 'transaction_management/to_account_dropdown_list_options.html', {'to_account': to_account})
 
-@login_required
 def transfers(request):
+    from_accounts = Account.objects.filter(user_id=request.user.user_id)
     if request.POST:
-        form = FundTransferForm(request.POST)
+        if request.POST['formId'] == 'ACCOUNT':
+            form = FundTransferForm(request.POST)
+        elif request.POST['formId'] == 'EMAIL':
+            form = FundTransferFormEmail(request.POST)
+        elif request.POST['formId'] == 'PHONE':
+            form = FundTransferFormPhone(request.POST)
         if form.is_valid():
+            s = request.POST.dict()
+            if s['formId'] == 'EMAIL':
+                s['to_account'] = User.objects.get(email=s['to_email']).primary_account
+            elif s['formId'] == 'PHONE':
+                s['to_account'] = User.objects.get(phone_number=s['to_phone']).primary_account
+            form = FundTransferForm(s, request.user)
             instance = form.save(commit=False)
+            instance.transfer_type = s['formId']
             instance.save()
             context = {}
             context['request_received'] = True
@@ -26,15 +38,35 @@ def transfers(request):
             return redirect('home')
         else:
             context = {}
-            context['transfer_form'] = form
+            account_form = FundTransferForm()
+            email_form = FundTransferFormEmail()
+            phone_form = FundTransferFormPhone()
+            account_form.fields['from_account'].queryset = from_accounts
+            email_form.fields['from_account'].queryset = from_accounts
+            phone_form.fields['from_account'].queryset = from_accounts
+            form.fields['from_account'].queryset = from_accounts
+            context['account_form'] = account_form
+            context['email_form'] = email_form
+            context['phone_form'] = phone_form
+            if request.POST['formId'] == 'ACCOUNT':
+                context['account_form'] = form
+            elif request.POST['formId'] == 'EMAIL':
+                context['email_form'] = form
+            elif request.POST['formId'] == 'PHONE':
+                context['phone_form'] = form
             return render(request, 'transaction_management/transfers.html', context)
             
     else:
         context = {}
-        form = FundTransferForm(instance=request.user)
-        form.fields['from_account'].queryset = Account.objects.filter(user_id=request.user.user_id)
-        # form.fields['to_account'].queryset = Account.objects.only('account_balance')
-        context['transfer_form'] = form
+        account_form = FundTransferForm()
+        email_form = FundTransferFormEmail()
+        phone_form = FundTransferFormPhone()
+        account_form.fields['from_account'].queryset = from_accounts
+        email_form.fields['from_account'].queryset = from_accounts
+        phone_form.fields['from_account'].queryset = from_accounts
+        context['account_form'] = account_form
+        context['email_form'] = email_form
+        context['phone_form'] = phone_form
         return render(request, 'transaction_management/transfers.html', context)
 
 def employee_check(user):

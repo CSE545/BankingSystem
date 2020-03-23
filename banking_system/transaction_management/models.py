@@ -8,6 +8,12 @@ REQUEST_STATUS = (
     ("REJECTED", "REJECTED"),
 )
 
+TRANSFER_TYPE = (
+    ("ACCOUNT", "ACCOUNT"),
+    ("EMAIL", "EMAIL"),
+    ("PHONE", "PHONE")
+)
+
 class FundTransfers(models.Model):
     request_id = models.AutoField(primary_key=True)
     from_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='from_account')
@@ -17,6 +23,11 @@ class FundTransfers(models.Model):
         max_length=10,
         choices=REQUEST_STATUS,
         default='NEW'
+    )
+    transfer_type = models.CharField(
+        max_length=10,
+        choices=TRANSFER_TYPE,
+        default="ACCOUNT"
     )
 
     def __str__(self):
