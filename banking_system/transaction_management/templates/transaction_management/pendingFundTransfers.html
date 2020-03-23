@@ -21,6 +21,7 @@ td, th {
                     Pending Fund Transfers
                 </div>
                 <div class="card-body">
+                    <p id="error_msg" style="display:none"> {{pendingFundTransfersData.error}} </p>
                     <table>
                         <tr>
                             {% for header in pendingFundTransfersData.headers %}
@@ -39,14 +40,35 @@ td, th {
                     </table>
                 </div>
             </div>
+        </br>
+            <div class="card">
+                <div class="card-header">
+                    Approved/Rejected Fund Transfers
+                </div>
+                <div class="card-body">
+                    <table>
+                        <tr>
+                            {% for header in actionedFundTransfersData.headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                            </tr>
+                            {% for row in actionedFundTransfersData.rows %}
+                            <tr>
+                                {% for value in row %}
+                                    <td>{{value}}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
 <script>
 (function test(){
-    var statusMap = {"Approve": "APPROVE","Reject": "REJECT"};
-    debugger
+    var statusMap = {"Approve": "APPROVED","Reject": "REJECTD"};
     console.log("hi")
     $(".action").click(function(e) {
         var status = statusMap[e.target.textContent]
@@ -56,8 +78,12 @@ td, th {
    type: "POST",
    url: "",
    data: { csrfmiddlewaretoken: '{{ csrf_token }}', request_id, status} ,
-   success: function callback(response){
-               console.log(response);
+   success: function callback(response, context, test, test2){
+               var s = $(response)
+               var error_text = s.find("#error_msg").text().trim()
+               if(error_text){
+                   alert(error_text);
+               }
                location.reload();
             }
 });
