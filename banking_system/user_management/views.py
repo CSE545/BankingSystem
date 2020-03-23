@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from user_management.forms import RegistrationForm, LoginForm, EditForm, FundTransferForm
 from django.contrib.auth.decorators import login_required, user_passes_test
-from user_management.models import User, FundTransferRequest, employee_info_update
+from user_management.models import User, FundTransferRequest, employee_info_update, OverrideRequest
 
 # Create your views here.
 
@@ -200,5 +200,16 @@ def technicalSupport(request):
             "rows": users
         }
     }
+
+    if request.POST:
+        if request.POST["action"] == "REQUEST_ACCESS":
+            from_id = request.user.user_id
+            for_id = request.POST['user_id']
+            print(OverrideRequest.objects.filter(requesting_id=from_id, for_id=for_id, status="NEW").count())
+            if OverrideRequest.objects.filter(requesting_id=from_id, for_id=for_id, status="NEW").count() > 0:
+                return render(request, 'employee_request_already_exists.html')
+            else:
+                new_request = OverrideRequest(requesting_id=from_id, for_id=for_id)
+                new_request.save()
 
     return render(request, 'user_management/technicalSupport.html', context)

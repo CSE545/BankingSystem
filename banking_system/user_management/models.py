@@ -30,6 +30,7 @@ ACCOUNT_TYPE = (
     ("CHECKING", "CHECKING")
 )
 
+
 # Create your models here.
 # Important to implement this for Django to Recognize
 
@@ -247,6 +248,15 @@ class employee_info_update(models.Model):
         null=True,
         blank=True
     )
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
+
+class OverrideRequest(models.Model):
+    requesting_id = models.IntegerField(null=False, blank=False)
+    for_id = models.IntegerField(null=False, blank=False)
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,

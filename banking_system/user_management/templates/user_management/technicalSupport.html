@@ -2,16 +2,17 @@
 {% block info %}
 <style>
     th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: gray;
-  color: white;
-}
-td, th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: gray;
+        color: white;
+    }
+
+    td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
 </style>
 <div class="container">
     <div class="row">
@@ -25,16 +26,18 @@ td, th {
                     <table>
                         <tr>
                             {% for header in users.headers %}
-                                <th>{{ header }}</th>
+                            <th>{{ header }}</th>
                             {% endfor %}
-                            </tr>
-                            {% for row in users.rows %}
-                            <tr>
-                                {% for value in row %}
-                                    <td>{{value}}</td>
-                                {% endfor %}
-                                <td><button class="action">Request</button></td>
-                            </tr>
+                        </tr>
+                        {% for row in users.rows %}
+                        <tr>
+                            {% for value in row %}
+                            <td>{{value}}</td>
+                            {% endfor %}
+                            <td>
+                                <button class="action">Request</button>
+                            </td>
+                        </tr>
                         {% endfor %}
                     </table>
                 </div>
@@ -44,19 +47,19 @@ td, th {
 </div>
 <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
 <script>
-(function request(){
-    $(".action").click(function(e) {
-        let action = "REQUEST_ACCESS";
-        let user_id = $(e.target).parents('tr').children(":first").text();
-        $.ajax({
-   type: "POST",
-   url: "",
-   data: { csrfmiddlewaretoken: '{{ csrf_token }}', user_id, action},
-   success: function callback(response){
-               location.reload();
-            }
-});
-    })
-})()
+    (function request() {
+        $(".action").click(function (e) {
+            console.log("hello 1");
+            let action = "REQUEST_ACCESS";
+            let user_id = $(e.target).parents('tr').children(":first").text();
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}', user_id, action},
+                success: function callback(response) {
+                }
+            });
+        })
+    })()
 </script>
 {% endblock %}
