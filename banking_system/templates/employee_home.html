@@ -1,5 +1,45 @@
 {% extends 'body.html' %}
 {% block content %}
+<style>
+    .sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 10%; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 40; /* Stay at the top */
+  left: 0;
+  background-color: #F8F8F8; /* Black */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 20px;
+}
+
+/* The navigation menu links */
+.sidenav a {
+  padding: 6px 8px 6px 16px;
+  text-decoration: none;
+  font-size: 16px;
+  /*color: #818181;*/
+  color: #404040;
+  display: block;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+  color: #282828;
+}
+
+/* Style page content */
+.main {
+  margin-left: 160px; /* Same as the width of the sidebar */
+  padding: 0px 10px;
+}
+
+/* On smaller screens, where height is less than 450px, change the style of the sidebar (less padding and a smaller font size) */
+@media screen and (max-height: 450px) {
+  .sidenav {padding-top: 15px;}
+  .sidenav a {font-size: 18px;}
+}
+    </style>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="javascript:void(0)">Banking System</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
@@ -9,9 +49,6 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/accounts/pendingFundTransfers/">Fund Transfer Requests</a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" href="/accounts/profile/">Profile</a>
             </li>
             <li class="nav-item">
@@ -20,6 +57,9 @@
         </ul>
     </div>
 </nav>
+<div class="sidenav">
+        <a href="/transactions/pendingFundTransfers/">Fund Transfer Requests</a>
+</div>
 <div>
     {% block info %}
     {% endblock %}
