@@ -1,7 +1,7 @@
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from transactions.forms import Trans_Create, Transaction_main
+from transactions.forms import Trans_Create, Transaction_main, Trans_Create_Credit
 
 from .models import EMP_Transaction_Create
 
@@ -65,6 +65,24 @@ def trans_create(request):
     else:
         return render(request, 'user_management/login.html')
 
+
+@login_required
+def trans_create_credit(request):
+    if request.user.is_authenticated:
+        trans_c = Trans_Create_Credit()
+        if request.method == "POST":
+            trans_c = Trans_Create_Credit(request.POST)
+            if trans_c.is_valid():
+                trans_c.save()
+                return redirect('/trans')
+            else:
+                print(trans_c.errors)
+        content = {
+            "trans_c": trans_c
+        }
+        return render(request, 'user_management/trans_create_credit.html', content)
+    else:
+        return render(request, 'user_management/login.html')
 
 @login_required
 def transaction_view(request, id):
