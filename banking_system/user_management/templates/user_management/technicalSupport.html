@@ -1,20 +1,6 @@
-{% extends 't3_employee_home.html' %}
+{% extends 'homepage.html' %}
 {% block info %}
-<style>
-    th {
-        padding-top: 12px;
-        padding-bottom: 12px;
-        text-align: left;
-        background-color: gray;
-        color: white;
-    }
-
-    td, th {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-</style>
-<div class="container" style="margin-left: 200px">
+<div class="container">
     <div class="row">
         <div class="col">
             <div class="card">
@@ -23,7 +9,7 @@
                 </div>
                 <div class="card-body">
                     <h1>Request an Override</h1>
-                    <table class="table">
+                    <table class="table table-bordered">
                         <tr>
                             {% for header in users.headers %}
                             <th>{{ header }}</th>
@@ -35,13 +21,13 @@
                             <td>{{value}}</td>
                             {% endfor %}
                             <td>
-                                <button class="action btn btn-outline-primary">Request</button>
+                                <button class="action btn btn-primary btn-sm">Request</button>
                             </td>
                         </tr>
                         {% endfor %}
                     </table>
                     <h1>Current Override Requests</h1>
-                    <table class="table">
+                    <table class="table table-bordered">
                         <tr>
                             {% for header in override.headers %}
                             <th>{{ header }}</th>
@@ -55,11 +41,11 @@
                             {% with row|last as last %}
                                 {% if last == 'NEW' %}
                                 <td>
-                                    <button class="action btn btn-outline-primary">Delete</button>
+                                    <button class="action btn btn-danger btn-sm">Delete</button>
                                 </td>
                                 {% else %}
                                 <td>
-                                    <button class="action btn btn-outline-primary">Login</button>
+                                    <button class="action btn btn-success btn-sm">Login</button>
                                 </td>
                                 {% endif %}
                             {% endwith %}
