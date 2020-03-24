@@ -9,6 +9,34 @@ ACCOUNT_TYPE = (
     ("CHECKING", "CHECKING")
 )
 
+class StatetementManager:
+     def create_statement(self, start_date, end_date, user):
+        if not user:
+            raise ValueError('User not known')
+        if not start_date:
+            raise ValueError('User must enter start date')
+        if not end_date:
+            raise ValueError('Users must have an end date')
+        
+        statementRequest = self.model(
+            start_date = start_date,
+            end_date = end_date,
+            user = user
+        )
+
+        statementRequest.save(using=self._db)
+        return statementRequest
+
+
+class StatementRequest(models.Model):
+    request_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, related_name = "user_info", on_delete=models.CASCADE)
+    start_date = models.DateField(blank= False)
+    end_date = models.DateField(blank= False)
+    def __str__(self):
+        return "Statement Request ID: {0}   User: {1}  Start Date: {2} End Date: {3}".format(self.user.first_name, self.user.request_id, self.start_date, self.end_date)
+    objects = StatetementManager()
+
 
 class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
