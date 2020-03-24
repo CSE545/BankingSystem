@@ -1,0 +1,55 @@
+{% extends 't3_employee_home.html' %}
+{% block info %}
+<style>
+    th {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        text-align: left;
+        background-color: gray;
+        color: white;
+    }
+
+    td, th {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+</style>
+<div class="container" style="margin-left: 200px">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Account Override Requests
+                </div>
+                <div class="card-body">
+                    <h1>Request an Override</h1>
+                    {% for user in override_requests %}
+                        <p>You have a request from {{ user.name }} (userid: <span id="user-id">{{ user.id }}</span>) to assist you. Accept?</p>
+                        <button class="action btn btn-outline-primary">Accept</button>
+                        <button class="action btn btn-outline-primary">Deny</button>
+                        <br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+<script>
+    (function request() {
+        let action_map = {Accept: "ACCEPTED", Deny: "DENIED"};
+        $(".action").click(function (e) {
+            let action = action_map[e.target.textContent];
+            let user_id = $("#user-id").text();
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}', user_id, action},
+                success: function callback(response) {
+                    location.reload();
+                }
+            });
+        })
+    })()
+</script>
+{% endblock %}

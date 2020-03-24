@@ -9,6 +9,7 @@ ACCOUNT_TYPE = (
     ("CHECKING", "CHECKING")
 )
 
+
 class Account(models.Model):
     account_id = models.AutoField(primary_key=True)
     account_type = models.CharField(
@@ -27,5 +28,3 @@ class Account(models.Model):
                 Account Balance: {2},  User: {3}" \
                 .format(self.account_id, self.account_type,
                         self.account_balance, self.user_id.first_name + " " + self.user_id.last_name)
-
-
