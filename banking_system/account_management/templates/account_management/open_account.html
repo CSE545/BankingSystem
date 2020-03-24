@@ -9,6 +9,12 @@
                     Open bank account
                 </div>
                 <div class="card-body">
+
+                    {% if pending_request %}
+                    <div class="alert alert-danger">
+                        <p><strong>You already have a pending request. Wait for an employee to approve it.</strong></p>
+                    </div>
+                    {% else %}
                     <form method="POST">{% csrf_token %}
                         {% for field in bank_form %}
                             <div class="control-group">
@@ -22,6 +28,7 @@
                             {% endfor %}
                             <button style="margin-top: 10px" type="submit" class="btn btn-primary">Create</button>
                     </form>
+                    {% endif %}
                 </div>
             </div>
         </div>

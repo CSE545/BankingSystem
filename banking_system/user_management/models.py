@@ -27,6 +27,7 @@ REQUEST_STATUS = (
 # Create your models here.
 # Important to implement this for Django to Recognize
 
+
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, phone_number, password=None):
 
@@ -115,6 +116,9 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    def get_full_name(self):
+        return '{0} {1}'.format(self.first_name, self.last_name)
+
 
 class UserLogin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -123,6 +127,7 @@ class UserLogin(models.Model):
 
     def __str__(self):
         return "First name: {0}".format(self.user)
+
 
 class UserPendingApproval(models.Model):
     created_by = models.ForeignKey(
@@ -183,6 +188,7 @@ def login_failed(sender, credentials, request, **kwargs):
             user.userlogin.save()
     except User.DoesNotExist:
         print('Login failed: User does not exist')
+
 
 class employee_info_update(models.Model):
     user_id = models.IntegerField(blank=False, default=0)

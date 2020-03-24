@@ -58,21 +58,6 @@ class AccountRequests(models.Model):
         super(AccountRequests, self).__init__(*args, **kwargs)
         self.old_status = self.status
 
-    def save(self, force_insert=False, force_update=False):
-        if self.old_status == 'NEW':
-            if self.status == 'APPROVED':
-                Account.objects.create(
-                    account_type=self.account_type,
-                    user_id=self.user_id
-                )
-                self.delete()
-            else:
-                super(AccountRequests, self).save(force_insert, force_update)
-                self.old_status = self.status
-        else:
-            super(AccountRequests, self).save(force_insert, force_update)
-            self.old_status = self.status
-
     def __str__(self):
         return "Account Id: {0},  Account Type: {1},  \
                 Account Balance: {2},  User: {3}" \
