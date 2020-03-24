@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.signals import user_login_failed
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.signals import user_login_failed
 
 GENDER = (
     ("M", "MALE"),
@@ -23,6 +23,13 @@ REQUEST_STATUS = (
     ("APPROVED", "APPROVED"),
     ("REJECTED", "REJECTED"),
 )
+
+ACCOUNT_TYPE = (
+    ("SAVINGS", "SAVINGS"),
+    ("CREDIT", "CREDIT"),
+    ("CHECKING", "CHECKING")
+)
+
 
 # Create your models here.
 # Important to implement this for Django to Recognize
@@ -67,6 +74,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
 # created_at, last_login, is_admin, is_active, is_staff, is_superuser are mandatory fields.
 
 
@@ -101,9 +109,9 @@ class User(AbstractBaseUser):
     def __str__(self):
         return "First name: {0},  Last name: {1},  \
                 Email: {2},  Phone number: {3},  Gender: {4}" \
-                .format(self.first_name, self.last_name,
-                        self.email, self.phone_number,
-                        self.gender)
+            .format(self.first_name, self.last_name,
+                    self.email, self.phone_number,
+                    self.gender)
 
     # For checking permissions. to keep it simple all admin have ALL permissons
     def has_perm(self, perm, obj=None):
@@ -203,6 +211,16 @@ class employee_info_update(models.Model):
         null=True,
         blank=True
     )
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
+
+
+class OverrideRequest(models.Model):
+    for_id = models.IntegerField(null=False, blank=False)
+    requesting_id = models.IntegerField(null=False, blank=False)
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,

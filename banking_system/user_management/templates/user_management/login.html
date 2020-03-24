@@ -41,16 +41,16 @@
                         {% endif %}
 
                         {% for error in login_form.non_field_errors %}
-                        {% if error == "Invalid OTP." %}
-                        <div class="alert alert-error">
-                            <strong>Invalid OTP.</strong> <br />
-                        </div>
-                        {% endif %}
-                        {% if error == "Enter OTP you received via text" %}
-                        <div class="alert alert-success">
-                            <strong>Enter OTP you received via text</strong> <br />
-                        </div>
-                        {% endif %}
+                            {% if error == "Invalid OTP." %}
+                            <div class="alert alert-danger">
+                                <strong>Invalid OTP.</strong> <br/>
+                            </div>
+                            {% endif %}
+                            {% if error == "Enter OTP you received via text" %}
+                            <div class="alert alert-success">
+                                <strong>Enter OTP you received via text</strong> <br/>
+                            </div>
+                            {% endif %}
                         {% endfor %}
 
                         <button style="margin-bottom: 10px" type="submit" class="btn btn-primary">Login</button>

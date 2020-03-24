@@ -1,7 +1,7 @@
 import boto3
 import math
 import random
-from user_management.models import User, UserLogin
+from user_management.models import User
 
 
 def send_otp(otp, phone_number):

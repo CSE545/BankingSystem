@@ -8,6 +8,7 @@ REQUEST_STATUS = (
     ("REJECTED", "REJECTED"),
 )
 
+
 class FundTransfers(models.Model):
     request_id = models.AutoField(primary_key=True)
     from_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='from_account')

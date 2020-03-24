@@ -22,3 +22,4 @@ A skeleton  secure  banking  system  (SBS) with  limited  functional, performanc
   - Make the account active from the admin panel.
   - Restart the server: `python manage.py runserver`
   - You should now be able to login.
+  - The application now has a OTP functionality. To see the OTP sent, you can either go to the terminal where your local server is running or go to admin panel and check it in the User Login heading.
