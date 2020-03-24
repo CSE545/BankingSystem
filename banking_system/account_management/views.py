@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from account_management.forms import BankAccountForm
 from django.core.exceptions import PermissionDenied
-from account_management.models import AccountRequests
+from account_management.models import AccountRequests, Account
 from user_management.models import User
 from account_management.utility.manage_accounts import create_account_for_current_request
 # Create your views here.
@@ -17,9 +17,7 @@ def open_account(request):
             instance = form.save(commit=False)
             instance.user_id = request.user
             instance.save()
-            # context['request_received'] = True
-            return redirect('/accounts/profile')
-
+            context['request_received'] = True
     else:
         pending_requests = AccountRequests.objects.filter(
             user_id=request.user,
@@ -29,7 +27,24 @@ def open_account(request):
             context['pending_request'] = True
         form = BankAccountForm()
         context['bank_form'] = form
-        return render(request, 'account_management/open_account.html', context)
+    return render(request, 'account_management/open_account.html', context)
+
+
+@login_required
+def view_accounts(request):
+    context = {}
+    context['account_details'] = {
+        'headers': ['Account number', 'Account type', 'Account balance'],
+        'accounts': []
+    }
+    user_accounts = Account.objects.filter(user_id=request.user)
+    for acc in user_accounts:
+        context['account_details']['accounts'].append([
+            acc.account_id,
+            acc.account_type,
+            acc.account_balance
+        ])
+    return render(request, 'account_management/view_accounts.html', context)
 
 
 @login_required
@@ -40,7 +55,8 @@ def view_requests(request):
     if request.POST:
         if request.POST['status'] == 'APPROVE':
             user = User.objects.get(email=request.POST['email'])
-            create_account_for_current_request(user, request.POST['account_type'])
+            create_account_for_current_request(
+                user, request.POST['account_type'])
             AccountRequests.objects.filter(user_id=user).update(
                 status='APPROVED'
             )
