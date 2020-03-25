@@ -19,6 +19,23 @@ def transfers(request):
             form = FundTransferFormEmail(request.POST)
         elif request.POST['formId'] == 'PHONE':
             form = FundTransferFormPhone(request.POST)
+        context = {'formId': request.POST['formId']}
+        account_form = FundTransferForm()
+        email_form = FundTransferFormEmail()
+        phone_form = FundTransferFormPhone()
+        account_form.fields['from_account'].queryset = from_accounts
+        email_form.fields['from_account'].queryset = from_accounts
+        phone_form.fields['from_account'].queryset = from_accounts
+        form.fields['from_account'].queryset = from_accounts
+        context['account_form'] = account_form
+        context['email_form'] = email_form
+        context['phone_form'] = phone_form
+        if request.POST['formId'] == 'ACCOUNT':
+            context['account_form'] = form
+        elif request.POST['formId'] == 'EMAIL':
+            context['email_form'] = form
+        elif request.POST['formId'] == 'PHONE':
+            context['phone_form'] = form
         if form.is_valid():
             s = request.POST.dict()
             if s['formId'] == 'EMAIL':
@@ -29,30 +46,8 @@ def transfers(request):
             instance = form.save(commit=False)
             instance.transfer_type = s['formId']
             instance.save()
-            context = {}
             context['request_received'] = True
-            print('request_received')
-            return redirect('home')
-        else:
-            context = {'formId': request.POST['formId']}
-            account_form = FundTransferForm()
-            email_form = FundTransferFormEmail()
-            phone_form = FundTransferFormPhone()
-            account_form.fields['from_account'].queryset = from_accounts
-            email_form.fields['from_account'].queryset = from_accounts
-            phone_form.fields['from_account'].queryset = from_accounts
-            form.fields['from_account'].queryset = from_accounts
-            context['account_form'] = account_form
-            context['email_form'] = email_form
-            context['phone_form'] = phone_form
-            if request.POST['formId'] == 'ACCOUNT':
-                context['account_form'] = form
-            elif request.POST['formId'] == 'EMAIL':
-                context['email_form'] = form
-            elif request.POST['formId'] == 'PHONE':
-                context['phone_form'] = form
-            return render(request, 'transaction_management/transfers.html', context)
-
+        return render(request, 'transaction_management/transfers.html', context)
     else:
         context = {'formId': 'ACCOUNT'}
         account_form = FundTransferForm()
@@ -68,7 +63,7 @@ def transfers(request):
 
 
 def employee_check(user):
-    return user.user_type in ["T1", "T2", "T3"]
+    return user.user_type == "T2"
 
 
 @login_required

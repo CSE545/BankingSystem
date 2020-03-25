@@ -58,6 +58,8 @@ class FundTransferFormEmail(forms.ModelForm):
                 self._errors['to_email'] = self.error_class(['Enter a valid user email'])
             elif User.objects.get(email=self.cleaned_data.get('to_email')).primary_account is None:
                 self._errors['to_email'] = self.error_class(["There's no primary account set for the email entered"])
+            elif User.objects.get(email=self.cleaned_data.get('to_email')).primary_account.account_id == from_account_id.account_id:
+                self._errors['to_email'] = self.error_class(["Cannot transfer to the same account. Please change your primary account or use account number to transfer."])
         return self.cleaned_data 
             
     class Meta:
@@ -90,6 +92,8 @@ class FundTransferFormPhone(forms.ModelForm):
                 self._errors['to_phone'] = self.error_class(['Enter a valid user phone number']) 
             elif User.objects.get(phone_number=self.cleaned_data.get('to_phone')).primary_account is None:
                 self._errors['to_phone'] = self.error_class(["There's no primary account set for the phone number entered"])
+            elif User.objects.get(phone=self.cleaned_data.get('to_phone')).primary_account.account_id == from_account_id.account_id:
+                self._errors['to_phone'] = self.error_class(["Cannot transfer to the same account. Please change your primary account or use account number to transfer."])
         return self.cleaned_data 
             
     class Meta:
