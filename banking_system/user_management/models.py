@@ -252,3 +252,22 @@ class employee_info_update(models.Model):
         choices=REQUEST_STATUS,
         default='NEW'
     )
+
+class CustomerInfoUpdate(models.Model):
+    user_id = models.IntegerField(blank=False, default=0)
+    email = models.EmailField(verbose_name="email",
+                              max_length=60, null=True, blank=True)
+    first_name = models.CharField(max_length=100, null=True, blank=True)
+    last_name = models.CharField(max_length=100, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    gender = models.CharField(
+        max_length=6,
+        choices=GENDER,
+        null=True,
+        blank=True
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
