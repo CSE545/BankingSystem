@@ -11,7 +11,7 @@ from transaction_management.models import FundTransfers
 
 @login_required
 def transfers(request):
-    from_accounts = Account.objects.filter(user_id=request.user.user_id)
+    from_accounts = Account.objects.filter(user_id=request.user.user_id).exclude(account_type="CREDIT")
     if request.POST:
         if request.POST['formId'] == 'ACCOUNT':
             form = FundTransferForm(request.POST)

@@ -24,8 +24,10 @@ class FundTransferForm(forms.ModelForm):
                 'Insufficient funds']) 
         if 'to_account' in self.cleaned_data:
             to_account_id = self.cleaned_data.get('to_account') 
-            if from_account_id == to_account_id:
+            if from_account_id.account_id == to_account_id.account_id:
                 self._errors['to_account'] = self.error_class(['Cannot transfer to the same account']) 
+            if Account.objects.get(account_id=to_account_id.account_id).account_type == "CREDIT":
+                self._errors['to_account'] = self.error_class(['Cannot transfer to a credit account']) 
         return self.cleaned_data 
             
     class Meta:
