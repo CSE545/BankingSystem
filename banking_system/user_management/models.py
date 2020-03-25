@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.signals import user_login_failed
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.signals import user_login_failed
 
 GENDER = (
     ("M", "MALE"),
@@ -24,8 +24,16 @@ REQUEST_STATUS = (
     ("REJECTED", "REJECTED"),
 )
 
+ACCOUNT_TYPE = (
+    ("SAVINGS", "SAVINGS"),
+    ("CREDIT", "CREDIT"),
+    ("CHECKING", "CHECKING")
+)
+
+
 # Create your models here.
 # Important to implement this for Django to Recognize
+
 
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, phone_number, password=None):
@@ -66,6 +74,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
 # created_at, last_login, is_admin, is_active, is_staff, is_superuser are mandatory fields.
 
 
@@ -101,9 +110,9 @@ class User(AbstractBaseUser):
     def __str__(self):
         return "First name: {0},  Last name: {1},  \
                 Email: {2},  Phone number: {3},  Gender: {4}" \
-                .format(self.first_name, self.last_name,
-                        self.email, self.phone_number,
-                        self.gender)
+            .format(self.first_name, self.last_name,
+                    self.email, self.phone_number,
+                    self.gender)
 
     # For checking permissions. to keep it simple all admin have ALL permissons
     def has_perm(self, perm, obj=None):
@@ -116,6 +125,9 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    def get_full_name(self):
+        return '{0} {1}'.format(self.first_name, self.last_name)
+
 
 class UserLogin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -124,6 +136,7 @@ class UserLogin(models.Model):
 
     def __str__(self):
         return "First name: {0}".format(self.user)
+
 
 class UserPendingApproval(models.Model):
     created_by = models.ForeignKey(
@@ -155,7 +168,6 @@ class UserPendingApproval(models.Model):
 
     def save(self, force_insert=False, force_update=False):
         if self.old_status == 'NEW':
-            print('Status changed from NEW to {0}'.format(self.status))
             if self.status == 'APPROVED':
                 User.objects.filter(user_id=self.created_by.user_id).update(
                     email=self.email,
@@ -186,6 +198,7 @@ def login_failed(sender, credentials, request, **kwargs):
     except User.DoesNotExist:
         print('Login failed: User does not exist')
 
+
 class employee_info_update(models.Model):
     user_id = models.IntegerField(blank=False, default=0)
     email = models.EmailField(verbose_name="email",
@@ -199,6 +212,16 @@ class employee_info_update(models.Model):
         null=True,
         blank=True
     )
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
+
+
+class OverrideRequest(models.Model):
+    for_id = models.IntegerField(null=False, blank=False)
+    requesting_id = models.IntegerField(null=False, blank=False)
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,

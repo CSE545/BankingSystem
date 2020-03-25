@@ -1,18 +1,5 @@
-{% extends 'employee_home.html' %}
+{% extends 'homepage.html' %}
 {% block info %}
-<style>
-    th {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  text-align: left;
-  background-color: gray;
-  color: white;
-}
-td, th {
-  border: 1px solid #ddd;
-  padding: 8px;
-}
-</style>
 <div class="container">
     <div class="row">
         <div class="col">
@@ -22,7 +9,7 @@ td, th {
                 </div>
                 <div class="card-body">
                     <p id="error_msg" style="display:none"> {{pendingFundTransfersData.error}} </p>
-                    <table>
+                    <table class="table table-bordered">
                         <tr>
                             {% for header in pendingFundTransfersData.headers %}
                                 <th>{{ header }}</th>
@@ -33,8 +20,8 @@ td, th {
                                 {% for value in row %}
                                     <td>{{value}}</td>
                                 {% endfor %}
-                                <td><button class="action">Approve</button></td>
-                                <td><button class="action">Reject</button></td>
+                                <td><button class="action btn btn-success btn-sm">Approve</button></td>
+                                <td><button class="action btn btn-danger btn-sm">Reject</button></td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -46,7 +33,7 @@ td, th {
                     Approved/Rejected Fund Transfers
                 </div>
                 <div class="card-body">
-                    <table>
+                    <table class="table table-bordered">
                         <tr>
                             {% for header in actionedFundTransfersData.headers %}
                                 <th>{{ header }}</th>

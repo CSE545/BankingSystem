@@ -3,6 +3,7 @@ from transaction_management.models import FundTransfers
 from account_management.models import Account
 from user_management.models import User
 
+
 class FundTransferForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
@@ -36,6 +37,7 @@ class FundTransferForm(forms.ModelForm):
         # return any errors if found 
         return self.cleaned_data 
             
+
     class Meta:
         model = FundTransfers
         fields = ("from_account", "to_account", "amount", "status")
@@ -116,8 +118,3 @@ class FundTransferFormPhone(forms.ModelForm):
         model = FundTransfers
         fields = ("from_account", "to_phone", "amount", "status")
         widgets = {'status': forms.HiddenInput()}
-    
-
-
-    
-    
