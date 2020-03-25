@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.shortcuts import render, redirect
 from transaction_management.forms import FundTransferForm, Trans_Create, Transaction_main, Trans_Create_Credit
-from transaction_management.models import FundTransfers, EMP_Transaction, EMP_Transaction
+from transaction_management.models import FundTransfers, EMP_Transaction, EMP_Transaction_Create
 from account_management.models import AccountRequests
 
 
@@ -137,7 +137,7 @@ def transaction_details(request):
     request.method == "POST"
     acc_type= AccountRequests.objects.filter(account_type="Credit").count()
     if acc_type>0:
-        context = {'acc_type'}
+        context = {'acc_type':acc_type}
     else:
         context={}
     return render(request, 'transaction_management/trans_details.html', context)
