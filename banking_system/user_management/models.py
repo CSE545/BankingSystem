@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.signals import user_login_failed
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.signals import user_login_failed
 
 GENDER = (
     ("M", "MALE"),
@@ -30,8 +30,10 @@ ACCOUNT_TYPE = (
     ("CHECKING", "CHECKING")
 )
 
+
 # Create your models here.
 # Important to implement this for Django to Recognize
+
 
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, phone_number, password=None):
@@ -72,6 +74,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
 # created_at, last_login, is_admin, is_active, is_staff, is_superuser are mandatory fields.
 
 
@@ -106,9 +109,9 @@ class User(AbstractBaseUser):
     def __str__(self):
         return "First name: {0},  Last name: {1},  \
                 Email: {2},  Phone number: {3},  Gender: {4}" \
-                .format(self.first_name, self.last_name,
-                        self.email, self.phone_number,
-                        self.gender)
+            .format(self.first_name, self.last_name,
+                    self.email, self.phone_number,
+                    self.gender)
 
     # For checking permissions. to keep it simple all admin have ALL permissons
     def has_perm(self, perm, obj=None):
@@ -121,6 +124,9 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    def get_full_name(self):
+        return '{0} {1}'.format(self.first_name, self.last_name)
+
 
 class UserLogin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -129,48 +135,6 @@ class UserLogin(models.Model):
 
     def __str__(self):
         return "First name: {0}".format(self.user)
-
-class Bank_Account(models.Model):
-    account_id = models.AutoField(primary_key=True)
-    account_type = models.CharField(
-        max_length=15,
-        choices=ACCOUNT_TYPE
-    )
-    account_balance = models.FloatField(default=0.0)
-    approved_by = models.OneToOneField(User, on_delete=models.CASCADE, related_name='approved_by')
-    user_id = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name='userid')
-
-    def __init__(self, *args, **kwargs):
-        super(Bank_Account, self).__init__(*args, **kwargs)
-
-
-class FundTransferRequest(models.Model):
-    request_id = models.AutoField(primary_key=True)
-    from_account = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name='from_account')
-    to_account = models.ForeignKey(User, default=None, on_delete=models.CASCADE, related_name='to_account')
-    amount = models.FloatField(blank=False, null=False)
-    status = models.CharField(
-        max_length=10,
-        choices=REQUEST_STATUS,
-        default='NEW'
-    )
-
-    def __str__(self):
-        return "Created by: {0}, Status: {1}".format(self.from_account, self.status)
-
-    def __init__(self, *args, **kwargs):
-        super(FundTransferRequest, self).__init__(*args, **kwargs)
-        self.old_status = self.status
-
-    def save(self, force_insert=False, force_update=False):
-        if self.status != 'NEW':
-            print('Status changed from NEW to {0}'.format(self.status))
-            FundTransferRequest.objects.filter(request_id=self.request_id).update(
-                status=self.status
-            )
-            self.delete()
-        else:
-            super(FundTransferRequest, self).save(force_insert, force_update)
 
 
 class UserPendingApproval(models.Model):
@@ -203,7 +167,6 @@ class UserPendingApproval(models.Model):
 
     def save(self, force_insert=False, force_update=False):
         if self.old_status == 'NEW':
-            print('Status changed from NEW to {0}'.format(self.status))
             if self.status == 'APPROVED':
                 User.objects.filter(user_id=self.created_by.user_id).update(
                     email=self.email,
@@ -233,6 +196,7 @@ def login_failed(sender, credentials, request, **kwargs):
             user.userlogin.save()
     except User.DoesNotExist:
         print('Login failed: User does not exist')
+
 
 class employee_info_update(models.Model):
     user_id = models.IntegerField(blank=False, default=0)
@@ -266,6 +230,15 @@ class CustomerInfoUpdate(models.Model):
         null=True,
         blank=True
     )
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
+
+class OverrideRequest(models.Model):
+    for_id = models.IntegerField(null=False, blank=False)
+    requesting_id = models.IntegerField(null=False, blank=False)
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,

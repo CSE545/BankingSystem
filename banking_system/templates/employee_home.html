@@ -3,7 +3,7 @@
 <style>
     .sidenav {
   height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 200px; /* Set the width of the sidebar */
+  width: 10%; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 1; /* Stay on top */
   top: 40; /* Stay at the top */
@@ -49,7 +49,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-                <a class="nav-link" href="/accounts/pendingFundTransfers/">Fund Transfer Requests</a>
+                <a class="nav-link" href="/">Home</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="/accounts/profile/">Profile</a>
@@ -60,10 +60,11 @@
         </ul>
     </div>
 </nav>
-<div class="sidenav">
-    <a href="/accounts/pendingCustomerRequests/">Customer Info Update Requests</a>
-</div>
 <div>
+        <a href="/transactions/pendingFundTransfers/">Fund Transfer Requests</a>
+        <a href="/accounts/overrideRequests">Active Override Requests</a>
+        <a href="/accounts/pendingCustomerRequests/">Customer Info Update Requests</a>
+</div>
 <div>
     {% block info %}
     {% endblock %}

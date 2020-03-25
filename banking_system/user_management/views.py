@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
-from user_management.forms import RegistrationForm, LoginForm, EditForm, FundTransferForm
-from django.contrib.auth.decorators import login_required, user_passes_test
-from user_management.models import User, FundTransferRequest, employee_info_update, CustomerInfoUpdate
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from user_management.forms import RegistrationForm, LoginForm, EditForm
+from user_management.models import User, employee_info_update, OverrideRequest, CustomerInfoUpdate
+
 
 # Create your views here.
 
@@ -48,10 +49,10 @@ def register_view(request):
     if request.POST:
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            form.save()
             email = form.cleaned_data.get("email")
             raw_password = form.cleaned_data.get("password1")
-            user = authenticate(email=email, password=raw_password)
+            authenticate(email=email, password=raw_password)
             # login(request, user)
             # return redirect('home')
             context['created'] = True
@@ -82,53 +83,6 @@ def view_profile(request):
 
 
 @login_required
-def transfers(request):
-    if request.POST:
-        form = FundTransferForm(request.POST, request.user)
-        if form.is_valid():
-            instance = form.save(commit=False)
-            instance.save()
-            context = {}
-            context['request_received'] = True
-            print('request_received')
-            return redirect('home')
-    else:
-        context = {}
-        form = FundTransferForm(instance=request.user)
-        form.fields['from_account'].queryset = User.objects.filter(
-            user_id=request.user.user_id)
-        form.fields['to_account'].queryset = User.objects.exclude(
-            user_id=request.user.user_id)
-        context['transfer_form'] = form
-        return render(request, 'user_management/transfers.html', context)
-
-
-def employee_check(user):
-    return user.user_type in ["T1", "T2", "T3"]
-
-
-@login_required
-@user_passes_test(employee_check)
-def pendingFundTransfers(request):
-    if request.POST:
-        FundTransferRequest.objects.filter(request_id=int(
-            request.POST['request_id'])).update(status=request.POST['status'])
-        return render(request, 'user_management/pendingFundTransfers.html')
-    context = {}
-    context['pendingFundTransfersData'] = {
-        'headers': [u'transactionId', u'from_name', u'to_name', u'amount', u'status', u'approve', u'reject'],
-        'rows': []
-    }
-    for e in FundTransferRequest.objects.filter(status="NEW"):
-        context['pendingFundTransfersData']['rows'].append([e.request_id,
-                                                            e.from_account.first_name + " " + e.from_account.last_name,
-                                                            e.to_account.first_name + " " + e.to_account.last_name,
-                                                            e.amount,
-                                                            e.status])
-    return render(request, 'user_management/pendingFundTransfers.html', context)
-
-
-@login_required
 def edit_profile(request):
     if request.POST:
         form = EditForm(request.POST)
@@ -152,11 +106,13 @@ def edit_profile(request):
                 context['request_received'] = True
                 return render(request, 'customer_edit_request_submitted.html', context)
                 
+            ## For employees ##
             num_results = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
             if num_results > 0:
                 return render(request, 'employee_request_already_exists.html')
 
-            new_entry = employee_info_update(user_id=user_id, email=data.get('email'), first_name=data.get('first_name'),
+            new_entry = employee_info_update(user_id=user_id, email=data.get('email'),
+                                             first_name=data.get('first_name'),
                                              last_name=data.get('last_name'), phone_number=data.get('phone_number'),
                                              gender=data.get('gender'), status='NEW')
             new_entry.save()
@@ -173,6 +129,7 @@ def edit_profile(request):
         context['edit_form'] = form
         return render(request, 'user_management/edit_profile.html', context)
 
+
 @login_required
 def show_pending_employee_requests(request):
     if request.POST:
@@ -180,7 +137,8 @@ def show_pending_employee_requests(request):
             request.POST['user_id']), status='NEW').update(status=request.POST['status'])
 
         if request.POST['status'] == 'APPROVE':
-            user_object = User.objects.get(user_id=int(request.POST['user_id']))
+            user_object = User.objects.get(
+                user_id=int(request.POST['user_id']))
             user_object.email = request.POST['email_id']
             user_object.first_name = request.POST['first_name']
             user_object.last_name = request.POST['last_name']
@@ -191,7 +149,8 @@ def show_pending_employee_requests(request):
         return render(request, 'user_management/pendingEmployeeRequests.html')
     context = {}
     context['employee_info_update_request'] = {
-        'headers': [u'user_id', u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve', u'reject'],
+        'headers': [u'user_id', u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve',
+                    u'reject'],
         'rows': []
     }
 
@@ -231,3 +190,66 @@ def show_pending_customer_requests(request):
                                                                 e.phone_number,
                                                                 e.gender])
     return render(request, 'user_management/pendingCustomerRequests.html', context)
+
+@login_required
+def technicalSupport(request):
+    headers = [u"user_id", u"email", u"first_name", u"last_name", u"user_type"]
+
+    users = [[getattr(user, header) for header in headers] for user in User.objects.exclude(user_id=request.user.user_id)
+             if user.user_type in ["T1", "T2", "T3"]]
+
+    req_headers = [u"for_id", u"requesting_id", u"status"]
+    overrides = [[getattr(req, header) for header in req_headers] for req
+                 in OverrideRequest.objects.exclude(status="DENIED") if req.requesting_id == request.user.user_id]
+
+    context = {
+        "users": {
+            "headers": headers + ["Account Override"],
+            "rows": users
+        },
+        "override": {
+            "headers": req_headers + ["Action"],
+            "rows": overrides
+        }
+    }
+
+    if request.POST:
+        requesting_id = request.user.user_id
+        for_id = request.POST['user_id']
+        if request.POST["action"] == "REQUEST_ACCESS":
+            if OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").count() > 0:
+                return render(request, 'employee_request_already_exists.html')
+            else:
+                new_request = OverrideRequest(requesting_id=requesting_id, for_id=for_id)
+                new_request.save()
+        elif request.POST["action"] == "DELETE":
+            print(requesting_id, for_id)
+            OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").delete()
+
+    return render(request, 'user_management/technicalSupport.html', context)
+
+
+def override_request(request):
+    override_requests_for_user = OverrideRequest.objects.filter(for_id=request.user.user_id, status="NEW")
+    requesting_users = [{"name": "No Name", "id": req.requesting_id} for req in override_requests_for_user]
+    for user in requesting_users:
+        corresponding_user = User.objects.filter(user_id=user["id"])[0]
+        user["name"] = corresponding_user.first_name + " " + corresponding_user.last_name
+
+    context = {
+        "override_requests": requesting_users
+    }
+
+    if request.POST:
+        for_id = request.user.user_id
+        requesting_id = request.POST['user_id']
+        override = OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW")[0]
+
+        if request.POST["action"] == "ACCEPTED":
+            override.status = "ACCEPTED"
+            override.save()
+        elif request.POST["action"] == "DENIED":
+            override.status = "DENIED"
+            override.save()
+
+    return render(request, "user_management/overrideRequests.html", context)

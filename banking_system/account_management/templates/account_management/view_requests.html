@@ -1,0 +1,62 @@
+{% extends 'homepage.html' %}
+{% block info %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Account requests
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                {% for heading in account_requests.headers %}
+                                <th scope="col">{{ heading }}</th>
+                                {% endfor %}
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in account_requests.body %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                {% for value in data %}
+                                <td>{{ value }}</td>
+                                {% endfor %}
+
+                                <td>
+                                    <button type="button" class="btn btn-success btn-sm action">Approve</button>
+                                    <button type="button" class="btn btn-danger btn-sm action">Reject</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function on_action() {
+        let statusMap = { "Approve": "APPROVE", "Reject": "REJECT" };
+        $(".action").click(function (e) {
+            let status = statusMap[e.target.textContent];
+            let first_name = $($(e.target).parents('tr').children()[1]).text();
+            let last_name = $($(e.target).parents('tr').children()[2]).text();
+            let email = $($(e.target).parents('tr').children()[3]).text();
+            let account_type = $($(e.target).parents('tr').children()[4]).text();
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: { csrfmiddlewaretoken: '{{ csrf_token }}', status, first_name, last_name, email, account_type},
+                success: function callback(response) {
+                    location.reload();
+                }
+            });
+        })
+    })();
+</script>
+{% endblock %}
