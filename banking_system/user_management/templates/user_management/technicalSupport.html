@@ -43,10 +43,18 @@
                                 <td>
                                     <button class="action btn btn-danger btn-sm">Delete</button>
                                 </td>
+                                {% elif last == 'EXPIRED' %}
+                                    <td></td>
                                 {% else %}
-                                <td>
-                                    <button class="action btn btn-success btn-sm">Login</button>
-                                </td>
+                                    {% with row|first as id %}
+                                        <td>
+                                            <form action="/accounts/accountOverrideLogin/" method="POST">{% csrf_token %}
+                                                <input type="hidden" id="action" name="action" value='SEND_OTP'>
+                                                <input type="hidden" id="request-id" name="request-id" value='{{ id }}'>
+                                                <input type="submit" class="btn btn-success btn-sm" value="Login">
+                                            </form>
+                                        </td>
+                                    {% endwith %}
                                 {% endif %}
                             {% endwith %}
                         </tr>

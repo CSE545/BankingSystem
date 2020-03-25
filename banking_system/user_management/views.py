@@ -1,9 +1,9 @@
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from user_management.forms import RegistrationForm, LoginForm, EditForm
+from user_management.forms import RegistrationForm, LoginForm, EditForm, AccountOverrideLoginForm
 from user_management.models import User, employee_info_update, OverrideRequest
-
+from user_management.utility.twofa import generate_otp, get_user_phone_number, save_otp_in_db  # , send_otp
 
 # Create your views here.
 
@@ -152,7 +152,7 @@ def technicalSupport(request):
     users = [[getattr(user, header) for header in headers] for user in User.objects.exclude(user_id=request.user.user_id)
              if user.user_type in ["T1", "T2", "T3"]]
 
-    req_headers = [u"for_id", u"requesting_id", u"status"]
+    req_headers = [u"id", u"for_id", u"requesting_id", u"status"]
     overrides = [[getattr(req, header) for header in req_headers] for req
                  in OverrideRequest.objects.exclude(status="DENIED") if req.requesting_id == request.user.user_id]
 
@@ -179,8 +179,52 @@ def technicalSupport(request):
         elif request.POST["action"] == "DELETE":
             print(requesting_id, for_id)
             OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").delete()
+        elif request.POST["action"] == "LOGIN":
+            return render(request, "user_management/login.html")
 
     return render(request, 'user_management/technicalSupport.html', context)
+
+
+def override_login(request):
+    if request.POST:
+        if request.POST["action"] == "SEND_OTP":
+            otp = generate_otp()
+            request.session['_overrideOTP'] = otp
+            print(otp)
+            # Uncomment this once the sns credentials are added in twofa.py file
+            # send_otp(otp, request.user.phone_number)
+
+            request_id = request.POST["request-id"]
+            override = OverrideRequest.objects.get(pk=request_id)
+            override_for = User.objects.get(pk=override.for_id).email
+            override.status = "EXPIRED"
+            override.save()
+
+            context = {
+                "otp_form": AccountOverrideLoginForm(),
+                "override": {
+                    "for_email": override_for
+                }
+            }
+            return render(request, "user_management/overrideLogin.html", context)
+        elif request.POST["action"] == "LOGIN":
+            user_email = request.POST["overrideUser"]
+            otp = request.POST["otp"]
+            print("Overriding %s with OPT: %s" % (user_email, otp))
+            if otp != request.session["_overrideOTP"]:
+                context = {
+                    "otp_form": AccountOverrideLoginForm(),
+                    "override": {
+                        "for_email": user_email
+                    },
+                    "error": "Invalid OTP"
+                }
+                return render(request, "user_management/overrideLogin.html", context)
+            else:
+                logout(request)
+                user = User.objects.filter(email=user_email)[0]
+                login(request, user)
+                return redirect("/")
 
 
 def override_request(request):
