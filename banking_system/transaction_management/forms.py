@@ -3,9 +3,7 @@ from transaction_management.models import FundTransfers
 from account_management.models import Account
 from user_management.models import User
 
-
 class FundTransferForm(forms.ModelForm):
-    
     def __init__(self, *args, **kwargs):
         super(FundTransferForm, self).__init__(*args, **kwargs)
         for field in iter(self.fields):
@@ -17,7 +15,6 @@ class FundTransferForm(forms.ModelForm):
     def clean(self): 
         # data from the form is fetched using super function 
         super(FundTransferForm, self).clean() 
-          
         # extract the username and text field from the data 
         from_account_id = self.cleaned_data.get('from_account') 
         amount = self.cleaned_data.get('amount') 
@@ -37,7 +34,6 @@ class FundTransferForm(forms.ModelForm):
         # return any errors if found 
         return self.cleaned_data 
             
-
     class Meta:
         model = FundTransfers
         fields = ("from_account", "to_account", "amount", "status")
