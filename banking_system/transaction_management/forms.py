@@ -1,5 +1,5 @@
 from django import forms
-from transaction_management.models import FundTransfers
+from transaction_management.models import FundTransfers, EMP_Transaction, EMP_Transaction_Create
 from account_management.models import Account
 
 
@@ -36,3 +36,39 @@ class FundTransferForm(forms.ModelForm):
         model = FundTransfers
         fields = ("from_account", "to_account", "amount", "status")
         widgets = {'status': forms.HiddenInput()}
+
+
+class Transaction_main(forms.ModelForm):
+    class Meta:
+        model = EMP_Transaction
+        fields = {'action'}
+
+
+class Trans_Create(forms.ModelForm):
+    class Meta:
+        model = EMP_Transaction_Create
+        fields = {
+            'name',
+            'to',
+            'transaction_amount'
+        }
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "to": forms.TextInput(attrs={"class": "form-control"}),
+            "transaction_amount": forms.NumberInput(attrs={"class": "form-control"})
+        }
+
+class Trans_Create_Credit(forms.ModelForm):
+    class Meta:
+        model = EMP_Transaction_Create
+        fields = {
+            'name',
+            'to',
+            'transaction_amount_credit'
+        }
+        widgets = {
+            "name": forms.TextInput(attrs={"class": "form-control"}),
+            "to": forms.TextInput(attrs={"class": "form-control"}),
+            "transaction_amount_credit": forms.NumberInput(attrs={"class": "form-control"})
+        }
+
