@@ -59,4 +59,4 @@ class EMP_Transaction_Create(models.Model):
                                              verbose_name=u"Amount", help_text=u"Choose an amount to send...")
     
     def get_absolute_url(self):
-        return f"/trans/list/view/{self.id}/"
+        return f"/transactions/trans/list/view/{self.id}/"

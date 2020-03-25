@@ -13,19 +13,19 @@
                     <div class="container">
                         <div class="row">
                             <div class="col-sm">
-                                <form action="/trans/create/" method ='GET'>{%csrf_token%}
+                                <form action="/transactions/trans/create/" method ='GET'>{%csrf_token%}
                                     <button type='submit' class="btn btn-outline-primary">Debit-Card transactions</button>
                                 </form>
                             </div>
                             {% if acc_type %}
                             <div class="col-sm">
-                                <form method="POST" action="/trans/create_credit/">{%csrf_token%}
+                                <form method="POST" action="/transactions/trans/create_credit/">{%csrf_token%}
                                     <button type="submit" class="btn btn-outline-primary">Credit-Card transaction</button>
                                 </form>
                             </div>
                             {% else %}
                             <div class="col-sm">
-                                <form method="POST" action="/trans/no_create_credit/">{%csrf_token%}
+                                <form method="POST" action="/transactions/trans/no_create_credit/">{%csrf_token%}
                                     <button type="submit" class="btn btn-outline-primary">Credit-Card transaction</button>
                                 </form>
                             </div>

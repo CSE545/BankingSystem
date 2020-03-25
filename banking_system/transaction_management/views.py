@@ -166,7 +166,7 @@ def trans_create(request):
         trans_c = Trans_Create(request.POST)
         if trans_c.is_valid():
             trans_c.save()
-            return redirect('/trans')
+            return redirect('/transactions/trans')
         else:
             print(trans_c.errors)
     content = {
@@ -180,7 +180,7 @@ def trans_create_credit(request):
         trans_c = Trans_Create_Credit(request.POST)
         if trans_c.is_valid():
             trans_c.save()
-            return redirect('/trans')
+            return redirect('/transactions/trans')
         else:
             print(trans_c.errors)
     content = {
