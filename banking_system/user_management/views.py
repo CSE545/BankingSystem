@@ -148,8 +148,7 @@ def show_pending_employee_requests(request):
         return render(request, 'user_management/pendingEmployeeRequests.html')
     context = {}
     context['employee_info_update_request'] = {
-        'headers': [u'user_id', u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve',
-                    u'reject'],
+        'headers': [u'User id', u'Email', u'First_name', u'Last_name', u'Phone number', u'Gender', u'Action'],
         'rows': []
     }
 
@@ -179,7 +178,7 @@ def show_pending_customer_requests(request):
    
     context = {}
     context['customer_info_update_request'] = {
-        'headers': [u'user_id', u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve', u'reject'],
+        'headers': [u'User id', u'Email', u'First name', u'Last name', u'Phone number', u'Gender', u'Action'],
         'rows': []
     }
 
