@@ -9,11 +9,6 @@ from transaction_management.models import FundTransfers
 
 # Create your views here.
 
-# def load_to_accounts(request):
-#     from_account_id = request.GET.get('from_account_id')
-#     to_account = Account.objects.exclude(account_id=int(from_account_id))
-#     return render(request, 'transaction_management/to_account_dropdown_list_options.html', {'to_account': to_account})
-
 @login_required
 def transfers(request):
     from_accounts = Account.objects.filter(user_id=request.user.user_id)
@@ -39,7 +34,7 @@ def transfers(request):
             print('request_received')
             return redirect('home')
         else:
-            context = {}
+            context = {'formId': request.POST['formId']}
             account_form = FundTransferForm()
             email_form = FundTransferFormEmail()
             phone_form = FundTransferFormPhone()
@@ -59,7 +54,7 @@ def transfers(request):
             return render(request, 'transaction_management/transfers.html', context)
 
     else:
-        context = {}
+        context = {'formId': 'ACCOUNT'}
         account_form = FundTransferForm()
         email_form = FundTransferFormEmail()
         phone_form = FundTransferFormPhone()

@@ -16,6 +16,7 @@
 }
 </style>
 <div class="container">
+    <p id="activeId" style="display: none;">{{formId}}</p>
     <div class="row">
         <div class="col">
             <div class="card">
@@ -25,14 +26,14 @@
                 <div class="card-body">
                   <nav>
                     <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                      <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Account Transfer</a>
-                      <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Email Transfer</a>
-                      <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Phone Transfer</a>
+                      <a class="nav-item nav-link active" id="nav-account-tab" data-toggle="tab" href="#nav-account" role="tab" aria-controls="nav-account" aria-selected="true">Account Transfer</a>
+                      <a class="nav-item nav-link" id="nav-email-tab" data-toggle="tab" href="#nav-email" role="tab" aria-controls="nav-email" aria-selected="false">Email Transfer</a>
+                      <a class="nav-item nav-link" id="nav-phone-tab" data-toggle="tab" href="#nav-phone" role="tab" aria-controls="nav-phone" aria-selected="false">Phone Transfer</a>
                     </div>
                   </nav>
                   <div class="tab-content" id="nav-tabContent">
                     
-                    <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                    <div class="tab-pane fade show active" id="nav-account" role="tabpanel" aria-labelledby="nav-account-tab">
                       <form method="POST" id="accountTransfer" class="transferForm">
                         {% csrf_token %}
                         {% if account_form.errors %}
@@ -51,7 +52,7 @@
                         <button type="submit" class="btn btn-primary">Submit Request</button>
                     </form>
                     </div>
-                    <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                    <div class="tab-pane fade" id="nav-email" role="tabpanel" aria-labelledby="nav-email-tab">
                       <form method="POST" id="emailTransfer" class="transferForm">
                         {% csrf_token %}
                         {% if email_form.errors %}
@@ -70,7 +71,7 @@
                         <button type="submit" class="btn btn-primary">Submit Request</button>
                     </form>
                     </div>
-                    <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
+                    <div class="tab-pane fade" id="nav-phone" role="tabpanel" aria-labelledby="nav-phone-tab">
                       <form method="POST" id="phoneTransfer" class="transferForm">
                         {% csrf_token %}
                         {% if phone_form.errors %}
@@ -96,5 +97,10 @@
         </div>
     </div>
 </div>
+<script>
+  var activeMap = {'ACCOUNT':'#nav-account-tab', 'EMAIL': '#nav-email-tab', 'PHONE':'#nav-phone-tab'}
+  var selectedTab = activeMap[$('#activeId').text()];
+  $(selectedTab).tab('show')
 
+</script>
 {% endblock %}
