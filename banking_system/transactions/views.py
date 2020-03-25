@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from transactions.forms import  Trans_Create, Transaction_main, Trans_Create_Credit
 
 from .models import EMP_Transaction_Create
+from user_management.models import AccountRequests
 
 def transaction_main(request):
     """trans=Transaction_main()
@@ -34,8 +35,29 @@ def transaction_details(request):
         'trans':trans
     }"""
     request.method == "POST"
-    context = {}
+    acc_type= AccountRequests.objects.filter(account_type="Credit").count()
+    if acc_type>0:
+        context = {'acc_type'}
+    else:
+        context={}
     return render(request, 'transactions/trans_details.html', context)
+
+def no_transaction_details(request):
+    """trans=Transaction_main()
+    if request.method=="POST":
+        trans = Transaction_main(request.POST)
+        if trans.is_valid():
+            trans.save()
+            return redirect('/trans/create')
+        else:
+            print(trans.errors)
+    context={
+        'trans':trans
+    }"""
+    request.method == "POST"
+    context = {}
+    return render(request, 'transactions/no_trans_details.html', context)
+
 
 
 def trans_create(request):
