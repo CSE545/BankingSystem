@@ -1,0 +1,43 @@
+{% extends 'body.html' %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Register
+                </div>
+                <div class="card-body">{% csrf_token %}
+                    {% if created %}
+                    <div class="alert alert-primary" style="text-align: center;">
+                        <p>Request successfully submitted. An employee will soon activate the
+                            account</p>
+                        <form action="/accounts/login">
+                            <button class="btn btn-primary">Login</button>
+                        </form>
+                    </div>
+                    {% else %}
+                    <div>
+                        <form method="POST">{% csrf_token %}
+
+                            {% for field in registration_form %}
+                            <div class="control-group">
+                                <label class="control-label" for="username">{{ field.label_tag }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                <p style="color: red;">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+
+                            <button style="margin-top: 10px;" type="submit" class="btn btn-primary">Register</button>
+                            <p> <a href="/accounts/login">Login</a></p>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

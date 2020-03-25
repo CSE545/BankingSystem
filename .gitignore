@@ -1,0 +1,22 @@
+# Editors/IDE
+# ===========
+.vscode
+.idea
+
+# MacOS
+# =====
+.DS_Store
+
+# Python
+# ======
+__pycache__
+*.py[cod]
+*$py.class
+venv/
+
+# Django
+# ======
+*.log
+local_settings.py
+db.sqlite3
+migrations

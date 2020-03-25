@@ -1,0 +1,56 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    View
+                </div>
+                <div class="card-body">
+                    <form>
+                        <fieldset disabled>
+                            <div class="form-group">
+                                <label class="control-label">Email: </label>
+                                <input type="email" id="disabledTextInput" class="form-control"
+                                    placeholder="{{ user.email }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">First Name: </label>
+                                <input type="text" id="disabledTextInput" class="form-control"
+                                    placeholder="{{ user.first_name }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Last Name: </label>
+                                <input type="text" id="disabledTextInput" class="form-control"
+                                    placeholder="{{ user.last_name }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Phone: </label>
+                                <input type="text" id="disabledTextInput" class="form-control"
+                                    placeholder="{{ user.phone_number }}">
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label">Gender: </label>
+                                <input type="text" id="disabledTextInput" class="form-control"
+                                    placeholder="{{ user.gender }}">
+                            </div>
+                        </fieldset>
+                        {% if request_received %}
+                        <div class="alert alert-warning alert-dismissible fade show" style="text-align: center;">
+                            <p>Request successfully submitted. An employee will soon activate the
+                                account</p>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        {% endif %}
+                        <a class="btn btn-primary" href="/accounts/profile/edit/" role="button">Edit</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

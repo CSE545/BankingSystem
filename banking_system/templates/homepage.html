@@ -1,0 +1,87 @@
+{% extends 'body.html' %}
+{% block content %}
+<style>
+    #sidebar-wrapper {
+        min-height: 100vh;
+        margin-left: -15rem;
+        -webkit-transition: margin .25s ease-out;
+        -moz-transition: margin .25s ease-out;
+        -o-transition: margin .25s ease-out;
+        transition: margin .25s ease-out;
+    }
+
+    #sidebar-wrapper .sidebar-heading {
+        padding: 0.875rem 1.25rem;
+        font-size: 1.2rem;
+    }
+
+    #sidebar-wrapper .list-group {
+        width: 11rem;
+    }
+
+    #page-content-wrapper {
+        min-width: 100vw;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    @media (min-width: 768px) {
+        #sidebar-wrapper {
+            margin-left: 0;
+        }
+
+        #page-content-wrapper {
+            min-width: 0;
+            width: 100%;
+        }
+
+        #wrapper.toggled #sidebar-wrapper {
+            margin-left: -15rem;
+        }
+    }
+</style>
+<div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div class="bg-light border-right" id="sidebar-wrapper">
+        <div class="sidebar-heading">Banking System </div>
+        <div class="list-group list-group-flush">
+            {% if user_type == 'CUSTOMER' %}
+                {% include 'side_nav/side_nav_customer.html' %}
+            {% elif user_type == 'T3' %}
+                {% include 'side_nav/side_nav_t3.html' %}
+            {% elif user_type == 'T2' %}
+                {% include 'side_nav/side_nav_t2.html' %}
+            {% elif user_type == 'T1' %}
+                {% include 'side_nav/side_nav_employee.html' %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div id="page-content-wrapper">
+
+        <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                
+                {% if user_type == 'CUSTOMER' %}
+                    {% include 'top_nav/top_nav_customer.html' %}
+                {% elif user_type == 'T3' %}
+                    {% include 'top_nav/top_nav_t3.html' %}
+                {% elif user_type == 'T2' %}
+                    {% include 'top_nav/top_nav_t2.html' %}
+                {% elif user_type == 'T1' %}
+                    {% include 'top_nav/top_nav_employee.html' %}
+                {% endif %}
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            {% block info %}
+            {% endblock %}
+        </div>
+    </div>
+    {% endblock %}

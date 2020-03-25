@@ -1,0 +1,59 @@
+{% extends 'homepage.html' %}
+{% block info %}
+<style>
+  select option[disabled] {
+    display: none;
+}
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Fund Transfers
+                </div>
+                {% if transfer_form.errors %}
+                    {% for field in transfer_form %}
+                        {% for error in field.errors %}
+                            <div class="alert alert-danger">
+                                <strong>{{ error|escape }}</strong>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                {% endif %}
+                <div class="card-body">
+                    <form method="POST" id="TransferForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            {{ transfer_form.as_p }}
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+  <script>
+    $("#id_from_account").change(function () {
+      var from_account = $(this).val();
+      updateToAccount(from_account);
+      $('#id_to_account').val('');
+    });
+    function updateToAccount(from_account){
+      $('#id_to_account option').prop("disabled", false);
+      $('#id_to_account option[value="' + from_account + '"]').prop('disabled', true);
+      $('#id_to_account option').each(function() {
+        $(this).text($(this).text().replace(/Account Balance:(?:.*),/, ""));
+      });
+    }
+    var from_account = $('#id_from_account').val();
+    if(from_account) {
+      updateToAccount(from_account);
+    }
+
+  </script>
+
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'body.html' %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Login
+                </div>
+                <div class="card-body">
+                    <form method="POST">{% csrf_token %}
+                        {% for field in login_form %}
+
+                        {% if field.label != "Otp" %}
+                        <div class="form-group">
+                            <label class="control-label">{{ field.label_tag }}</label>
+                            {{ field }}
+                        </div>
+                        {% endif %}
+
+                        {% endfor %}
+                        {% if otp_sent %}
+                        <div class="form-group">
+                            <label for="{{ login_form.otp.id_for_label }}"
+                                class="control-label">{{ login_form.otp.label }}</label>
+                            {{ login_form.otp }}
+                        </div>
+                        {% endif %}
+
+                        {% if user_none %}
+                        <div class="alert alert-danger">
+                            <strong>Invalid credentials or user does not exist.</strong>
+                        </div>
+                        {% endif %}
+
+                        {% if inactive %}
+                        <div class="alert alert-danger">
+                            <strong>The account is not active yet.</strong>
+                        </div>
+                        {% endif %}
+
+                        {% for error in login_form.non_field_errors %}
+                            {% if error == "Invalid OTP." %}
+                            <div class="alert alert-danger">
+                                <strong>Invalid OTP.</strong> <br/>
+                            </div>
+                            {% endif %}
+                            {% if error == "Enter OTP you received via text" %}
+                            <div class="alert alert-success">
+                                <strong>Enter OTP you received via text</strong> <br/>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <button style="margin-bottom: 10px" type="submit" class="btn btn-primary">Login</button>
+                        <br>
+                        <p> <a href="/accounts/password_reset">Forgot password?</a></p>
+                        <p> <a href="/accounts/register">Sign up</a></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

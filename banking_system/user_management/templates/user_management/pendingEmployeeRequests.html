@@ -1,0 +1,67 @@
+{% extends 'homepage.html' %}
+{% block info %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Pending Employee Information Update Requests
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            {% for header in employee_info_update_request.headers %}
+                            <th>{{ header }}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for row in employee_info_update_request.rows %}
+                        <tr>
+                            {% for value in row %}
+                            <td>{{value}}</td>
+                            {% endfor %}
+                            <td>
+                                <button class="action btn btn-success btn-sm">Approve</button>
+                            </td>
+                            <td>
+                                <button class="action btn btn-danger btn-sm">Reject</button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function test() {
+        var statusMap = {"Approve": "APPROVE", "Reject": "REJECT"};
+        $(".action").click(function (e) {
+            var status = statusMap[e.target.textContent]
+            var user_id = $(e.target).parents('tr').children(":first").text()
+            var email_id = $($(e.target).parents('tr').children()[1]).text()
+            var first_name = $($(e.target).parents('tr').children()[2]).text()
+            var last_name = $($(e.target).parents('tr').children()[3]).text()
+            var phone_number = $($(e.target).parents('tr').children()[4]).text()
+            var gender = $($(e.target).parents('tr').children()[5]).text()
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    user_id,
+                    status,
+                    email_id,
+                    first_name,
+                    last_name,
+                    phone_number,
+                    gender
+                },
+                success: function callback(response) {
+                    location.reload();
+                }
+            });
+        })
+    })()
+</script>
+{% endblock %}
