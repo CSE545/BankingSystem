@@ -104,9 +104,8 @@ def edit_profile(request):
                 instance.save()
                 context = {}
                 context['request_received'] = True
-                return render(request, 'customer_edit_request_submitted.html', context)
-                
-            ## For employees ##
+                return render(request, 'customer_edit_request_submitted.html', context)                         
+            # For employees
             num_results = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
             if num_results > 0:
                 return render(request, 'employee_request_already_exists.html')
