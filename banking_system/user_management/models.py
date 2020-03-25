@@ -34,6 +34,7 @@ ACCOUNT_TYPE = (
 # Create your models here.
 # Important to implement this for Django to Recognize
 
+
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, first_name, last_name, phone_number, password=None):
 
@@ -123,6 +124,9 @@ class User(AbstractBaseUser):
     def has_module_perms(self, app_label):
         return True
 
+    def get_full_name(self):
+        return '{0} {1}'.format(self.first_name, self.last_name)
+
 
 class UserLogin(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
@@ -163,7 +167,6 @@ class UserPendingApproval(models.Model):
 
     def save(self, force_insert=False, force_update=False):
         if self.old_status == 'NEW':
-            print('Status changed from NEW to {0}'.format(self.status))
             if self.status == 'APPROVED':
                 User.objects.filter(user_id=self.created_by.user_id).update(
                     email=self.email,

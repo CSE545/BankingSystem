@@ -120,7 +120,8 @@ def show_pending_employee_requests(request):
             request.POST['user_id']), status='NEW').update(status=request.POST['status'])
 
         if request.POST['status'] == 'APPROVE':
-            user_object = User.objects.get(user_id=int(request.POST['user_id']))
+            user_object = User.objects.get(
+                user_id=int(request.POST['user_id']))
             user_object.email = request.POST['email_id']
             user_object.first_name = request.POST['first_name']
             user_object.last_name = request.POST['last_name']

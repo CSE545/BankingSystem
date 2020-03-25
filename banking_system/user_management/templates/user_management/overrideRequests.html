@@ -1,20 +1,6 @@
-{% extends 't3_employee_home.html' %}
+{% extends 'homepage.html' %}
 {% block info %}
-<style>
-    th {
-        padding-top: 12px;
-        padding-bottom: 12px;
-        text-align: left;
-        background-color: gray;
-        color: white;
-    }
-
-    td, th {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-</style>
-<div class="container" style="margin-left: 200px">
+<div class="container">
     <div class="row">
         <div class="col">
             <div class="card">
@@ -22,11 +8,11 @@
                     Account Override Requests
                 </div>
                 <div class="card-body">
-                    <h1>Request an Override</h1>
+                    <h1>Requested Overrides</h1>
                     {% for user in override_requests %}
                         <p>You have a request from {{ user.name }} (userid: <span id="user-id">{{ user.id }}</span>) to assist you. Accept?</p>
-                        <button class="action btn btn-outline-primary">Accept</button>
-                        <button class="action btn btn-outline-primary">Deny</button>
+                        <button class="action btn btn-success btn-sm">Accept</button>
+                        <button class="action btn btn-danger btn-sm">Deny</button>
                         <br>
                     {% endfor %}
                 </div>

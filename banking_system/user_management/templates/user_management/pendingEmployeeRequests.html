@@ -1,20 +1,6 @@
-{% extends 't3_employee_home.html' %}
+{% extends 'homepage.html' %}
 {% block info %}
-<style>
-    th {
-        padding-top: 12px;
-        padding-bottom: 12px;
-        text-align: left;
-        background-color: gray;
-        color: white;
-    }
-
-    td, th {
-        border: 1px solid #ddd;
-        padding: 8px;
-    }
-</style>
-<div class="container" style="margin-left: 200px">
+<div class="container">
     <div class="row">
         <div class="col">
             <div class="card">
@@ -22,7 +8,7 @@
                     Pending Employee Information Update Requests
                 </div>
                 <div class="card-body">
-                    <table class="table">
+                    <table class="table table-bordered">
                         <tr>
                             {% for header in employee_info_update_request.headers %}
                             <th>{{ header }}</th>
@@ -34,10 +20,10 @@
                             <td>{{value}}</td>
                             {% endfor %}
                             <td>
-                                <button class="action">Approve</button>
+                                <button class="action btn btn-success btn-sm">Approve</button>
                             </td>
                             <td>
-                                <button class="action">Reject</button>
+                                <button class="action btn btn-danger btn-sm">Reject</button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -47,7 +33,6 @@
         </div>
     </div>
 </div>
-<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
 <script>
     (function test() {
         var statusMap = {"Approve": "APPROVE", "Reject": "REJECT"};

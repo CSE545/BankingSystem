@@ -13,6 +13,7 @@ from transaction_management.models import FundTransfers
 #     to_account = Account.objects.exclude(account_id=int(from_account_id))
 #     return render(request, 'transaction_management/to_account_dropdown_list_options.html', {'to_account': to_account})
 
+
 @login_required
 def transfers(request):
     if request.POST:
@@ -32,7 +33,8 @@ def transfers(request):
     else:
         context = {}
         form = FundTransferForm(instance=request.user)
-        form.fields['from_account'].queryset = Account.objects.filter(user_id=request.user.user_id)
+        form.fields['from_account'].queryset = Account.objects.filter(
+            user_id=request.user.user_id)
         # form.fields['to_account'].queryset = Account.objects.only('account_balance')
         context['transfer_form'] = form
         return render(request, 'transaction_management/transfers.html', context)
@@ -47,9 +49,11 @@ def employee_check(user):
 def pendingFundTransfers(request):
     if request.POST:
         context = {"pendingFundTransfersData": {"error": ""}}
-        curFundObj = FundTransfers.objects.get(request_id=int(request.POST['request_id']))
+        curFundObj = FundTransfers.objects.get(
+            request_id=int(request.POST['request_id']))
         if (request.POST['status'] == "APPROVED"):
-            curBal = Account.objects.get(account_id=curFundObj.from_account_id).account_balance
+            curBal = Account.objects.get(
+                account_id=curFundObj.from_account_id).account_balance
             if curBal >= curFundObj.amount:
                 FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(
                     status=request.POST['status'])
@@ -59,7 +63,8 @@ def pendingFundTransfers(request):
                     account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
             else:
                 context["pendingFundTransfersData"]["error"] = "Rejected: Insufficient funds"
-                FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(status="REJECTED")
+                FundTransfers.objects.filter(request_id=int(
+                    request.POST['request_id'])).update(status="REJECTED")
 
         else:
             FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(

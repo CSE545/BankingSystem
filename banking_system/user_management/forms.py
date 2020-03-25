@@ -36,7 +36,10 @@ class LoginForm(AuthenticationForm):
 
     def clean(self):
         otp = generate_otp()
-        print('otp', otp)
+        if '_otp' in self.request.session:
+            print(self.request.session['_otp'])
+        else:
+            print('otp', otp)
         cleaned_data = super().clean()
         user = get_user_phone_number(cleaned_data['username'])
         # Uncomment this once the sns credentials are added in twofa.py file
