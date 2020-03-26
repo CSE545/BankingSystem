@@ -23,9 +23,18 @@
                                 {% for value in data %}
                                     {% if forloop.counter == 1%}
                                         <td>{{ value }}</td>
-                                    {% else %} 
+                                    {% elif forloop.counter == 4%} 
+                                        {% if value == 0%}
+                                        <td><button id="makePrimary" class="btn btn-primary btn-sm">Make primary</button></td>
+                                        {% elif value == -1 %}
+                                        <td>Credit Account</td>
+                                        {% else %}
+                                        <td>Primary Account</td>
+                                        {% endif %}
+                                    {% else %}
                                         <td>{{ value }}</td>
                                     {% endif %}
+                                    
                                 {% endfor %}
                             </tr>
                             {% endfor %}
@@ -39,6 +48,22 @@
 <script type="text/javascript">
     $(function () {
         $("[rel='tooltip']").tooltip();
+
+
+        $("#makePrimary").click(function (e) {
+            let account_num = $($(e.target).parents('tr').children()[0]).text();
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: { csrfmiddlewaretoken: '{{ csrf_token }}', account_num},
+                success: function callback(response) {
+                    location.reload();
+                }
+            });
+        })
+
+
+
     });
 </script>
 {% endblock %}

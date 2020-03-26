@@ -23,7 +23,7 @@ def send_otp(otp, phone_number):
 
 
 def generate_otp():
-    digits = "0123456789"
+    digits = "123456789"
     OTP = ""
 
     for i in range(4):

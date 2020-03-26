@@ -5,16 +5,16 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    Pending Employee Information Update Requests
+                    Pending customer information update requests
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
                         <tr>
-                            {% for header in employee_info_update_request.headers %}
+                            {% for header in customer_info_update_request.headers %}
                             <th>{{ header }}</th>
                             {% endfor %}
                         </tr>
-                        {% for row in employee_info_update_request.rows %}
+                        {% for row in customer_info_update_request.rows %}
                         <tr>
                             {% for value in row %}
                             <td>{{value}}</td>
