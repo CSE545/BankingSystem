@@ -176,7 +176,7 @@ def criticalPendingFundTransfers(request):
             'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status'],
             'rows': []
         }
-        for e in FundTransfers.objects.filter(~Q(status="NEW")).filter(amount__gte= 1000):
+        for e in FundTransfers.objects.filter(~Q(status="NEW")).filter(amount__gte=1000):
             context['actionedFundTransfersData']['rows'].append([
                 e.request_id,
                 str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
