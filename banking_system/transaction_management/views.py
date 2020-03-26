@@ -4,7 +4,7 @@ from transaction_management.forms import FundTransferForm, FundTransferFormEmail
 from user_management.models import User
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from transaction_management.forms import FundTransferForm, Trans_Create, Transaction_main, Trans_Create_Credit
+from transaction_management.forms import FundTransferForm, Trans_Create, Transaction_main,
 from transaction_management.models import FundTransfers, EMP_Transaction, EMP_Transaction_Create
 from account_management.models import AccountRequests
 
@@ -249,8 +249,6 @@ def no_transaction_details(request):
     request.method == "POST"
     context = {}
     return render(request, 'transaction_management/no_trans_details.html', context)
-
-
 
 
 def transaction_view(request, id):
