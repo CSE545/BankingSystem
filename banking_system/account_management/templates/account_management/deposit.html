@@ -10,7 +10,13 @@
                 </div>
                 <div class="card-body">
                     {% if select_account %}
-                        {{user_accounts}}
+                    {{user_accounts}}
+                    {% for account in user_accounts.data %}
+                    <option value="{{account.account_number}}">
+                        {{org.name|capfirst}}
+                    </option>
+                    {% endfor %}
+
                     {% else %}
 
                     {% endif %}

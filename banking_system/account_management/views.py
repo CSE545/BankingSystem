@@ -41,7 +41,6 @@ def view_accounts(request):
         'accounts': []
     }
     user_accounts = Account.objects.filter(user_id=request.user)
-    print(user_accounts)
     primary_account = User.objects.get(
         user_id=request.user.user_id).primary_account
     primary_account_id = primary_account.account_id if primary_account else None
@@ -99,13 +98,20 @@ def deposit(request):
     if request.POST:
         pass
     else:
-        context['user_accounts'] = []
+        context['user_accounts'] = {
+            'headers': ['Account number', 'Account type', 'Account balance'],
+            'data': []
+        }
         context['select_account'] = True
         user_accounts = Account.objects.filter(
             user_id=request.user,
             account_type__in=["SAVINGS", "CHECKING"])
         for account in user_accounts:
-            print(account)
+            context['user_accounts']['data'].append([
+                account.account_id,
+                account.account_type,
+                account.account_balance
+            ])
     return render(request, 'account_management/deposit.html', context)
 
 
