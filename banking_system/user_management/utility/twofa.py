@@ -27,7 +27,7 @@ def generate_otp():
     OTP = ""
 
     for i in range(4):
-        OTP += digits[math.floor(random.random() * 10)]
+        OTP += digits[random.randrange(0, 9, 1)]
 
     return OTP
 
