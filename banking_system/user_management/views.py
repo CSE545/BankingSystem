@@ -189,44 +189,61 @@ def show_pending_customer_requests(request):
                                                                 e.gender])
     return render(request, 'user_management/pendingCustomerRequests.html', context)
 
-@login_required
-def technicalSupport(request):
+
+def userID_to_human_readable(userID):
+    user = User.objects.get(pk=userID)
+    return "%s, %s (%s)" % (user.last_name, user.first_name, user.email)
+
+
+def generate_support_context(request, errors=""):
     headers = [u"user_id", u"email", u"first_name", u"last_name", u"user_type"]
+    cleaned_headers = [u"User ID", u"Email", u"First Name", u"Last Name", u"User Type"]
 
     users = [[getattr(user, header) for header in headers] for user in User.objects.exclude(user_id=request.user.user_id)
              if user.user_type in ["T1", "T2", "T3"]]
 
     req_headers = [u"id", u"for_id", u"requesting_id", u"status"]
+    cleaned_req_headers = [u"Request ID", u"Request For", u"Requesting Admin", u"Status"]
     overrides = [[getattr(req, header) for header in req_headers] for req
                  in OverrideRequest.objects.exclude(status="DENIED") if req.requesting_id == request.user.user_id]
 
-    context = {
+    for override in overrides:
+        for_id_index = req_headers.index("for_id")
+        req_id_index = req_headers.index("requesting_id")
+        override[for_id_index] = userID_to_human_readable(for_id_index)
+        override[req_id_index] = userID_to_human_readable(req_id_index)
+
+    return {
         "users": {
-            "headers": headers + ["Account Override"],
+            "headers": cleaned_headers + ["Account Override"],
             "rows": users
         },
         "override": {
-            "headers": req_headers + ["Action"],
-            "rows": overrides
-        }
+            "headers": cleaned_req_headers + ["Action"],
+            "rows": overrides,
+        },
+        "errors": errors
     }
 
+@login_required
+def technical_support(request):
+
     if request.POST:
-        requesting_id = request.user.user_id
-        for_id = request.POST['user_id']
         if request.POST["action"] == "REQUEST_ACCESS":
+            requesting_id = request.user.user_id
+            for_id = request.POST['user_id']
             if OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").count() > 0:
-                return render(request, 'employee_request_already_exists.html')
+                print("error", generate_support_context(request, "REQUEST_EXISTS"))
+                return render(request, 'user_management/technicalSupport.html',
+                              generate_support_context(request, "REQUEST_EXISTS"))
             else:
                 new_request = OverrideRequest(requesting_id=requesting_id, for_id=for_id)
                 new_request.save()
         elif request.POST["action"] == "DELETE":
-            print(requesting_id, for_id)
-            OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").delete()
-        elif request.POST["action"] == "LOGIN":
-            return render(request, "user_management/login.html")
+            print(request.POST)
+            OverrideRequest.objects.filter(id=request.POST["request-id"])[0].delete()
 
-    return render(request, 'user_management/technicalSupport.html', context)
+    return render(request, 'user_management/technicalSupport.html', generate_support_context(request))
 
 
 def override_login(request):
