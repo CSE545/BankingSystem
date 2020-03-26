@@ -101,7 +101,8 @@ class User(AbstractBaseUser):
         max_length=20,
         choices=USER_TYPE
     )
-    primary_account = models.ForeignKey('account_management.Account', default=None, on_delete=models.CASCADE, null=True, blank=True)
+    primary_account = models.ForeignKey(
+        'account_management.Account', default=None, on_delete=models.CASCADE, null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name',
                        'last_name', 'password', 'phone_number']
@@ -248,6 +249,7 @@ class employee_info_update(models.Model):
         default='NEW'
     )
 
+
 class CustomerInfoUpdate(models.Model):
     user_id = models.IntegerField(blank=False, default=0)
     email = models.EmailField(verbose_name="email",
@@ -266,6 +268,7 @@ class CustomerInfoUpdate(models.Model):
         choices=REQUEST_STATUS,
         default='NEW'
     )
+
 
 class OverrideRequest(models.Model):
     for_id = models.IntegerField(null=False, blank=False)

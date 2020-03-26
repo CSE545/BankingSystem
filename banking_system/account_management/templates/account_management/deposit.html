@@ -1,0 +1,24 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Depost
+                </div>
+                <div class="card-body">
+                    {% if select_account %}
+                        {{user_accounts}}
+                    {% else %}
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+</script>
+{% endblock %}
