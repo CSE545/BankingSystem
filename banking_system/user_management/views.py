@@ -210,8 +210,8 @@ def generate_support_context(request, errors=""):
     for override in overrides:
         for_id_index = req_headers.index("for_id")
         req_id_index = req_headers.index("requesting_id")
-        override[for_id_index] = userID_to_human_readable(for_id_index)
-        override[req_id_index] = userID_to_human_readable(req_id_index)
+        override[for_id_index] = userID_to_human_readable(override[for_id_index])
+        override[req_id_index] = userID_to_human_readable(override[req_id_index])
 
     return {
         "users": {
@@ -233,7 +233,6 @@ def technical_support(request):
             requesting_id = request.user.user_id
             for_id = request.POST['user_id']
             if OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").count() > 0:
-                print("error", generate_support_context(request, "REQUEST_EXISTS"))
                 return render(request, 'user_management/technicalSupport.html',
                               generate_support_context(request, "REQUEST_EXISTS"))
             else:
