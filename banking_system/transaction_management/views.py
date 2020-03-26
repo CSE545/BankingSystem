@@ -128,6 +128,71 @@ def pendingFundTransfers(request):
             ])
         return render(request, 'transaction_management/pendingFundTransfers.html', context)
 
+@login_required
+def trans_create(request):
+    from_accounts = Account.objects.filter(user_id=request.user.user_id).exclude(account_type="CREDIT")
+    if request.POST:
+        if request.POST['formId'] == 'ACCOUNT':
+            form = FundTransferForm(request.POST)
+        context = {'formId': request.POST['formId']}
+        account_form = FundTransferForm()
+        account_form.fields['from_account'].queryset = from_accounts
+        form.fields['from_account'].queryset = from_accounts
+        context['account_form'] = account_form
+        if request.POST['formId'] == 'ACCOUNT':
+            context['account_form'] = form
+        if form.is_valid():
+            s = request.POST.dict()
+            if s['formId'] == 'ACCOUNT':
+                s['to_account'] = User.objects.get(account=s['to_account']).primary_account
+            form = FundTransferForm(s, request.user)
+            instance = form.save(commit=False)
+            instance.transfer_type = s['formId']
+            instance.save()
+            context['request_received'] = True
+        return render(request, 'transaction_management/trans_create.html', context)
+    else:
+        context = {'formId': 'ACCOUNT'}
+        account_form = FundTransferForm()
+        email_form = FundTransferFormEmail()
+        phone_form = FundTransferFormPhone()
+        account_form.fields['from_account'].queryset = from_accounts
+        context['account_form'] = account_form
+        return render(request, 'transaction_management/trans_create.html', context)
+
+@login_required
+def trans_create_credit(request):
+    from_accounts = Account.objects.filter(user_id=request.user.user_id)
+    if request.POST:
+        if request.POST['formId'] == 'ACCOUNT':
+            form = FundTransferForm(request.POST)
+        context = {'formId': request.POST['formId']}
+        account_form = FundTransferForm()
+        account_form.fields['from_account'].queryset = from_accounts
+        form.fields['from_account'].queryset = from_accounts
+        context['account_form'] = account_form
+        if request.POST['formId'] == 'ACCOUNT':
+            context['account_form'] = form
+        if form.is_valid():
+            s = request.POST.dict()
+            if s['formId'] == 'ACCOUNT':
+                s['to_account'] = User.objects.get(account=s['to_account']).primary_account
+            form = FundTransferForm(s, request.user)
+            instance = form.save(commit=False)
+            instance.transfer_type = s['formId']
+            instance.save()
+            context['request_received'] = True
+        return render(request, 'transaction_management/trans_create_credit.html', context)
+    else:
+        context = {'formId': 'ACCOUNT'}
+        account_form = FundTransferForm()
+        email_form = FundTransferFormEmail()
+        phone_form = FundTransferFormPhone()
+        account_form.fields['from_account'].queryset = from_accounts
+        context['account_form'] = account_form
+        return render(request, 'transaction_management/trans_create_credit.html', context)
+
+
 
 def transaction_main(request):
     """trans=Transaction_main()
@@ -144,6 +209,9 @@ def transaction_main(request):
     request.method == "POST"
     context = {}
     return render(request, 'transaction_management/trans_main.html', context)
+
+
+
 
 def transaction_details(request):
     """trans=Transaction_main()
@@ -165,6 +233,7 @@ def transaction_details(request):
         context={}
     return render(request, 'transaction_management/trans_details.html', context)
 
+
 def no_transaction_details(request):
     """trans=Transaction_main()
     if request.method=="POST":
@@ -182,34 +251,6 @@ def no_transaction_details(request):
     return render(request, 'transaction_management/no_trans_details.html', context)
 
 
-
-def trans_create(request):
-    trans_c = Trans_Create()
-    if request.method == "POST":
-        trans_c = Trans_Create(request.POST)
-        if trans_c.is_valid():
-            trans_c.save()
-            return redirect('/transactions/trans')
-        else:
-            print(trans_c.errors)
-    content = {
-        "trans_c": trans_c
-    }
-    return render(request, 'transaction_management/trans_create.html', content)
-
-def trans_create_credit(request):
-    trans_c = Trans_Create_Credit()
-    if request.method == "POST":
-        trans_c = Trans_Create_Credit(request.POST)
-        if trans_c.is_valid():
-            trans_c.save()
-            return redirect('/transactions/trans')
-        else:
-            print(trans_c.errors)
-    content = {
-        "trans_c": trans_c
-    }
-    return render(request, 'transaction_management/trans_create_credit.html', content)
 
 
 def transaction_view(request, id):
