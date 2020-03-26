@@ -205,7 +205,7 @@ def generate_support_context(request, errors=""):
     req_headers = [u"id", u"for_id", u"requesting_id", u"status"]
     cleaned_req_headers = [u"Request ID", u"Request For", u"Requesting Admin", u"Status"]
     overrides = [[getattr(req, header) for header in req_headers] for req
-                 in OverrideRequest.objects.exclude(status="DENIED") if req.requesting_id == request.user.user_id]
+                 in OverrideRequest.objects.all() if req.requesting_id == request.user.user_id]
 
     for override in overrides:
         for_id_index = req_headers.index("for_id")
