@@ -58,17 +58,5 @@ class Trans_Create(forms.ModelForm):
             "transaction_amount": forms.NumberInput(attrs={"class": "form-control"})
         }
 
-class Trans_Create_Credit(forms.ModelForm):
-    class Meta:
-        model = EMP_Transaction_Create
-        fields = {
-            'name',
-            'to',
-            'transaction_amount_credit'
-        }
-        widgets = {
-            "name": forms.TextInput(attrs={"class": "form-control"}),
-            "to": forms.TextInput(attrs={"class": "form-control"}),
-            "transaction_amount_credit": forms.NumberInput(attrs={"class": "form-control"})
-        }
+
 

@@ -2,7 +2,7 @@ from account_management.models import Account
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.shortcuts import render, redirect
-from transaction_management.forms import FundTransferForm, Trans_Create, Transaction_main, Trans_Create_Credit
+from transaction_management.forms import FundTransferForm, Trans_Create, Transaction_main,
 from transaction_management.models import FundTransfers, EMP_Transaction, EMP_Transaction_Create
 from account_management.models import AccountRequests
 
@@ -175,9 +175,9 @@ def trans_create(request):
     return render(request, 'transaction_management/trans_create.html', content)
 
 def trans_create_credit(request):
-    trans_c = Trans_Create_Credit()
+    trans_c = Trans_Create()
     if request.method == "POST":
-        trans_c = Trans_Create_Credit(request.POST)
+        trans_c = Trans_Create(request.POST)
         if trans_c.is_valid():
             trans_c.save()
             return redirect('/transactions/trans')
