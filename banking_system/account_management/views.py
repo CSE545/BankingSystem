@@ -33,14 +33,17 @@ def open_account(request):
 @login_required
 def view_accounts(request):
     if request.POST:
-        User.objects.filter(user_id=request.user.user_id).update(primary_account=request.POST['account_num'])
+        User.objects.filter(user_id=request.user.user_id).update(
+            primary_account=request.POST['account_num'])
     context = {}
     context['account_details'] = {
         'headers': ['Account number', 'Account type', 'Account balance', 'Action'],
         'accounts': []
     }
     user_accounts = Account.objects.filter(user_id=request.user)
-    primary_account = User.objects.get(user_id=request.user.user_id).primary_account
+    print(user_accounts)
+    primary_account = User.objects.get(
+        user_id=request.user.user_id).primary_account
     primary_account_id = primary_account.account_id if primary_account else None
     for acc in user_accounts:
         if acc.account_type == "CREDIT":
@@ -88,3 +91,25 @@ def view_requests(request):
             pr.account_type
         ])
     return render(request, 'account_management/view_requests.html', context)
+
+
+@login_required
+def deposit(request):
+    context = {}
+    if request.POST:
+        pass
+    else:
+        context['user_accounts'] = []
+        context['select_account'] = True
+        user_accounts = Account.objects.filter(
+            user_id=request.user,
+            account_type__in=["SAVINGS", "CHECKING"])
+        for account in user_accounts:
+            print(account)
+    return render(request, 'account_management/deposit.html', context)
+
+
+@login_required
+def withdraw(request):
+    context = {}
+    return render(request, 'account_management/withdraw.html', context)
