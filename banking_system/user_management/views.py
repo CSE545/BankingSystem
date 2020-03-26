@@ -2,7 +2,7 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from user_management.forms import RegistrationForm, LoginForm, EditForm
-from user_management.models import User, employee_info_update, OverrideRequest
+from user_management.models import User, employee_info_update, OverrideRequest, CustomerInfoUpdate
 
 
 # Create your views here.
@@ -89,7 +89,23 @@ def edit_profile(request):
         if form.is_valid():
             data = request.POST.copy()
             user_id = int(request.user.user_id)
-
+            
+            if request.user.user_type == 'CUSTOMER':
+                num_results = CustomerInfoUpdate.objects.filter(user_id=user_id, status='NEW').count()
+                if num_results > 0:
+                    return render(request, 'customer_request_already_exists.html')
+            
+                new_entry = CustomerInfoUpdate(user_id=user_id, email=data.get('email'), first_name=data.get('first_name'),
+                                               last_name=data.get('last_name'), phone_number=data.get('phone_number'),
+                                               gender=data.get('gender'), status='NEW')
+                new_entry.save()
+                instance = form.save(commit=False)
+                instance.created_by = request.user
+                instance.save()
+                context = {}
+                context['request_received'] = True
+                return render(request, 'customer_edit_request_submitted.html', context)                         
+            # For employees
             num_results = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
             if num_results > 0:
                 return render(request, 'employee_request_already_exists.html')
@@ -132,8 +148,7 @@ def show_pending_employee_requests(request):
         return render(request, 'user_management/pendingEmployeeRequests.html')
     context = {}
     context['employee_info_update_request'] = {
-        'headers': [u'user_id', u'email', u'first_name', u'last_name', u'phone_number', u'gender', u'approve',
-                    u'reject'],
+        'headers': [u'User id', u'Email', u'First_name', u'Last_name', u'Phone number', u'Gender', u'Action'],
         'rows': []
     }
 
@@ -144,6 +159,35 @@ def show_pending_employee_requests(request):
                                                                 e.gender])
     return render(request, 'user_management/pendingEmployeeRequests.html', context)
 
+@login_required
+def show_pending_customer_requests(request):
+    if request.POST:
+        CustomerInfoUpdate.objects.filter(user_id=int(
+            request.POST['user_id']), status='NEW').update(status=request.POST['status'])
+
+        if request.POST['status'] == 'APPROVE':
+            user_object = User.objects.get(user_id=int(request.POST['user_id']))
+            user_object.email = request.POST['email_id']
+            user_object.first_name = request.POST['first_name']
+            user_object.last_name = request.POST['last_name']
+            user_object.phone_number = request.POST['phone_number']
+            user_object.gender = request.POST['gender']
+            user_object.save()
+
+        return render(request, 'user_management/pendingCustomerRequests.html')
+   
+    context = {}
+    context['customer_info_update_request'] = {
+        'headers': [u'User id', u'Email', u'First name', u'Last name', u'Phone number', u'Gender', u'Action'],
+        'rows': []
+    }
+
+    for e in CustomerInfoUpdate.objects.filter(status="NEW"):
+        context['customer_info_update_request']['rows'].append([e.user_id, e.email,
+                                                                e.first_name, e.last_name,
+                                                                e.phone_number,
+                                                                e.gender])
+    return render(request, 'user_management/pendingCustomerRequests.html', context)
 
 @login_required
 def technicalSupport(request):

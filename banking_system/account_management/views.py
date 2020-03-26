@@ -32,17 +32,28 @@ def open_account(request):
 
 @login_required
 def view_accounts(request):
+    if request.POST:
+        User.objects.filter(user_id=request.user.user_id).update(primary_account=request.POST['account_num'])
     context = {}
     context['account_details'] = {
-        'headers': ['Account number', 'Account type', 'Account balance'],
+        'headers': ['Account number', 'Account type', 'Account balance', 'Action'],
         'accounts': []
     }
     user_accounts = Account.objects.filter(user_id=request.user)
+    primary_account = User.objects.get(user_id=request.user.user_id).primary_account
+    primary_account_id = primary_account.account_id if primary_account else None
     for acc in user_accounts:
+        if acc.account_type == "CREDIT":
+            primary_account_flag = -1
+        elif acc.account_id == primary_account_id:
+            primary_account_flag = 1
+        else:
+            primary_account_flag = 0
         context['account_details']['accounts'].append([
             acc.account_id,
             acc.account_type,
-            acc.account_balance
+            acc.account_balance,
+            primary_account_flag
         ])
     return render(request, 'account_management/view_accounts.html', context)
 
@@ -55,11 +66,15 @@ def view_requests(request):
     if request.POST:
         if request.POST['status'] == 'APPROVE':
             user = User.objects.get(email=request.POST['email'])
-            create_account_for_current_request(
+            account = create_account_for_current_request(
                 user, request.POST['account_type'])
             AccountRequests.objects.filter(user_id=user).update(
                 status='APPROVED'
             )
+            if user.primary_account is None and account.account_type != "CREDIT":
+                User.objects.filter(email=request.POST['email']).update(
+                    primary_account=account
+                )
     context['account_requests'] = {
         'headers': ['First name', 'Last name', 'Email', 'Account type'],
         'body': []
