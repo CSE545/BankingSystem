@@ -1,5 +1,5 @@
-from django.db import models
 from account_management.models import Account
+from django.db import models
 
 # Create your models here.
 REQUEST_STATUS = (
@@ -13,6 +13,12 @@ TRANSFER_TYPE = (
     ("EMAIL", "EMAIL"),
     ("PHONE", "PHONE")
 )
+
+TRANSACTION_TYPE = (
+    ("DEBIT", "DEBIT"),
+    ("CREDIT", "CREDIT")
+)
+
 
 class FundTransfers(models.Model):
     request_id = models.AutoField(primary_key=True)
@@ -46,3 +52,27 @@ class FundTransfers(models.Model):
             self.delete()
         else:
             super(FundTransfers, self).save(force_insert, force_update)
+
+
+class Transaction(models.Model):
+    request_id = models.AutoField(primary_key=True)
+    from_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE,
+                                     related_name='transaction_from_account')
+    to_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE,
+                                   related_name='transaction_to_account')
+    amount = models.FloatField(blank=False, null=False)
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
+    transfer_type = models.CharField(
+        max_length=10,
+        choices=TRANSACTION_TYPE
+    )
+
+    def __str__(self):
+        return "Created by: {0}, Status: {1}".format(self.from_account, self.status)
+
+    def __init__(self, *args, **kwargs):
+        super(Transaction, self).__init__(*args, **kwargs)
