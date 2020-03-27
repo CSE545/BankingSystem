@@ -291,6 +291,9 @@ def override_login(request):
                     "for_email": override_for
                 }
             }
+            create_user_log(user_id=override.for_id,
+                            log_str="Override Login: Send OTP action, OTP Created",
+                            log_type="info")
             return render(request, "user_management/overrideLogin.html", context)
         elif request.POST["action"] == "LOGIN":
             user_email = request.POST["overrideUser"]
@@ -308,7 +311,10 @@ def override_login(request):
             else:
                 logout(request)
                 user = User.objects.filter(email=user_email)[0]
-                login(request, user)
+                login(request, user,backend="django.contrib.auth.backends.ModelBackend")
+                create_user_log(user_id=user.user_id,
+                                log_str="Override Login, Login Successful",
+                                log_type="info")
                 return redirect("/")
 
 
@@ -331,8 +337,14 @@ def override_request(request):
         if request.POST["action"] == "ACCEPTED":
             override.status = "ACCEPTED"
             override.save()
+            create_user_log(user_id=requesting_id,
+                            log_str="Override Request accepted for " + str(for_id),
+                            log_type="info")
         elif request.POST["action"] == "DENIED":
             override.status = "DENIED"
             override.save()
+            create_user_log(user_id=requesting_id,
+                            log_str="Override Request denied for " + str(for_id),
+                            log_type="debug")
 
     return render(request, "user_management/overrideRequests.html", context)
