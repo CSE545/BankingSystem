@@ -1,0 +1,67 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Customer deposit requests
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                {% for heading in deposits.headers %}
+                                <th scope="col">{{ heading }}</th>
+                                {% endfor %}
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in deposits.details %}
+                            <tr>
+                                <th id="{{data.4}}" scope="row">{{ forloop.counter }}</th>
+                                {% for value in data %}
+                                    {% if forloop.counter != 5%}
+                                        <td>{{ value }}</td>
+                                    {% endif %}
+                                {% endfor %}
+
+                                <td>
+                                    <button class="btn btn-success btn-sm action">Deposit</button>
+                                    <button class="btn btn-danger btn-sm action">Deny</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        let statusMap = { "Deposit": "DEPOSIT", "Deny": "DENY" };
+        $(".action").click(function (e) {
+            let action = statusMap[e.target.textContent];
+            let account_id = $($(e.target).parents('tr').children()[0]).attr('id');
+            
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: { 
+                    csrfmiddlewaretoken: '{{ csrf_token }}', 
+                    action, 
+                    account_id
+                    },
+                success: function callback(response) {
+                    location.reload();
+                }
+            });
+        })
+    });
+</script>
+{% endblock %}

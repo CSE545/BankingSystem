@@ -9,9 +9,23 @@ def create_account_for_current_request(user, account_type):
     return account
 
 
-def create_deposit_request(user, deposit_amount):
+def create_deposit_request(user, deposit_amount, account_id):
+    account = Account.objects.get(account_id=account_id)
     deposit_request = DepositRequest.objects.create(
         user_id=user,
-        deposit_amount=deposit_amount
+        deposit_amount=deposit_amount,
+        account=account
     )
     return deposit_request
+
+
+def update_deposit_request(id, action):
+    deposit_request = DepositRequest.objects.get(deposit_id=id)
+    if action == 'DEPOSIT':
+        deposit_request.account.account_balance += deposit_request.deposit_amount
+        deposit_request.status = 'APPROVED'
+        deposit_request.account.save()
+        deposit_request.save()
+    else:
+        deposit_request.status = 'REJECTED'
+        deposit_request.save()

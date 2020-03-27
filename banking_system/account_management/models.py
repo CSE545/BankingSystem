@@ -75,6 +75,8 @@ class DepositRequest(models.Model):
         choices=REQUEST_STATUS,
         default='NEW'
     )
+    account = models.ForeignKey(
+        Account, default=None, on_delete=models.CASCADE, related_name='accountidDepositRequest')
 
     def __init__(self, *args, **kwargs):
         super(DepositRequest, self).__init__(*args, **kwargs)

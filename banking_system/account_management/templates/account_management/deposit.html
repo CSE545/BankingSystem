@@ -83,7 +83,6 @@
 </div>
 <script type="text/javascript">
     $(function () {
-        let error = false;
         $(".action").click(function (e) {
 
             let account_id = $('#account_number').val();
@@ -97,12 +96,12 @@
                 url: "/bankaccount/deposit/" + account_id + "/",
                 data: {
                     csrfmiddlewaretoken: '{{ csrf_token }}',
-                    amount
+                    amount,
+                    account_id
                 },
                 success: function callback(response) {
                     $("#init").hide();
                     $("#result").show();
-
                 }
             });
         })

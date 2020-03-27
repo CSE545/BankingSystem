@@ -198,7 +198,7 @@ def login_failed(sender, credentials, request, **kwargs):
             user.userlogin.save()
     except User.DoesNotExist:
         print('Login failed: User does not exist')
-        
+
 
 class UserLog(models.Model):
     CRITICAL = "critical"
@@ -229,7 +229,8 @@ class UserLog(models.Model):
 
     def __str__(self):
         return "Log Id: {0}, UserId: {1}, Log Level: {2}, Log Str: {3}".format(self.log_id, self.user_id, self.log_type, self.log)
-    
+
+
 class employee_info_update(models.Model):
     user_id = models.IntegerField(blank=False, default=0)
     email = models.EmailField(verbose_name="email",
@@ -278,5 +279,3 @@ class OverrideRequest(models.Model):
         choices=REQUEST_STATUS,
         default='NEW'
     )
-
-

@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from account_management.forms import BankAccountForm
 from django.core.exceptions import PermissionDenied
-from account_management.models import AccountRequests, Account
+from account_management.models import AccountRequests, Account, DepositRequest
 from user_management.models import User
 from account_management.utility.manage_accounts import create_account_for_current_request
 from account_management.utility.manage_accounts import create_deposit_request
+from account_management.utility.manage_accounts import update_deposit_request
+from django.middleware.csrf import get_token
 # Create your views here.
 
 
@@ -98,7 +100,9 @@ def deposit(request, pk=None):
     context = {}
     if pk and request.POST:
         amount = request.POST['amount']
-        deposit_request = create_deposit_request(request.user, amount)
+        account_id = request.POST['account_id']
+        deposit_request = create_deposit_request(
+            request.user, amount, account_id)
         context['deposit_request_submitted'] = True
         context['deposit_id'] = deposit_request.deposit_id
         return render(request, 'account_management/deposit.html', context)
@@ -136,3 +140,24 @@ def deposit(request, pk=None):
 def withdraw(request):
     context = {}
     return render(request, 'account_management/withdraw.html', context)
+
+# TODO Remove login required annotation with middlewares
+@login_required
+def customer_deposits(request):
+    context = {}
+    if request.POST:
+        update_deposit_request(request.POST['account_id'], request.POST['action'])
+    customer_deposits = DepositRequest.objects.filter(status='NEW')
+    context['deposits'] = {
+        'headers': ['Deposit amount', 'User first name', 'User last name', 'User email id'],
+        'details': []
+    }
+    for deposit in customer_deposits:
+        context['deposits']['details'].append([
+            deposit.deposit_amount,
+            deposit.user_id.first_name,
+            deposit.user_id.last_name,
+            deposit.user_id.email,
+            deposit.deposit_id
+        ])
+    return render(request, 'account_management/customer_deposit_requests.html', context)
