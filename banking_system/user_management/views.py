@@ -155,7 +155,7 @@ def show_pending_employee_requests(request):
             user_object.phone_number = request.POST['phone_number']
             user_object.gender = request.POST['gender']
             user_object.save()
-            create_user_log(user_id=request.POST['user_id'], log_str="Request Approved for edit by "+ str(request.user.user_id),
+            create_user_log(user_id=request.POST['user_id'], log_str="Request Approved for edit by " + str(request.user.user_id),
                             log_type="info")
 
         return render(request, 'user_management/pendingEmployeeRequests.html')
