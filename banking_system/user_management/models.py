@@ -197,8 +197,38 @@ def login_failed(sender, credentials, request, **kwargs):
             user.userlogin.save()
     except User.DoesNotExist:
         print('Login failed: User does not exist')
+        
 
+class UserLog(models.Model):
+    CRITICAL = "critical"
+    INFO = "info"
+    WARN = "warn"
+    DEBUG = "debug"
+    ERROR = "error"
+    TYPES = [
+        (CRITICAL, 'critical'),
+        (INFO, 'info'),
+        (WARN, 'warn'),
+        (DEBUG, 'debug'),
+        (ERROR, 'error')
+    ]
+    log_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(
+        User, default=None, on_delete=models.CASCADE)
+    log = models.CharField(
+        max_length=2000,
+        default="",
+        null=False
+    )
+    log_type = models.CharField(
+        max_length=9,
+        choices=TYPES
+    )
+    created = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return "Log Id: {0}, UserId: {1}, Log Level: {2}, Log Str: {3}".format(self.log_id, self.user_id, self.log_type, self.log)
+    
 class employee_info_update(models.Model):
     user_id = models.IntegerField(blank=False, default=0)
     email = models.EmailField(verbose_name="email",
@@ -245,3 +275,5 @@ class OverrideRequest(models.Model):
         choices=REQUEST_STATUS,
         default='NEW'
     )
+
+

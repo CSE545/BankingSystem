@@ -1,0 +1,39 @@
+{% extends 'homepage.html' %}
+{% block info %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Override Login
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" role="alert">
+                        Please enter one time 4-digit authentication number that has been texted to you.
+                    </div>
+                    {% if error == "Invalid OTP" %}
+                    <div class="alert alert-danger">
+                        <strong>Invalid OTP.</strong> <br/>
+                    </div>
+                    {% endif %}
+                    <form method="POST">{% csrf_token %}
+                        <input type="hidden" id="action" name="action" value='LOGIN'>
+
+                        <div class="form-group">
+                            <label for="overrideUser" class="control-label">Override For User</label>
+                            <input id=overrideUser name="overrideUser" class="form-control" value="{{ override.for_email }}" readonly>
+                        </div>
+                        {% for field in otp_form %}
+                        <div class="form-group">
+                            <label class="control-label">{{ field.label_tag }}</label>
+                            {{ field }}
+                        </div>
+                        {% endfor %}
+                        <button style="margin-bottom: 10px" type="submit" class="btn btn-primary">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
