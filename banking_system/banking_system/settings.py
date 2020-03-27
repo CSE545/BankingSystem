@@ -89,8 +89,6 @@ DATABASES = {
         'NAME': 'ss_project',
         'USER': 'bank_admin',
         'PASSWORD': 'Password#0',
-        #'USER': 'root',
-        #'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '3306'
     }
