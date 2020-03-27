@@ -5,6 +5,7 @@ from django.core.exceptions import PermissionDenied
 from account_management.models import AccountRequests, Account
 from user_management.models import User
 from account_management.utility.manage_accounts import create_account_for_current_request
+from account_management.utility.manage_accounts import create_deposit_request
 # Create your views here.
 
 
@@ -93,21 +94,37 @@ def view_requests(request):
 
 
 @login_required
-def deposit(request):
+def deposit(request, pk=None):
     context = {}
-    if request.POST:
-        pass
+    if pk and request.POST:
+        amount = request.POST['amount']
+        deposit_request = create_deposit_request(request.user, amount)
+        context['deposit_request_submitted'] = True
+        context['deposit_id'] = deposit_request.deposit_id
+        return render(request, 'account_management/deposit.html', context)
+    elif pk:
+        context['account_selected'] = True
+        current_account = Account.objects.get(account_id=pk)
+        context['user_accounts'] = {
+            'headers': ['Account number', 'Account type', 'Account balance'],
+            'details': {
+                'account_balance': current_account.account_balance,
+                'account_number': current_account.account_id,
+                'account_type': current_account.account_type,
+            }
+        }
+        return render(request, 'account_management/deposit.html', context)
     else:
         context['user_accounts'] = {
             'headers': ['Account number', 'Account type', 'Account balance'],
-            'data': []
+            'details': []
         }
         context['select_account'] = True
         user_accounts = Account.objects.filter(
             user_id=request.user,
             account_type__in=["SAVINGS", "CHECKING"])
         for account in user_accounts:
-            context['user_accounts']['data'].append([
+            context['user_accounts']['details'].append([
                 account.account_id,
                 account.account_type,
                 account.account_balance
