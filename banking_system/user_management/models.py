@@ -1,8 +1,8 @@
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.signals import user_login_failed
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.signals import user_logged_in, user_login_failed
 
 GENDER = (
     ("M", "MALE"),
@@ -23,8 +23,15 @@ REQUEST_STATUS = (
     ("APPROVED", "APPROVED"),
     ("REJECTED", "REJECTED"),
 )
-# Create your models here.
 
+ACCOUNT_TYPE = (
+    ("SAVINGS", "SAVINGS"),
+    ("CREDIT", "CREDIT"),
+    ("CHECKING", "CHECKING")
+)
+
+
+# Create your models here.
 # Important to implement this for Django to Recognize
 
 
@@ -67,6 +74,7 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
+
 # created_at, last_login, is_admin, is_active, is_staff, is_superuser are mandatory fields.
 
 
@@ -84,7 +92,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=20)
+    phone_number = models.CharField(max_length=20, unique=True)
     gender = models.CharField(
         max_length=6,
         choices=GENDER
@@ -93,6 +101,7 @@ class User(AbstractBaseUser):
         max_length=20,
         choices=USER_TYPE
     )
+    primary_account = models.ForeignKey('account_management.Account', default=None, on_delete=models.CASCADE, null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name',
                        'last_name', 'password', 'phone_number']
@@ -101,17 +110,23 @@ class User(AbstractBaseUser):
     def __str__(self):
         return "First name: {0},  Last name: {1},  \
                 Email: {2},  Phone number: {3},  Gender: {4}" \
-                .format(self.first_name, self.last_name,
-                        self.email, self.phone_number,
-                        self.gender)
+            .format(self.first_name, self.last_name,
+                    self.email, self.phone_number,
+                    self.gender)
 
     # For checking permissions. to keep it simple all admin have ALL permissons
     def has_perm(self, perm, obj=None):
         return self.is_admin
 
+    def check_user_type(self):
+        return self.user_type
+
     # Does this user have permission to view this app? (ALWAYS YES FOR SIMPLICITY)
     def has_module_perms(self, app_label):
         return True
+
+    def get_full_name(self):
+        return '{0} {1}'.format(self.first_name, self.last_name)
 
 
 class UserLogin(models.Model):
@@ -153,7 +168,6 @@ class UserPendingApproval(models.Model):
 
     def save(self, force_insert=False, force_update=False):
         if self.old_status == 'NEW':
-            print('Status changed from NEW to {0}'.format(self.status))
             if self.status == 'APPROVED':
                 User.objects.filter(user_id=self.created_by.user_id).update(
                     email=self.email,
@@ -183,7 +197,7 @@ def login_failed(sender, credentials, request, **kwargs):
             user.userlogin.save()
     except User.DoesNotExist:
         print('Login failed: User does not exist')
-
+        
 
 class UserLog(models.Model):
     CRITICAL = "critical"
@@ -211,5 +225,50 @@ class UserLog(models.Model):
         choices=TYPES
     )
     created = models.DateTimeField(auto_now_add=True)
+    
+class employee_info_update(models.Model):
+    user_id = models.IntegerField(blank=False, default=0)
+    email = models.EmailField(verbose_name="email",
+                              max_length=60, null=True, blank=True)
+    first_name = models.CharField(max_length=100, null=True, blank=True)
+    last_name = models.CharField(max_length=100, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    gender = models.CharField(
+        max_length=6,
+        choices=GENDER,
+        null=True,
+        blank=True
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
 
+class CustomerInfoUpdate(models.Model):
+    user_id = models.IntegerField(blank=False, default=0)
+    email = models.EmailField(verbose_name="email",
+                              max_length=60, null=True, blank=True)
+    first_name = models.CharField(max_length=100, null=True, blank=True)
+    last_name = models.CharField(max_length=100, null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
+    gender = models.CharField(
+        max_length=6,
+        choices=GENDER,
+        null=True,
+        blank=True
+    )
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
 
+class OverrideRequest(models.Model):
+    for_id = models.IntegerField(null=False, blank=False)
+    requesting_id = models.IntegerField(null=False, blank=False)
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
