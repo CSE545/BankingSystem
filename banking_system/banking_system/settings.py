@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'banking_system',
-    'user_management'
+    'user_management',
     'transaction_management',
     'account_management'
 ]
@@ -89,6 +89,8 @@ DATABASES = {
         'NAME': 'ss_project',
         'USER': 'bank_admin',
         'PASSWORD': 'Password#0',
+        #'USER': 'root',
+        #'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '3306'
     }

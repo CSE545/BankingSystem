@@ -96,6 +96,7 @@ def edit_profile(request):
             if request.user.user_type == 'CUSTOMER':
                 num_results = CustomerInfoUpdate.objects.filter(user_id=user_id, status='NEW').count()
                 if num_results > 0:
+                    create_user_log(user_id=user_id, log_str="customer request already exists for edit profile", log_type="debug")
                     return render(request, 'customer_request_already_exists.html')
 
                 new_entry = CustomerInfoUpdate(user_id=user_id, email=data.get('email'), first_name=data.get('first_name'),
@@ -107,12 +108,13 @@ def edit_profile(request):
                 instance.save()
                 context = {}
                 context['request_received'] = True
+                create_user_log(user_id=user_id, log_str="customer request successfully created for edit profile", log_type="info")
                 return render(request, 'customer_edit_request_submitted.html', context)
             # For employees
             num_results = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
             if num_results > 0:
+                create_user_log(user_id=user_id, log_str="employee request already exists for edit profile", log_type="debug")
                 return render(request, 'employee_request_already_exists.html')
-
             new_entry = employee_info_update(user_id=user_id, email=data.get('email'),
                                              first_name=data.get('first_name'),
                                              last_name=data.get('last_name'), phone_number=data.get('phone_number'),
@@ -124,7 +126,7 @@ def edit_profile(request):
             instance.save()
             context = {}
             context['request_received'] = True
-            create_user_log(user_id=request.user.user_id, log_str="Profile Edit Successful", log_type="info")
+            create_user_log(user_id=user_id, log_str="employee request created for edit profile", log_type="info")
             return render(request, 'employee_edit_request_submitted.html', context)
     else:
         context = {}
@@ -153,6 +155,8 @@ def show_pending_employee_requests(request):
             user_object.phone_number = request.POST['phone_number']
             user_object.gender = request.POST['gender']
             user_object.save()
+            create_user_log(user_id=request.POST['user_id'], log_str="Request Approved for edit by "+ str(request.user.user_id),
+                            log_type="info")
 
         return render(request, 'user_management/pendingEmployeeRequests.html')
     context = {}
@@ -182,6 +186,9 @@ def show_pending_customer_requests(request):
             user_object.phone_number = request.POST['phone_number']
             user_object.gender = request.POST['gender']
             user_object.save()
+            create_user_log(user_id=request.POST['user_id'],
+                            log_str="Request Approved for edit by " + str(request.user.user_id),
+                            log_type="info")
 
         return render(request, 'user_management/pendingCustomerRequests.html')
 
@@ -242,14 +249,23 @@ def technical_support(request):
             requesting_id = request.user.user_id
             for_id = request.POST['user_id']
             if OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").count() > 0:
+                create_user_log(user_id=requesting_id,
+                                log_str="Request for technical support for " + str(for_id) + " already exist",
+                                log_type="debug")
                 return render(request, 'user_management/technicalSupport.html',
                               generate_support_context(request, "REQUEST_EXISTS"))
             else:
                 new_request = OverrideRequest(requesting_id=requesting_id, for_id=for_id)
                 new_request.save()
+                create_user_log(user_id=requesting_id,
+                                log_str="Request for technical support for " + str(for_id) + " added",
+                                log_type="debug")
         elif request.POST["action"] == "DELETE":
             print(request.POST)
             OverrideRequest.objects.filter(id=request.POST["request-id"])[0].delete()
+            create_user_log(user_id=request.POST["request-id"],
+                            log_str="Request for technical support for deleted",
+                            log_type="debug")
 
     return render(request, 'user_management/technicalSupport.html', generate_support_context(request))
 
