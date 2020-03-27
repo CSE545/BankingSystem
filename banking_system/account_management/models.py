@@ -63,3 +63,25 @@ class AccountRequests(models.Model):
                 Account Balance: {2},  User: {3}" \
                 .format(self.account_id, self.account_type,
                         self.account_balance, self.user_id.first_name + " " + self.user_id.last_name)
+
+
+class DepositRequest(models.Model):
+    deposit_id = models.AutoField(primary_key=True)
+    user_id = models.ForeignKey(
+        User, default=None, on_delete=models.CASCADE, related_name='useridDepositRequests')
+    deposit_amount = models.FloatField(default=0.0)
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(DepositRequest, self).__init__(*args, **kwargs)
+        self.old_status = self.status
+
+    def __str__(self):
+        return "Deposit Id: {0},  \
+                Deposit amount: {1},  User: {2}" \
+                .format(self.deposit_id,
+                        self.deposit_amount, self.user_id.first_name + " " + self.user_id.last_name)
