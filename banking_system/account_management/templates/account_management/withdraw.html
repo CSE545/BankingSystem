@@ -6,40 +6,76 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    View current accounts
+                    Withdraw
                 </div>
                 <div class="card-body">
+                    {% if select_account %}
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                {% for heading in account_details.headers %}
-                                    <th scope="col">{{ heading }}</th>
+                                {% for heading in user_accounts.headers %}
+                                <th scope="col">{{ heading }}</th>
                                 {% endfor %}
+                                <th scope="col">Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for data in account_details.accounts %}
+                            {% for data in user_accounts.details %}
                             <tr>
                                 {% for value in data %}
-                                    {% if forloop.counter == 1%}
-                                        <td>{{ value }}</td>
-                                    {% elif forloop.counter == 4%} 
-                                        {% if value == 0%}
-                                        <td><button id="makePrimary" class="btn btn-primary btn-sm">Make primary</button></td>
-                                        {% elif value == -1 %}
-                                        <td>Credit Account</td>
-                                        {% else %}
-                                        <td>Primary Account</td>
-                            a            {% endif %}
-                                    {% else %}
-                                        <td>{{ value }}</td>
-                                    {% endif %}
-                                    
+
+                                <td>{{ value }}</td>
+
                                 {% endfor %}
+                                <td>
+                                    <a class="btn btn-primary btn-sm"
+                                        href="{% url 'account_management:withdraw_with_pk' pk=data.0 %}">Select
+                                        account</a>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
                     </table>
+                    {% elif account_selected %}
+                    <div id="init">
+                        <form method="POST" action="/bankaccount/deposit/">
+                            <div class="form-group row">
+                                <label for="account_number" class="col-sm-2 col-form-label">Account number</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_number"
+                                        value="{{ user_accounts.details.account_number }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="account_type" class="col-sm-2 col-form-label">Account type</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_type"
+                                        value="{{ user_accounts.details.account_type }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="account_balance" class="col-sm-2 col-form-label">Account balance</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_balance"
+                                        value="{{ user_accounts.details.account_balance }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="withdraw_amount" class="col-sm-2 col-form-label">Enter withdrawal amount</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" id="withdraw_amount"
+                                        placeholder="Enter amount...">
+                                </div>
+                            </div>
+                            <a href="/bankaccount/deposit/" class="btn btn-primary">&laquo; Back</a>
+                            <button type="button" class="btn btn-primary action">Submit</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    <div style="display: none;" id="result" class="alert alert-primary" style="text-align: center;">
+                        <p>Request successfully submitted. The amount will soon reflect into your account.</p>
+                        <a type="button" class="btn btn-primary" href="/">Home</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -47,23 +83,31 @@
 </div>
 <script type="text/javascript">
     $(function () {
-        $("[rel='tooltip']").tooltip();
+        $(".action").click(function (e) {
 
-
-        $("#makePrimary").click(function (e) {
-            let account_num = $($(e.target).parents('tr').children()[0]).text();
+            let account_balance = $('#account_balance').val();
+            let account_id = $('#account_number').val();
+            let amount = $('#withdraw_amount').val();
+            if(parseFloat(amount) > parseFloat(account_balance)) {
+                alert('Insufficient funds');
+            }
+            if (amount === '') {
+                alert('Withdrawal amount empty.');
+                return;
+            }
             $.ajax({
                 type: "POST",
-                url: "",
-                data: { csrfmiddlewaretoken: '{{ csrf_token }}', account_num},
+                url: "/bankaccount/withdraw/" + account_id + "/",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    amount,
+                    account_id
+                },
                 success: function callback(response) {
-                    location.reload();
+                    location.replace("/bankaccount/view_accounts/");
                 }
             });
         })
-
-
-
     });
 </script>
 {% endblock %}

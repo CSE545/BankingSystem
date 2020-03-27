@@ -6,8 +6,7 @@ from account_management.models import AccountRequests, Account, DepositRequest
 from user_management.models import User
 from account_management.utility.manage_accounts import create_account_for_current_request
 from account_management.utility.manage_accounts import create_deposit_request
-from account_management.utility.manage_accounts import update_deposit_request
-from django.middleware.csrf import get_token
+from account_management.utility.manage_accounts import update_deposit_request, withdraw_money
 # Create your views here.
 
 
@@ -104,7 +103,6 @@ def deposit(request, pk=None):
         deposit_request = create_deposit_request(
             request.user, amount, account_id)
         context['deposit_request_submitted'] = True
-        context['deposit_id'] = deposit_request.deposit_id
         return render(request, 'account_management/deposit.html', context)
     elif pk:
         context['account_selected'] = True
@@ -137,8 +135,43 @@ def deposit(request, pk=None):
 
 
 @login_required
-def withdraw(request):
+def withdraw(request, pk=None):
     context = {}
+    if pk and request.POST:
+        amount = request.POST['amount']
+        account_id = request.POST['account_id']
+        if withdraw_money(account_id, amount):
+            context['withdraw_successful'] = True
+        else:
+            context['withdraw_successful'] = False
+        return render(request, 'account_management/withdraw.html', context)
+    elif pk:
+        context['account_selected'] = True
+        current_account = Account.objects.get(account_id=pk)
+        context['user_accounts'] = {
+            'headers': ['Account number', 'Account type', 'Account balance'],
+            'details': {
+                'account_balance': current_account.account_balance,
+                'account_number': current_account.account_id,
+                'account_type': current_account.account_type,
+            }
+        }
+        return render(request, 'account_management/withdraw.html', context)
+    else:
+        context['user_accounts'] = {
+            'headers': ['Account number', 'Account type', 'Account balance'],
+            'details': []
+        }
+        context['select_account'] = True
+        user_accounts = Account.objects.filter(
+            user_id=request.user,
+            account_type__in=["SAVINGS", "CHECKING"])
+        for account in user_accounts:
+            context['user_accounts']['details'].append([
+                account.account_id,
+                account.account_type,
+                account.account_balance
+            ])
     return render(request, 'account_management/withdraw.html', context)
 
 # TODO Remove login required annotation with middlewares
@@ -146,7 +179,8 @@ def withdraw(request):
 def customer_deposits(request):
     context = {}
     if request.POST:
-        update_deposit_request(request.POST['account_id'], request.POST['action'])
+        update_deposit_request(
+            request.POST['account_id'], request.POST['action'])
     customer_deposits = DepositRequest.objects.filter(status='NEW')
     context['deposits'] = {
         'headers': ['Deposit amount', 'User first name', 'User last name', 'User email id'],

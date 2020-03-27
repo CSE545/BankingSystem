@@ -29,3 +29,13 @@ def update_deposit_request(id, action):
     else:
         deposit_request.status = 'REJECTED'
         deposit_request.save()
+
+
+def withdraw_money(account_id, amount):
+    amount = float(amount)
+    account = Account.objects.get(account_id=account_id)
+    if amount > account.account_balance:
+        return False
+    account.account_balance -= amount
+    account.save()
+    return True

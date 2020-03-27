@@ -10,5 +10,6 @@ urlpatterns = [
     path('deposit/', views.deposit, name="deposit"),
     re_path(r'^deposit/(?P<pk>\d+)/$', views.deposit, name="deposit_with_pk"),
     path('withdraw/', views.withdraw, name="withdraw"),
+    re_path(r'^withdraw/(?P<pk>\d+)/$', views.withdraw, name="withdraw_with_pk"),
     path('customer_deposits/', views.customer_deposits, name="customer_deposits")
 ]
