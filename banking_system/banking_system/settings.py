@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'banking_system',
     'user_management'
-    'user_management',
     'transaction_management',
     'account_management'
 ]
