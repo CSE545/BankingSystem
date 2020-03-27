@@ -65,6 +65,17 @@ class LoginForm(AuthenticationForm):
         fields = ("email", "password", "otp")
 
 
+class AccountOverrideLoginForm(forms.Form):
+    otp = forms.CharField(required=False, widget=forms.PasswordInput)
+
+    def __init__(self, *args, **kwargs):
+        super(AccountOverrideLoginForm, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+
+
 class EditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EditForm, self).__init__(*args, **kwargs)

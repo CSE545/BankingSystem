@@ -1,9 +1,9 @@
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
-from user_management.forms import RegistrationForm, LoginForm, EditForm
+from user_management.forms import RegistrationForm, LoginForm, EditForm, AccountOverrideLoginForm
 from user_management.models import User, employee_info_update, OverrideRequest, CustomerInfoUpdate
-
+from user_management.utility.twofa import generate_otp, get_user_phone_number, save_otp_in_db  # , send_otp
 
 # Create your views here.
 
@@ -89,12 +89,12 @@ def edit_profile(request):
         if form.is_valid():
             data = request.POST.copy()
             user_id = int(request.user.user_id)
-            
+
             if request.user.user_type == 'CUSTOMER':
                 num_results = CustomerInfoUpdate.objects.filter(user_id=user_id, status='NEW').count()
                 if num_results > 0:
                     return render(request, 'customer_request_already_exists.html')
-            
+
                 new_entry = CustomerInfoUpdate(user_id=user_id, email=data.get('email'), first_name=data.get('first_name'),
                                                last_name=data.get('last_name'), phone_number=data.get('phone_number'),
                                                gender=data.get('gender'), status='NEW')
@@ -104,7 +104,7 @@ def edit_profile(request):
                 instance.save()
                 context = {}
                 context['request_received'] = True
-                return render(request, 'customer_edit_request_submitted.html', context)                         
+                return render(request, 'customer_edit_request_submitted.html', context)
             # For employees
             num_results = employee_info_update.objects.filter(user_id=user_id, status='NEW').count()
             if num_results > 0:
@@ -175,7 +175,7 @@ def show_pending_customer_requests(request):
             user_object.save()
 
         return render(request, 'user_management/pendingCustomerRequests.html')
-   
+
     context = {}
     context['customer_info_update_request'] = {
         'headers': [u'User id', u'Email', u'First name', u'Last name', u'Phone number', u'Gender', u'Action'],
@@ -189,42 +189,102 @@ def show_pending_customer_requests(request):
                                                                 e.gender])
     return render(request, 'user_management/pendingCustomerRequests.html', context)
 
-@login_required
-def technicalSupport(request):
+
+def userID_to_human_readable(userID):
+    user = User.objects.get(pk=userID)
+    return "%s, %s (%s)" % (user.last_name, user.first_name, user.email)
+
+
+def generate_support_context(request, errors=""):
     headers = [u"user_id", u"email", u"first_name", u"last_name", u"user_type"]
+    cleaned_headers = [u"User ID", u"Email", u"First Name", u"Last Name", u"User Type"]
 
     users = [[getattr(user, header) for header in headers] for user in User.objects.exclude(user_id=request.user.user_id)
              if user.user_type in ["T1", "T2", "T3"]]
 
-    req_headers = [u"for_id", u"requesting_id", u"status"]
+    req_headers = [u"id", u"for_id", u"requesting_id", u"status"]
+    cleaned_req_headers = [u"Request ID", u"Request For", u"Requesting Admin", u"Status"]
     overrides = [[getattr(req, header) for header in req_headers] for req
-                 in OverrideRequest.objects.exclude(status="DENIED") if req.requesting_id == request.user.user_id]
+                 in OverrideRequest.objects.all() if req.requesting_id == request.user.user_id]
 
-    context = {
+    for override in overrides:
+        for_id_index = req_headers.index("for_id")
+        req_id_index = req_headers.index("requesting_id")
+        override[for_id_index] = userID_to_human_readable(override[for_id_index])
+        override[req_id_index] = userID_to_human_readable(override[req_id_index])
+
+    return {
         "users": {
-            "headers": headers + ["Account Override"],
+            "headers": cleaned_headers + ["Account Override"],
             "rows": users
         },
         "override": {
-            "headers": req_headers + ["Action"],
-            "rows": overrides
-        }
+            "headers": cleaned_req_headers + ["Action"],
+            "rows": overrides,
+        },
+        "errors": errors
     }
 
+@login_required
+def technical_support(request):
+
     if request.POST:
-        requesting_id = request.user.user_id
-        for_id = request.POST['user_id']
         if request.POST["action"] == "REQUEST_ACCESS":
+            requesting_id = request.user.user_id
+            for_id = request.POST['user_id']
             if OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").count() > 0:
-                return render(request, 'employee_request_already_exists.html')
+                return render(request, 'user_management/technicalSupport.html',
+                              generate_support_context(request, "REQUEST_EXISTS"))
             else:
                 new_request = OverrideRequest(requesting_id=requesting_id, for_id=for_id)
                 new_request.save()
         elif request.POST["action"] == "DELETE":
-            print(requesting_id, for_id)
-            OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").delete()
+            print(request.POST)
+            OverrideRequest.objects.filter(id=request.POST["request-id"])[0].delete()
 
-    return render(request, 'user_management/technicalSupport.html', context)
+    return render(request, 'user_management/technicalSupport.html', generate_support_context(request))
+
+
+def override_login(request):
+    if request.POST:
+        if request.POST["action"] == "SEND_OTP":
+            otp = generate_otp()
+            request.session['_overrideOTP'] = otp
+            print(otp)
+            # Uncomment this once the sns credentials are added in twofa.py file
+            # send_otp(otp, request.user.phone_number)
+
+            request_id = request.POST["request-id"]
+            override = OverrideRequest.objects.get(pk=request_id)
+            override_for = User.objects.get(pk=override.for_id).email
+            override.status = "EXPIRED"
+            override.save()
+
+            context = {
+                "otp_form": AccountOverrideLoginForm(),
+                "override": {
+                    "for_email": override_for
+                }
+            }
+            return render(request, "user_management/overrideLogin.html", context)
+        elif request.POST["action"] == "LOGIN":
+            user_email = request.POST["overrideUser"]
+            otp = request.POST["otp"]
+            print("Overriding %s with OPT: %s" % (user_email, otp))
+            if otp != request.session["_overrideOTP"]:
+                context = {
+                    "otp_form": AccountOverrideLoginForm(),
+                    "override": {
+                        "for_email": user_email
+                    },
+                    "error": "Invalid OTP"
+                }
+                return render(request, "user_management/overrideLogin.html", context)
+            else:
+                logout(request)
+                user = User.objects.filter(email=user_email)[0]
+                login(request, user)
+                return redirect("/")
 
 
 def override_request(request):
