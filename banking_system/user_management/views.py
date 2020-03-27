@@ -311,7 +311,7 @@ def override_login(request):
             else:
                 logout(request)
                 user = User.objects.filter(email=user_email)[0]
-                login(request, user,backend="django.contrib.auth.backends.ModelBackend")
+                login(request, user, backend="django.contrib.auth.backends.ModelBackend")
                 create_user_log(user_id=user.user_id,
                                 log_str="Override Login, Login Successful",
                                 log_type="info")
