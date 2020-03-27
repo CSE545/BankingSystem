@@ -1,12 +1,10 @@
 from account_management.models import Account
 from django.contrib.auth.decorators import login_required, user_passes_test
-from transaction_management.forms import FundTransferForm, FundTransferFormEmail, FundTransferFormPhone
-from user_management.models import User
 from django.db.models import Q
-from django.shortcuts import render, redirect
-from transaction_management.forms import FundTransferForm, Trans_Create, Transaction_main,
-from transaction_management.models import FundTransfers, EMP_Transaction, EMP_Transaction_Create
-from account_management.models import AccountRequests
+from django.shortcuts import render
+from transaction_management.forms import FundTransferForm, FundTransferFormEmail, FundTransferFormPhone, TransactionForm
+from transaction_management.models import FundTransfers, Transaction
+from user_management.models import User
 
 
 # Create your views here.
@@ -95,12 +93,11 @@ def pendingFundTransfers(request):
                 status=request.POST['status'])
         return render(request, 'transaction_management/pendingFundTransfers.html', context)
     else:
-        context = {}
-        context['pendingFundTransfersData'] = {
+        context = {'pendingFundTransfersData': {
             'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status', u'Approve', u'Reject'],
             'rows': [],
             'error': ""
-        }
+        }}
         for e in FundTransfers.objects.filter(status="NEW"):
             context['pendingFundTransfersData']['rows'].append([
                 e.request_id,
@@ -128,141 +125,59 @@ def pendingFundTransfers(request):
             ])
         return render(request, 'transaction_management/pendingFundTransfers.html', context)
 
+
 @login_required
-def trans_create(request):
-    from_accounts = Account.objects.filter(user_id=request.user.user_id).exclude(account_type="CREDIT")
+def transaction(request):
+    from_accounts_debit = Account.objects.filter(user_id=request.user.user_id).exclude(account_type="CREDIT")
+    from_accounts_credit = Account.objects.filter(user_id=request.user.user_id).filter(account_type="CREDIT")
     if request.POST:
-        if request.POST['formId'] == 'ACCOUNT':
-            form = FundTransferForm(request.POST)
+        if request.POST['formId'] == 'DEBIT':
+            form = TransactionForm(request.POST)
+            form.fields['from_account'].queryset = from_accounts_debit
+        elif request.POST['formId'] == 'CREDIT':
+            form = TransactionForm(request.POST)
+            form.fields['from_account'].queryset = from_accounts_credit
         context = {'formId': request.POST['formId']}
-        account_form = FundTransferForm()
-        account_form.fields['from_account'].queryset = from_accounts
-        form.fields['from_account'].queryset = from_accounts
-        context['account_form'] = account_form
+        debit_form = FundTransferForm()
+        credit_form = FundTransferFormEmail()
+        debit_form.fields['from_account'].queryset = from_accounts_debit
+        credit_form.fields['from_account'].queryset = from_accounts_credit
+        context['debit_form'] = debit_form
+        context['credit_form'] = credit_form
         if request.POST['formId'] == 'ACCOUNT':
-            context['account_form'] = form
+            context['debit_form'] = form
+        elif request.POST['formId'] == 'CREDIT':
+            context['credit_form'] = form
         if form.is_valid():
-            s = request.POST.dict()
-            if s['formId'] == 'ACCOUNT':
-                s['to_account'] = User.objects.get(account=s['to_account']).primary_account
-            form = FundTransferForm(s, request.user)
             instance = form.save(commit=False)
-            instance.transfer_type = s['formId']
+            instance.transfer_type = request.POST['formId']
             instance.save()
             context['request_received'] = True
         return render(request, 'transaction_management/trans_create.html', context)
     else:
-        context = {'formId': 'ACCOUNT'}
-        account_form = FundTransferForm()
-        email_form = FundTransferFormEmail()
-        phone_form = FundTransferFormPhone()
-        account_form.fields['from_account'].queryset = from_accounts
-        context['account_form'] = account_form
+        context = {'formId': 'DEBIT'}
+        debit_form = TransactionForm()
+        credit_form = TransactionForm()
+        debit_form.fields['from_account'].queryset = from_accounts_debit
+        credit_form.fields['from_account'].queryset = from_accounts_credit
+        context['debit_form'] = debit_form
+        context['credit_form'] = credit_form
         return render(request, 'transaction_management/trans_create.html', context)
 
+
 @login_required
-def trans_create_credit(request):
-    from_accounts = Account.objects.filter(user_id=request.user.user_id)
-    if request.POST:
-        if request.POST['formId'] == 'ACCOUNT':
-            form = FundTransferForm(request.POST)
-        context = {'formId': request.POST['formId']}
-        account_form = FundTransferForm()
-        account_form.fields['from_account'].queryset = from_accounts
-        form.fields['from_account'].queryset = from_accounts
-        context['account_form'] = account_form
-        if request.POST['formId'] == 'ACCOUNT':
-            context['account_form'] = form
-        if form.is_valid():
-            s = request.POST.dict()
-            if s['formId'] == 'ACCOUNT':
-                s['to_account'] = User.objects.get(account=s['to_account']).primary_account
-            form = FundTransferForm(s, request.user)
-            instance = form.save(commit=False)
-            instance.transfer_type = s['formId']
-            instance.save()
-            context['request_received'] = True
-        return render(request, 'transaction_management/trans_create_credit.html', context)
-    else:
-        context = {'formId': 'ACCOUNT'}
-        account_form = FundTransferForm()
-        email_form = FundTransferFormEmail()
-        phone_form = FundTransferFormPhone()
-        account_form.fields['from_account'].queryset = from_accounts
-        context['account_form'] = account_form
-        return render(request, 'transaction_management/trans_create_credit.html', context)
-
-
-
-def transaction_main(request):
-    """trans=Transaction_main()
-    if request.method=="POST":
-        trans = Transaction_main(request.POST)
-        if trans.is_valid():
-            trans.save()
-            return redirect('/trans/create')
-        else:
-            print(trans.errors)
-    context={
-        'trans':trans
-    }"""
-    request.method == "POST"
-    context = {}
-    return render(request, 'transaction_management/trans_main.html', context)
-
-
-
-
-def transaction_details(request):
-    """trans=Transaction_main()
-    if request.method=="POST":
-        trans = Transaction_main(request.POST)
-        if trans.is_valid():
-            trans.save()
-            return redirect('/trans/create')
-        else:
-            print(trans.errors)
-    context={
-        'trans':trans
-    }"""
-    request.method == "POST"
-    acc_type= AccountRequests.objects.filter(account_type="Credit").count()
-    if acc_type>0:
-        context = {'acc_type':acc_type}
-    else:
-        context={}
-    return render(request, 'transaction_management/trans_details.html', context)
-
-
-def no_transaction_details(request):
-    """trans=Transaction_main()
-    if request.method=="POST":
-        trans = Transaction_main(request.POST)
-        if trans.is_valid():
-            trans.save()
-            return redirect('/trans/create')
-        else:
-            print(trans.errors)
-    context={
-        'trans':trans
-    }"""
-    request.method == "POST"
-    context = {}
-    return render(request, 'transaction_management/no_trans_details.html', context)
-
-
 def transaction_view(request, id):
-    obj = EMP_Transaction_Create.objects.get(id=id)
+    obj = Transaction.objects.get(request_id=id)
     context = {
         "obj": obj
     }
     return render(request, "transaction_management/trans_view.html", context)
 
 
+@login_required
 def trans_list_view(request):
-    object_list = EMP_Transaction_Create.objects.all()
+    object_list = Transaction.objects.all()
     context = {
         "object_list": object_list
     }
     return render(request, "transaction_management/trans_list.html", context)
-

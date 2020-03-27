@@ -1,35 +1,41 @@
-{% extends 'body.html' %}
+{% extends 'homepage.html' %}
 
-{% block content %}
-
+{% block info %}
 <div class="container">
     <div class="row">
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    Welcome, {{request.user}}. Here are the details for the requested transaction.
+                    Welcome, {{request.user.first_name}}. Here are the details for the requested transaction.
                 </div>
                 <div class="card-body">
                     <div class="container">
                         <div class="row">
-                            <div class="col-sm-6">From:</div>
-                            <div class="col-sm-6">{{obj.name}}</div>
+                            <div class="col-sm-3">From:</div>
+                            <div class="col-sm-9">{{obj.from_account_id}}</div>
                         </div>
 
                         <div class="row">
-                            <div class="col-sm-6">To:</div>
-                            <div class="col-sm-6">{{obj.to}}</div>
+                            <div class="col-sm-3">To:</div>
+                            <div class="col-sm-9">{{obj.to_account_id}}</div>
                         </div>
-
                         <div class="row">
-                            <div class="col-sm-6">Transaction Amount:</div>
-                            <div class="col-sm-6">{{obj.transaction_amount}}</div>
+                            <div class="col-sm-3">Transaction Amount:</div>
+                            <div class="col-sm-9">{{obj.amount}}</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-3">Current Status:</div>
+                            {% if obj.status == "NEW" %}
+                            <div class="col-sm-9">Awaiting Approval</div>
+                            {% else %}
+                            <div class="col-sm-9">{{obj.status}}</div>
+                            {% endif %}
                         </div>
                         <div class="row">
                             <div class="col-sm-10">
                             </div>
                             <div class="col-sm-2">
-                                <a href="/transactions/trans" class="btn btn-outline-primary">Go Back</a>
+                                <a href="/transactions/trans/list" class="btn btn-primary">Go Back</a>
                             </div>
                         </div>
                     </div>
@@ -39,5 +45,4 @@
         </div>
     </div>
 </div>
-
 {%endblock%}

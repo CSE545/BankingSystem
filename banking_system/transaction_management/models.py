@@ -1,5 +1,5 @@
-from django.db import models
 from account_management.models import Account
+from django.db import models
 
 # Create your models here.
 REQUEST_STATUS = (
@@ -13,6 +13,12 @@ TRANSFER_TYPE = (
     ("EMAIL", "EMAIL"),
     ("PHONE", "PHONE")
 )
+
+TRANSACTION_TYPE = (
+    ("DEBIT", "DEBIT"),
+    ("CREDIT", "CREDIT")
+)
+
 
 class FundTransfers(models.Model):
     request_id = models.AutoField(primary_key=True)
@@ -47,23 +53,26 @@ class FundTransfers(models.Model):
         else:
             super(FundTransfers, self).save(force_insert, force_update)
 
-class EMP_Transaction(models.Model):
-    Action = (
-        ('create', 'Creating a Transaction'),
-        ('Authorize', 'Authorizing a transaction'),
-        ('view', 'viewing specific transaction'),
+
+class Transaction(models.Model):
+    request_id = models.AutoField(primary_key=True)
+    from_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE,
+                                     related_name='transaction_from_account')
+    to_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE,
+                                   related_name='transaction_to_account')
+    amount = models.FloatField(blank=False, null=False)
+    status = models.CharField(
+        max_length=10,
+        choices=REQUEST_STATUS,
+        default='NEW'
+    )
+    transfer_type = models.CharField(
+        max_length=10,
+        choices=TRANSACTION_TYPE
     )
 
-    action = models.CharField(max_length=32, choices=Action, default='view')
+    def __str__(self):
+        return "Created by: {0}, Status: {1}".format(self.from_account, self.status)
 
-
-class EMP_Transaction_Create(models.Model):
-    name = models.CharField(max_length=32, default=None,
-                            verbose_name=u"Sender", help_text=u"Choose the sending account...")
-    to = models.CharField(max_length=32, default=None,
-                            verbose_name=u"Recipient", help_text=u"Choose the recipient account...")
-    transaction_amount = models.DecimalField(decimal_places=2, max_digits=8, default=None,
-                                             verbose_name=u"Amount", help_text=u"Choose an amount to send...")
-    
-    def get_absolute_url(self):
-        return f"/transactions/trans/list/view/{self.id}/"
+    def __init__(self, *args, **kwargs):
+        super(Transaction, self).__init__(*args, **kwargs)

@@ -1,38 +1,28 @@
-{% extends 'body.html' %}
+{% extends 'homepage.html' %}
 
-{% block content %}
-
-
+{% block info %}
 <div class="container">
     <div class="row">
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    Welcome, {{request.user}}. Here are all of the current transactions.
+                    Past Transactions
                 </div>
                 <div class="card-body">
                     <table class="table table-striped" style="text-align: center;">
                         <tr>
                             <th>Transaction ID</th>
                             <th>From Account</th>
+                            <th>View</th>
                         </tr>
                         {%for instance in object_list%}
                         <tr class='clickable-row'>
-                            <td><a class="btn btn-outline-primary btn-block" href='{{ instance.get_absolute_url }}'>{{instance.id}}</a></td>
-                            <td>{{instance.name}}</td>
+                            <td>{{instance.from_account_id}}</td>
+                            <td>{{instance.request_id}}</td>
+                            <td><a class="btn btn-primary btn-sm" href='/transactions/trans/list/{{instance.request_id}}'>View</a></td>
                         </tr>
                         {%endfor%}
                     </table>
-                    <div class="container">
-                        <div class="row">
-                            <div class="col-sm-10">
-                            </div>
-                            <div class="col-sm-2">
-                                <a href="/transactions/trans" class="btn btn-outline-primary">Go Back</a>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
         </div>

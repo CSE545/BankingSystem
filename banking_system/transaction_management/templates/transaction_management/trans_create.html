@@ -1,15 +1,17 @@
 {% extends 'homepage.html' %}
 {% block info %}
 <style>
-  select option[disabled] {
-    display: none;
-}
-.errorlist, .hidden {
-  display: none;
-}
-.tab-content{
-  margin-top: 13px;
-}
+    select option[disabled] {
+        display: none;
+    }
+
+    .errorlist, .hidden {
+        display: none;
+    }
+
+    .tab-content {
+        margin-top: 13px;
+    }
 </style>
 <div class="container">
     <p id="activeId" style="display: none;">{{formId}}</p>
@@ -17,50 +19,70 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    Fund Transfers
+                    Initiate Transaction
                 </div>
                 <div class="card-body">
-                  {% if request_received %}
+                    {% if request_received %}
                     <div class="alert alert-success">
-                        <p><strong>Request received. Fund will be transferred upon approval from an employee.</strong></p>
+                        <p><strong>Request received. Transaction waiting approval.</strong></p>
                     </div>
-                  {% endif %}
-                  <nav>
-                    <div class="nav nav-tabs" id="nav-tab" role="tablist">
-                      <a class="nav-item nav-link active" id="nav-account-tab" data-toggle="tab" href="#nav-account" role="tab" aria-controls="nav-account" aria-selected="true">Account Transfer</a>
-                    </div>
-                  </nav>
-                  <div class="tab-content" id="nav-tabContent">
-                    
-                    <div class="tab-pane fade show active" id="nav-account" role="tabpanel" aria-labelledby="nav-account-tab">
-                      <form method="POST" id="accountTransfer" class="transferForm">
-                        {% csrf_token %}
-                        {% if account_form.errors %}
-                        {% for field in account_form %}
-                            {% for error in field.errors %}
+                    {% endif %}
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <a class="nav-item nav-link active" id="nav-debit-tab" data-toggle="tab" href="#nav-debit"
+                               role="tab" aria-controls="nav-debit" aria-selected="true">Debit</a>
+                            <a class="nav-item nav-link" id="nav-credit-tab" data-toggle="tab" href="#nav-credit"
+                               role="tab" aria-controls="nav-credit" aria-selected="true">Credit</a>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-debit" role="tabpanel"
+                             aria-labelledby="nav-debit-tab">
+                            <form method="POST" id="debit" class="transferForm">{% csrf_token %}
+                                {% if debit_form.errors %}
+                                {% for field in debit_form %}
+                                {% for error in field.errors %}
                                 <div class="alert alert-danger">
                                     <strong>{{ error|escape }}</strong>
                                 </div>
-                            {% endfor %}
-                        {% endfor %}
-                        {% endif %}
-                        <div class="form-group">
-                          <input type = 'hidden' name = "formId" value="ACCOUNT">
-                            {{ account_form.as_p }}
+                                {% endfor %}
+                                {% endfor %}
+                                {% endif %}
+                                <div class="form-group">
+                                    <input type='hidden' name="formId" value="DEBIT">
+                                    {{ debit_form.as_p }}
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Request</button>
+                            </form>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit Request</button>
-                    </form>
+                        <div class="tab-pane fade show" id="nav-credit" role="tabpanel"
+                             aria-labelledby="nav-credit-tab">
+                            <form method="POST" id="credit" class="transferForm">{% csrf_token %}
+                                {% if credit_form.errors %}
+                                {% for field in credit_form %}
+                                {% for error in field.errors %}
+                                <div class="alert alert-danger">
+                                    <strong>{{ error|escape }}</strong>
+                                </div>
+                                {% endfor %}
+                                {% endfor %}
+                                {% endif %}
+                                <div class="form-group">
+                                    <input type='hidden' name="formId" value="CREDIT">
+                                    {{ credit_form.as_p }}
+                                </div>
+                                <button type="submit" class="btn btn-primary">Submit Request</button>
+                            </form>
+                        </div>
                     </div>
-                  </div>
-                  
                 </div>
             </div>
         </div>
     </div>
 </div>
 <script>
-  var activeMap = {'ACCOUNT':'#nav-account-tab'}
-  var selectedTab = activeMap[$('#activeId').text()];
-  $(selectedTab).tab('show')
+    var activeMap = {'DEBIT': '#nav-debit-tab', "CREDIT": "#nav-credit-tab"};
+    var selectedTab = activeMap[$('#activeId').text()];
+    $(selectedTab).tab('show')
 </script>
 {% endblock %}
