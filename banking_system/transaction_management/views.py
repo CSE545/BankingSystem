@@ -283,8 +283,7 @@ def cashierCheck(request):
                 str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
                 " " + e.from_account.user_id.last_name,
                 e.recipient,
-                e.amount,
-                e.status
+                e.amount
             ])
         return render(request, 'transaction_management/cashierCheck.html', context)
 

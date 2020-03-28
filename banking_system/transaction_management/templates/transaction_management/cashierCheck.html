@@ -25,7 +25,7 @@
                         <p><strong>Request received. Check will be sent and funds will be withdrawn upon approval from an employee.</strong></p>
                     </div>
                   {% endif %}
-                  
+
                   <div class="tab-content" id="nav-tabContent">
                     <div class="tab-pane fade show active" id="nav-account" role="tabpanel" aria-labelledby="nav-account-tab">
                       <form method="POST" id="accountTransfer" class="transferForm">
@@ -57,9 +57,10 @@
                 <div class="card-body">
                     <table class="table table-bordered">
                         <tr>
-                            {% for header in approvedCashierChecksData.headers %}
-                                <th>{{ header }}</th>
-                            {% endfor %}
+                            <th>Check ID</th>
+                            <th>From Account</th>
+                            <th>Recipient</th>
+                            <th>Amount</th>
                             </tr>
                             {% for row in approvedCashierChecksData.rows %}
                             <tr>
