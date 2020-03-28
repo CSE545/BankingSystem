@@ -6,5 +6,6 @@ app_name = 'account_management'
 urlpatterns = [
     path('open_account/', views.open_account, name="open_account"),
     path('view_requests/', views.view_requests, name="view_requests"),
-    path('view_accounts/', views.view_accounts, name="view_accounts")
+    path('view_accounts/', views.view_accounts, name="view_accounts"),
+    path('generate_statement/', views.generate_statement, name="generate_statement"),
 ]

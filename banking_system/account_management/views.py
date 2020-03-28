@@ -1,12 +1,12 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from account_management.forms import BankAccountForm
+from account_management.forms import BankAccountForm, StatementRequestForm
+from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from account_management.models import AccountRequests, Account
 from user_management.models import User
 from account_management.utility.manage_accounts import create_account_for_current_request
 # Create your views here.
-
 
 @login_required
 def open_account(request):
@@ -56,6 +56,20 @@ def view_accounts(request):
             primary_account_flag
         ])
     return render(request, 'account_management/view_accounts.html', context)
+
+
+@login_required
+def generate_statement(request):
+    user_accounts = Account.objects.filter(user_id=request.user)
+    if request.POST:
+        print("Functionality still to be implemented!")
+    else:
+        context = {}
+        form = StatementRequestForm()
+        context['form'] = form
+        context['accounts'] = user_accounts
+        #account_form.fields['account'] = user_accounts;
+        return render(request, 'account_management/generate_statement.html', context)
 
 
 @login_required
