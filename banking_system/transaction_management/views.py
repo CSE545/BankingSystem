@@ -136,7 +136,7 @@ def criticalPendingFundTransfers(request):
         context = {"pendingFundTransfersData": {"error": ""}}
         curFundObj = FundTransfers.objects.get(
             request_id=int(request.POST['request_id']))
-        if curFundObj >= 1000:
+        if curFundObj.amount >= 1000:
             if (request.POST['status'] == "APPROVED"):
                 curBal = Account.objects.get(
                     account_id=curFundObj.from_account_id).account_balance
