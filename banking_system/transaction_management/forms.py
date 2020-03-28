@@ -1,6 +1,6 @@
 from account_management.models import Account
 from django import forms
-from transaction_management.models import FundTransfers, Transaction
+from transaction_management.models import FundTransfers, Transaction, CashierCheck
 from user_management.models import User
 
 
@@ -142,3 +142,28 @@ class TransactionForm(forms.ModelForm):
         model = Transaction
         fields = ("from_account", "to_account", "amount", "status")
         widgets = {'status': forms.HiddenInput(), 'to_account': forms.TextInput()}
+
+class CashierCheckForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(CashierCheckForm, self).__init__(*args, **kwargs)
+        for field in iter(self.fields):
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control'
+            })
+
+    def clean(self):
+        super(CashierCheckForm, self).clean()
+        from_account_id = self.cleaned_data.get('from_account')
+        amount = self.cleaned_data.get('amount')
+        balance = Account.objects.get(account_id=from_account_id.account_id).account_balance
+        if amount <= 0:
+            self._errors['amount'] = self.error_class(['Invalid amount'])
+        if amount > balance:
+            self._errors['amount'] = self.error_class([
+                'Insufficient funds'])
+        return self.cleaned_data
+
+    class Meta:
+        model = CashierCheck
+        fields = ("from_account", "recipient", "amount", "status")
+        widgets = {'status': forms.HiddenInput(), 'recipient': forms.TextInput()}

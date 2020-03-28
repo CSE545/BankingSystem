@@ -80,7 +80,7 @@ class Transaction(models.Model):
 class CashierCheck(models.Model):
     request_id = models.AutoField(primary_key=True)
     from_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='from_acc')
-    to_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='to_acc')
+    recipient = models.CharField(default=" ", max_length=50, blank=False, null=False)
     amount = models.FloatField(blank=False, null=False)
     status = models.CharField(
         max_length=10,

@@ -8,14 +8,14 @@
                     Pending Cashier Checks
                 </div>
                 <div class="card-body">
-                    <p id="error_msg" style="display:none"> {{pendingFundTransfersData.error}} </p>
+                    <p id="error_msg" style="display:none"> {{pendingCashierChecksData.error}} </p>
                     <table class="table table-bordered">
                         <tr>
-                            {% for header in pendingFundTransfersData.headers %}
+                            {% for header in pendingCashierChecksData.headers %}
                                 <th>{{ header }}</th>
                             {% endfor %}
                             </tr>
-                            {% for row in pendingFundTransfersData.rows %}
+                            {% for row in pendingCashierChecksData.rows %}
                             <tr>
                                 {% for value in row %}
                                     <td>{{value}}</td>
@@ -35,11 +35,11 @@
                 <div class="card-body">
                     <table class="table table-bordered">
                         <tr>
-                            {% for header in actionedFundTransfersData.headers %}
+                            {% for header in actionedCashierChecksData.headers %}
                                 <th>{{ header }}</th>
                             {% endfor %}
                             </tr>
-                            {% for row in actionedFundTransfersData.rows %}
+                            {% for row in actionedCashierChecksData.rows %}
                             <tr>
                                 {% for value in row %}
                                     <td>{{value}}</td>
