@@ -165,5 +165,5 @@ class CashierCheckForm(forms.ModelForm):
 
     class Meta:
         model = CashierCheck
-        fields = ("from_account", "recipient", "amount", "status")
-        widgets = {'status': forms.HiddenInput(), 'recipient': forms.TextInput()}
+        fields = ("from_account", "pay_to_the_order_of", "amount", "status")
+        widgets = {'status': forms.HiddenInput(), 'pay_to_the_order_of': forms.TextInput()}

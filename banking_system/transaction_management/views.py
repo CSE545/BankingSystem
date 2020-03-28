@@ -282,7 +282,7 @@ def cashierCheck(request):
                 e.request_id,
                 str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
                 " " + e.from_account.user_id.last_name,
-                e.recipient,
+                e.pay_to_the_order_of,
                 e.amount
             ])
         return render(request, 'transaction_management/cashierCheck.html', context)
@@ -314,7 +314,7 @@ def pendingCashierChecks(request):
     else:
         context = {}
         context['pendingCashierChecksData'] = {
-            'headers': [u'Transaction Id', u'From Account', u'Recipient', u'Amount', u'Status', u'Approve', u'Reject'],
+            'headers': [u'Transaction Id', u'From Account', u'Pay to the Order of', u'Amount', u'Status', u'Approve', u'Reject'],
             'rows': [],
             'error': ""
         }
@@ -323,13 +323,13 @@ def pendingCashierChecks(request):
                 e.request_id,
                 str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
                 " " + e.from_account.user_id.last_name,
-                e.recipient,
+                e.pay_to_the_order_of,
                 e.amount,
                 e.status
             ])
 
         context['actionedCashierChecksData'] = {
-            'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status'],
+            'headers': [u'Transaction Id', u'From Account', u'Pay to the Order of', u'Amount', u'Status'],
             'rows': []
         }
         for e in CashierCheck.objects.filter(~Q(status="NEW")):
@@ -337,7 +337,7 @@ def pendingCashierChecks(request):
                 e.request_id,
                 str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
                 " " + e.from_account.user_id.last_name,
-                e.recipient,
+                e.pay_to_the_order_of,
                 e.amount,
                 e.status
             ])
