@@ -1,9 +1,18 @@
 from django import forms
 from account_management.models import AccountRequests, Account
+from django.forms import DateTimeInput
 
-
-class NameForm(forms.Form):
-    your_name = forms.CharField(label='Your name', max_length=100)
+class BootstrapDateTimePickerInput(DateTimeInput):
+    template_name = 'widgets/bootstrap_datetimepicker.html'
+    def get_context(self, name, value, attrs):
+        datetimepicker_id = 'datetimepicker_{name}'.format(name=name)
+        if attrs is None:
+            attrs = dict()
+        attrs['data-target'] = '#{id}'.format(id=datetimepicker_id)
+        attrs['class'] = 'form-control datetimepicker-input'
+        context = super().get_context(name, value, attrs)
+        context['widget']['datetimepicker_id'] = datetimepicker_id
+        return context
     
 class BankAccountForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -18,12 +27,11 @@ class BankAccountForm(forms.ModelForm):
         fields = ('account_type',)
 
 class StatementRequestForm(forms.Form):
-        DATEPICKER = {
-        'type': 'text',
-        'class': 'form-control',
-        'id': 'datetimepicker1'
-        }
-        # Call attrs with form widget
-        start_date = forms.DateField(label="Start Date")
-        
+    start_date = forms.DateTimeField(
+        input_formats=['%d/%m/%Y %H:%M'],
+        widget=forms.DateTimeInput(attrs={
+            'class': 'form-control datetimepicker-input',
+            'data-target': '#datetimepicker1'
+        })
+    )
              

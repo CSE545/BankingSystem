@@ -12,24 +12,24 @@
                     <form method="POST" id="statementForm" class="statementForm">
                         {% csrf_token %}
                         <div class="form-group">
-                            <select class="custom-select" required>
+                            <select class="custom-select" name="account" required>
                               <option value="">Choose Account</option>
-                              <option value="1">One</option>
-                              <option value="2">Two</option>
-                              <option value="3">Three</option>
+                              {% for account in user_accounts %}
+                              <option name="{{account}}">{{account}}</option>
+                              {% endfor %}
                             </select>
                             <div class="invalid-feedback">Example invalid custom select feedback</div>
                           </div>
                         <div class="form-group row">
                             <label for="example-date-input" class="col-2 col-form-label">Start Date</label>
                             <div class="col-10">
-                              <input class="form-control" type="date" value="2011-08-19" id="example-date-input">
+                              <input class="form-control" type="date" value="2020-01-01" id="example-date-input"  name="start_date">
                             </div>
                           </div>
                           <div class="form-group row">
-                            <label for="example-date-input" class="col-2 col-form-label">End Date</label>
+                            <label for="example-date-input" class="col-2 col-form-label" >End Date</label>
                             <div class="col-10">
-                              <input class="form-control" type="date" value="2011-08-19" id="example-date-input">
+                              <input class="form-control" type="date" value="2020-01-01" id="example-date-input" name="end_date">
                             </div>
                           </div>
                         <button type="submit" class="btn btn-primary">Generate Statement</button>

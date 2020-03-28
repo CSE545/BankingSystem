@@ -5,8 +5,30 @@ from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from account_management.models import AccountRequests, Account
 from user_management.models import User
+from django import forms
 from account_management.utility.manage_accounts import create_account_for_current_request
-# Create your views here.
+from reportlab.pdfgen import canvas
+import datetime
+from django.http import FileResponse
+from io import BytesIO
+from django.http import HttpResponse
+from django.template.loader import get_template
+import xhtml2pdf.pisa as pisa
+
+
+class Render:
+    @staticmethod
+    def render(path: str, params: dict):
+        template = get_template(path)
+        html = template.render(params)
+        response = BytesIO()
+        pdf = pisa.pisaDocument(BytesIO(html.encode("UTF-8")), response)
+        if not pdf.err:
+            return HttpResponse(response.getvalue(), content_type='application/pdf')
+        else:
+            return HttpResponse("Error Rendering PDF", status=400)
+
+
 
 @login_required
 def open_account(request):
@@ -63,12 +85,27 @@ def generate_statement(request):
     user_accounts = Account.objects.filter(user_id=request.user)
     if request.POST:
         print("Functionality still to be implemented!")
+        print(request.POST.keys())
+        print(request.POST["account"])
+        account_id = request.POST["account"].split(",")[0].split(":")[1].strip()
+        account_name = request.POST["account"].split(",")[3].split(":")[1].strip()
+        start_date_string = request.POST["start_date"]
+        end_date_string = request.POST["end_date"]
+        start_date = datetime.datetime.strptime(start_date_string, '%Y-%m-%d')
+        end_date = datetime.datetime.strptime(end_date_string, '%Y-%m-%d')
+        context = {}
+        form = StatementRequestForm()
+        form.account_list = user_accounts
+        context['form'] = form
+        params= {"name":account_name,"accountNo": account_id,"today":datetime.datetime.today()}
+        
+        return Render.render('account_management/pdfTemplate.html', params)
+        
     else:
         context = {}
         form = StatementRequestForm()
         context['form'] = form
-        context['accounts'] = user_accounts
-        #account_form.fields['account'] = user_accounts;
+        context['user_accounts'] = user_accounts
         return render(request, 'account_management/generate_statement.html', context)
 
 
