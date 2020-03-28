@@ -273,6 +273,19 @@ def cashierCheck(request):
         account_form = CashierCheckForm()
         account_form.fields['from_account'].queryset = from_accounts
         context['account_form'] = account_form
+        context['approvedCashierChecksData'] = {
+            'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status'],
+            'rows': []
+        }
+        for e in CashierCheck.objects.filter(status="APPROVED"):
+            context['approvedCashierChecksData']['rows'].append([
+                e.request_id,
+                str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+                " " + e.from_account.user_id.last_name,
+                e.recipient,
+                e.amount,
+                e.status
+            ])
         return render(request, 'transaction_management/cashierCheck.html', context)
 
 @login_required

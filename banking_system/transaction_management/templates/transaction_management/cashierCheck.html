@@ -53,6 +53,28 @@
                   </div>
                 </div>
             </div>
+          </br>
+            <div class="card">
+                <div class="card-header">
+                    Cashier Checks
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            {% for header in approvedCashierChecksData.headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                            </tr>
+                            {% for row in approvedCashierChecksData.rows %}
+                            <tr>
+                                {% for value in row %}
+                                    <td>{{value}}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
