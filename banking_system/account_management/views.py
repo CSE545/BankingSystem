@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from account_management.models import AccountRequests, Account
 from user_management.models import User
+from transaction_management.models import FundTransfers
 from django import forms
 from account_management.utility.manage_accounts import create_account_for_current_request
 from reportlab.pdfgen import canvas
@@ -14,6 +15,7 @@ from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
 import xhtml2pdf.pisa as pisa
+from django.db.models import Q
 
 
 class Render:
@@ -84,20 +86,25 @@ def view_accounts(request):
 def generate_statement(request):
     user_accounts = Account.objects.filter(user_id=request.user)
     if request.POST:
-        print("Functionality still to be implemented!")
-        print(request.POST.keys())
-        print(request.POST["account"])
         account_id = request.POST["account"].split(",")[0].split(":")[1].strip()
         account_name = request.POST["account"].split(",")[3].split(":")[1].strip()
         start_date_string = request.POST["start_date"]
         end_date_string = request.POST["end_date"]
         start_date = datetime.datetime.strptime(start_date_string, '%Y-%m-%d')
         end_date = datetime.datetime.strptime(end_date_string, '%Y-%m-%d')
+        transactions_from =FundTransfers.objects.filter(from_account_id = account_id)
+        transactions_to = FundTransfers.objects.filter(to_account_id = account_id)
+        
+        my_dict = transactions_from.values()
+        my_dict2 = transactions_to.values()
+        comb_dict = my_dict | my_dict2
+        result =list(comb_dict)        
+        print(result)
         context = {}
         form = StatementRequestForm()
         form.account_list = user_accounts
         context['form'] = form
-        params= {"name":account_name,"accountNo": account_id,"today":datetime.datetime.today()}
+        params= {"name":account_name,"accountNo": account_id,"today":datetime.datetime.today(), "result": result}
         
         return Render.render('account_management/pdfTemplate.html', params)
         

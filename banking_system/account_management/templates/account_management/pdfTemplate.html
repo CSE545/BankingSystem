@@ -66,29 +66,28 @@
         <div class="list-group">
             <p>Name: {{name }}</p>
             <p>Acoount Id: {{accountNo}}</p>
-            
         </div>
 
         <table class="table">
             <thead>
             <tr>
-                <th>Date</th>
-                <th>Transaction Type</th>
-                <th>From</th>
-                <th>To</th>
+                <th>Request Id</th>
+                <th>From Account</th>
+                <th>To Account</th>
                 <th>Amount</th>
+                <th>Status</th>
             </tr>
             </thead>
             <tbody>
-            <!-- {% for sale in sales %}
+             {% for transaction in  result %}
                 <tr>
-                    <td>{{ sale.created_at | date:"d/m/Y" }}</td>
-                    <td>{{ sale.product.title }}</td>
-                    <td>{{ sale.quantity }}</td>
-                    <td>&pound;{{ sale.price }}</td>
-                    <td>{{ sale.customer.first_name }} {{ sale.customer.last_name }}</td>
+                    <td>{{ transaction.request_id }}</td>
+                    <td>{{ transaction.from_account_id }}</td>
+                    <td>{{ transaction.to_account_id }}</td>
+                    <td>&dollar;{{ transaction.amount }}</td>
+                    <td>{{ transaction.status }}</td>
                 </tr>
-            {% endfor %} -->
+            {% endfor %}
             </tbody>
         </table>
     </div>
