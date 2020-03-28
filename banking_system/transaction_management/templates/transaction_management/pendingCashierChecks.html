@@ -1,0 +1,80 @@
+{% extends 'homepage.html' %}
+{% block info %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Pending Cashier Checks
+                </div>
+                <div class="card-body">
+                    <p id="error_msg" style="display:none"> {{pendingFundTransfersData.error}} </p>
+                    <table class="table table-bordered">
+                        <tr>
+                            {% for header in pendingFundTransfersData.headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                            </tr>
+                            {% for row in pendingFundTransfersData.rows %}
+                            <tr>
+                                {% for value in row %}
+                                    <td>{{value}}</td>
+                                {% endfor %}
+                                <td><button class="action btn btn-success btn-sm">Approve</button></td>
+                                <td><button class="action btn btn-danger btn-sm">Reject</button></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </br>
+            <div class="card">
+                <div class="card-header">
+                    Approved/Rejected Cashier Checks
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <tr>
+                            {% for header in actionedFundTransfersData.headers %}
+                                <th>{{ header }}</th>
+                            {% endfor %}
+                            </tr>
+                            {% for row in actionedFundTransfersData.rows %}
+                            <tr>
+                                {% for value in row %}
+                                    <td>{{value}}</td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.1.0.js"></script>
+<script>
+(function test(){
+    var statusMap = {"Approve": "APPROVED","Reject": "REJECTD"};
+    console.log("hi")
+    $(".action").click(function(e) {
+        var status = statusMap[e.target.textContent]
+    var request_id = $(e.target).parents('tr').children(":first").text()
+        console.log(e)
+        $.ajax({
+   type: "POST",
+   url: "",
+   data: { csrfmiddlewaretoken: '{{ csrf_token }}', request_id, status} ,
+   success: function callback(response, context, test, test2){
+               var s = $(response)
+               var error_text = s.find("#error_msg").text().trim()
+               if(error_text){
+                   alert(error_text);
+               }
+               location.reload();
+            }
+});
+    })
+})()
+</script>
+{% endblock %}

@@ -9,5 +9,7 @@ urlpatterns = [
     path('criticalPendingFundTransfers/', views.criticalPendingFundTransfers, name="criticalPendingFundTransfers"),
     path('trans/create/', views.transaction, name="create"),
     path('trans/list/<int:id>/', views.transaction_view, name="trans_view"),
-    path('trans/list/', views.trans_list_view, name="list")
+    path('trans/list/', views.trans_list_view, name="list"),
+    path('cashierCheck/', views.cashierCheck, name="cashierCheck"),
+    path('pendingCashierChecks/', views.pendingCashierChecks, name="pendingCashierChecks")
 ]
