@@ -1,5 +1,6 @@
 from django.db import models
 from account_management.models import Account
+import datetime
 
 # Create your models here.
 REQUEST_STATUS = (
@@ -19,6 +20,7 @@ class FundTransfers(models.Model):
     from_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='from_account')
     to_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='to_account')
     amount = models.FloatField(blank=False, null=False)
+    date =models.DateField(blank=False, null= False, default= datetime.datetime.now())
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,
