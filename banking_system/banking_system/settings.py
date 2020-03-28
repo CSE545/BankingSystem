@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'banking_system',
     'user_management',
     'transaction_management',
-    'account_management'
+    'account_management',
+    'appointments'
 ]
 
 MIDDLEWARE = [
@@ -87,8 +88,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ss_project',
-        'USER': 'bank_admin',
-        'PASSWORD': 'Password#0',
+        'USER': 'root',
+        'PASSWORD': 'ripu',
         'HOST': 'localhost',
         'PORT': '3306'
     }
