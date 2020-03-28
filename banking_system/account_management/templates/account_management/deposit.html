@@ -1,0 +1,110 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Deposit
+                </div>
+                <div class="card-body">
+                    {% if select_account %}
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                {% for heading in user_accounts.headers %}
+                                <th scope="col">{{ heading }}</th>
+                                {% endfor %}
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in user_accounts.details %}
+                            <tr>
+                                {% for value in data %}
+
+                                <td>{{ value }}</td>
+
+                                {% endfor %}
+                                <td>
+                                    <a class="btn btn-primary btn-sm"
+                                        href="{% url 'account_management:deposit_with_pk' pk=data.0 %}">Select
+                                        account</a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% elif account_selected %}
+                    <div id="init">
+                        <form method="POST" action="/bankaccount/deposit/">
+                            <div class="form-group row">
+                                <label for="account_number" class="col-sm-2 col-form-label">Account number</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_number"
+                                        value="{{ user_accounts.details.account_number }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="account_type" class="col-sm-2 col-form-label">Account type</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_type"
+                                        value="{{ user_accounts.details.account_type }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="account_balance" class="col-sm-2 col-form-label">Account balance</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_balance"
+                                        value="{{ user_accounts.details.account_balance }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="deposit_amount" class="col-sm-2 col-form-label">Enter amount</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" id="deposit_amount"
+                                        placeholder="Enter amount...">
+                                </div>
+                            </div>
+                            <a href="/bankaccount/deposit/" class="btn btn-primary">&laquo; Back</a>
+                            <button type="button" class="btn btn-primary action">Submit</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    <div style="display: none;" id="result" class="alert alert-primary" style="text-align: center;">
+                        <p>Request successfully submitted. The amount will soon reflect into your account.</p>
+                        <a type="button" class="btn btn-primary" href="/">Home</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $(".action").click(function (e) {
+
+            let account_id = $('#account_number').val();
+            let amount = $('#deposit_amount').val();
+            if (amount === '') {
+                alert('Deposit amount empty.');
+                return;
+            }
+            $.ajax({
+                type: "POST",
+                url: "/bankaccount/deposit/" + account_id + "/",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    amount,
+                    account_id
+                },
+                success: function callback(response) {
+                    $("#init").hide();
+                    $("#result").show();
+                }
+            });
+        })
+    });
+</script>
+{% endblock %}
