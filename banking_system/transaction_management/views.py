@@ -75,24 +75,25 @@ def nonCriticalPendingFundTransfers(request):
         context = {"pendingFundTransfersData": {"error": ""}}
         curFundObj = FundTransfers.objects.get(
             request_id=int(request.POST['request_id']))
-        if (request.POST['status'] == "APPROVED"):
-            curBal = Account.objects.get(
-                account_id=curFundObj.from_account_id).account_balance
-            if curBal >= curFundObj.amount:
+        if curFundObj.amount < 1000:
+            if (request.POST['status'] == "APPROVED"):
+                curBal = Account.objects.get(
+                    account_id=curFundObj.from_account_id).account_balance
+                if curBal >= curFundObj.amount:
+                    FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(
+                        status=request.POST['status'])
+                    Account.objects.filter(account_id=curFundObj.from_account_id).update(
+                        account_balance=curBal - curFundObj.amount)
+                    Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(
+                        account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
+                else:
+                    context["pendingFundTransfersData"]["error"] = "Rejected: Insufficient funds"
+                    FundTransfers.objects.filter(request_id=int(
+                        request.POST['request_id'])).update(status="REJECTED")
+
+            else:
                 FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(
                     status=request.POST['status'])
-                Account.objects.filter(account_id=curFundObj.from_account_id).update(
-                    account_balance=curBal - curFundObj.amount)
-                Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(
-                    account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
-            else:
-                context["pendingFundTransfersData"]["error"] = "Rejected: Insufficient funds"
-                FundTransfers.objects.filter(request_id=int(
-                    request.POST['request_id'])).update(status="REJECTED")
-
-        else:
-            FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(
-                status=request.POST['status'])
         return render(request, 'transaction_management/pendingFundTransfers.html', context)
     else:
         context = {}
@@ -135,24 +136,25 @@ def criticalPendingFundTransfers(request):
         context = {"pendingFundTransfersData": {"error": ""}}
         curFundObj = FundTransfers.objects.get(
             request_id=int(request.POST['request_id']))
-        if (request.POST['status'] == "APPROVED"):
-            curBal = Account.objects.get(
-                account_id=curFundObj.from_account_id).account_balance
-            if curBal >= curFundObj.amount:
+        if curFundObj >= 1000:
+            if (request.POST['status'] == "APPROVED"):
+                curBal = Account.objects.get(
+                    account_id=curFundObj.from_account_id).account_balance
+                if curBal >= curFundObj.amount:
+                    FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(
+                        status=request.POST['status'])
+                    Account.objects.filter(account_id=curFundObj.from_account_id).update(
+                        account_balance=curBal - curFundObj.amount)
+                    Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(
+                        account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
+                else:
+                    context["pendingFundTransfersData"]["error"] = "Rejected: Insufficient funds"
+                    FundTransfers.objects.filter(request_id=int(
+                        request.POST['request_id'])).update(status="REJECTED")
+
+            else:
                 FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(
                     status=request.POST['status'])
-                Account.objects.filter(account_id=curFundObj.from_account_id).update(
-                    account_balance=curBal - curFundObj.amount)
-                Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(
-                    account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
-            else:
-                context["pendingFundTransfersData"]["error"] = "Rejected: Insufficient funds"
-                FundTransfers.objects.filter(request_id=int(
-                    request.POST['request_id'])).update(status="REJECTED")
-
-        else:
-            FundTransfers.objects.filter(request_id=int(request.POST['request_id'])).update(
-                status=request.POST['status'])
         return render(request, 'transaction_management/pendingFundTransfers.html', context)
     else:
         context = {'pendingFundTransfersData': {
