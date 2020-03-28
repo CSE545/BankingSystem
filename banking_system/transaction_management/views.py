@@ -2,8 +2,8 @@ from account_management.models import Account
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.shortcuts import render
-from transaction_management.forms import FundTransferForm, FundTransferFormEmail, FundTransferFormPhone, TransactionForm
-from transaction_management.models import FundTransfers, Transaction
+from transaction_management.forms import FundTransferForm, FundTransferFormEmail, FundTransferFormPhone, TransactionForm, CashierCheckForm
+from transaction_management.models import FundTransfers, Transaction, CashierCheck
 from user_management.models import User
 
 
@@ -245,3 +245,100 @@ def trans_list_view(request):
         "object_list": object_list
     }
     return render(request, "transaction_management/trans_list.html", context)
+
+
+@login_required
+def cashierCheck(request):
+    from_accounts = Account.objects.filter(user_id=request.user.user_id).exclude(account_type="CREDIT")
+    if request.POST:
+        if request.POST['formId'] == 'ACCOUNT':
+            form = CashierCheckForm(request.POST)
+        context = {'formId': request.POST['formId']}
+        account_form = CashierCheckForm()
+        account_form.fields['from_account'].queryset = from_accounts
+        form.fields['from_account'].queryset = from_accounts
+        context['account_form'] = account_form
+        if request.POST['formId'] == 'ACCOUNT':
+            context['account_form'] = form
+        if form.is_valid():
+            s = request.POST.dict()
+            form = CashierCheckForm(s, request.user)
+            instance = form.save(commit=False)
+            instance.transfer_type = s['formId']
+            instance.save()
+            context['request_received'] = True
+        return render(request, 'transaction_management/cashierCheck.html', context)
+    else:
+        context = {'formId': 'ACCOUNT'}
+        account_form = CashierCheckForm()
+        account_form.fields['from_account'].queryset = from_accounts
+        context['account_form'] = account_form
+        context['approvedCashierChecksData'] = {
+            'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status'],
+            'rows': []
+        }
+        for e in CashierCheck.objects.filter(status="APPROVED"):
+            context['approvedCashierChecksData']['rows'].append([
+                e.request_id,
+                str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+                " " + e.from_account.user_id.last_name,
+                e.pay_to_the_order_of,
+                e.amount
+            ])
+        return render(request, 'transaction_management/cashierCheck.html', context)
+
+@login_required
+@user_passes_test(t1_check)
+def pendingCashierChecks(request):
+    if request.POST:
+        context = {"pendingCashierChecksData": {"error": ""}}
+        curFundObj = CashierCheck.objects.get(
+            request_id=int(request.POST['request_id']))
+        if (request.POST['status'] == "APPROVED"):
+            curBal = Account.objects.get(
+                account_id=curFundObj.from_account_id).account_balance
+            if curBal >= curFundObj.amount + 10:
+                CashierCheck.objects.filter(request_id=int(request.POST['request_id'])).update(
+                    status=request.POST['status'])
+                Account.objects.filter(account_id=curFundObj.from_account_id).update(
+                    account_balance=curBal - curFundObj.amount - 10)
+            else:
+                context["pendingCashierChecksData"]["error"] = "Rejected: Insufficient funds"
+                CashierCheck.objects.filter(request_id=int(
+                    request.POST['request_id'])).update(status="REJECTED")
+
+        else:
+            CashierCheck.objects.filter(request_id=int(request.POST['request_id'])).update(
+                status=request.POST['status'])
+        return render(request, 'transaction_management/pendingCashierChecks.html', context)
+    else:
+        context = {}
+        context['pendingCashierChecksData'] = {
+            'headers': [u'Transaction Id', u'From Account', u'Pay to the Order of', u'Amount', u'Status', u'Approve', u'Reject'],
+            'rows': [],
+            'error': ""
+        }
+        for e in CashierCheck.objects.filter(status="NEW"):
+            context['pendingCashierChecksData']['rows'].append([
+                e.request_id,
+                str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+                " " + e.from_account.user_id.last_name,
+                e.pay_to_the_order_of,
+                e.amount,
+                e.status
+            ])
+
+        context['actionedCashierChecksData'] = {
+            'headers': [u'Transaction Id', u'From Account', u'Pay to the Order of', u'Amount', u'Status'],
+            'rows': []
+        }
+        for e in CashierCheck.objects.filter(~Q(status="NEW")):
+            context['actionedCashierChecksData']['rows'].append([
+                e.request_id,
+                str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+                " " + e.from_account.user_id.last_name,
+                e.pay_to_the_order_of,
+                e.amount,
+                e.status
+            ])
+        return render(request, 'transaction_management/pendingCashierChecks.html', context)
