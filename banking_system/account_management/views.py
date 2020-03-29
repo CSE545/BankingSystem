@@ -18,7 +18,6 @@ from account_management.utility.manage_accounts import update_deposit_request, w
 # Create your views here.
 
 
-
 """
 Referenced from Ben Cleary's work on his public GitHub and provided in a GitHub Gist.
  * @author Ben Cleary
