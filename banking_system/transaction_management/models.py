@@ -15,12 +15,16 @@ TRANSFER_TYPE = (
     ("PHONE", "PHONE")
 )
 
+
 class FundTransfers(models.Model):
     request_id = models.AutoField(primary_key=True)
-    from_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='from_account')
-    to_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='to_account')
+    from_account = models.ForeignKey(
+        Account, default=None, on_delete=models.CASCADE, related_name='from_account')
+    to_account = models.ForeignKey(
+        Account, default=None, on_delete=models.CASCADE, related_name='to_account')
     amount = models.FloatField(blank=False, null=False)
-    date =models.DateField(blank=False, null= False, default= datetime.datetime.now())
+    date = models.DateField(blank=False, null=False,
+                            default=datetime.datetime.now())
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,

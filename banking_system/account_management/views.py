@@ -25,6 +25,7 @@ from django.db.models import Q
  * @referenced 3/28/20
 """
 
+
 class Render:
     @staticmethod
     def render(path: str, params: dict):
@@ -36,6 +37,7 @@ class Render:
             return HttpResponse(response.getvalue(), content_type='application/pdf')
         else:
             return HttpResponse("Error Rendering PDF", status=400)
+
 
 @login_required
 def open_account(request):
@@ -62,14 +64,16 @@ def open_account(request):
 @login_required
 def view_accounts(request):
     if request.POST:
-        User.objects.filter(user_id=request.user.user_id).update(primary_account=request.POST['account_num'])
+        User.objects.filter(user_id=request.user.user_id).update(
+            primary_account=request.POST['account_num'])
     context = {}
     context['account_details'] = {
         'headers': ['Account number', 'Account type', 'Account balance', 'Action'],
         'accounts': []
     }
     user_accounts = Account.objects.filter(user_id=request.user)
-    primary_account = User.objects.get(user_id=request.user.user_id).primary_account
+    primary_account = User.objects.get(
+        user_id=request.user.user_id).primary_account
     primary_account_id = primary_account.account_id if primary_account else None
     for acc in user_accounts:
         if acc.account_type == "CREDIT":
@@ -91,34 +95,41 @@ def view_accounts(request):
 def generate_statement(request):
     user_accounts = Account.objects.filter(user_id=request.user)
     if request.POST:
-        account_id = request.POST["account"].split(",")[0].split(":")[1].strip()
-        account_name = request.POST["account"].split(",")[3].split(":")[1].strip()
+        account_id = request.POST["account"].split(",")[0].split(":")[
+            1].strip()
+        account_name = request.POST["account"].split(",")[3].split(":")[
+            1].strip()
         start_date_string = request.POST["start_date"]
         end_date_string = request.POST["end_date"]
         start_date = datetime.datetime.strptime(start_date_string, '%Y-%m-%d')
         end_date = datetime.datetime.strptime(end_date_string, '%Y-%m-%d')
-        transactions_from =FundTransfers.objects.filter(from_account_id = account_id)
-        transactions_from = transactions_from.filter(date__range=[start_date_string,end_date_string])
-        transactions_to = FundTransfers.objects.filter(to_account_id = account_id)
-        transactions_to = transactions_to.filter(date__range=[start_date_string,end_date_string])
-        result =[]
+        transactions_from = FundTransfers.objects.filter(
+            from_account_id=account_id)
+        transactions_from = transactions_from.filter(
+            date__range=[start_date_string, end_date_string])
+        transactions_to = FundTransfers.objects.filter(
+            to_account_id=account_id)
+        transactions_to = transactions_to.filter(
+            date__range=[start_date_string, end_date_string])
+        result = []
         for i in transactions_to:
-            temp =i.__dict__
+            temp = i.__dict__
             temp["description"] = i.from_account.user_id.get_full_name()
             result.append(temp)
-            
+
         for i in transactions_from:
-            temp =i.__dict__
+            temp = i.__dict__
             temp["description"] = i.from_account.user_id.get_full_name()
             result.append(temp)
-            
+
         context = {}
         form = StatementRequestForm()
         form.account_list = user_accounts
         context['form'] = form
-        params= {"name":account_name,"accountNo": int(account_id),"today":datetime.datetime.today(), "result": result}
+        params = {"name": account_name, "accountNo": int(
+            account_id), "today": datetime.datetime.today(), "result": result}
         return Render.render('account_management/pdfTemplate.html', params)
-        
+
     else:
         context = {}
         form = StatementRequestForm()
