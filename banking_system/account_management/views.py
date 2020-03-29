@@ -18,6 +18,13 @@ import xhtml2pdf.pisa as pisa
 from django.db.models import Q
 
 
+"""
+ * Referenced from Ben Cleary's work on his public GitHub and provided in a GitHub Gist.
+ * @author Ben Cleary
+ * @url https://gist.github.com/bencleary/1cb0f951362d3fdac954e0ab94d2e6bd/revisions
+ * @referenced 3/28/20
+"""
+
 class Render:
     @staticmethod
     def render(path: str, params: dict):
@@ -29,8 +36,6 @@ class Render:
             return HttpResponse(response.getvalue(), content_type='application/pdf')
         else:
             return HttpResponse("Error Rendering PDF", status=400)
-
-
 
 @login_required
 def open_account(request):
@@ -112,7 +117,6 @@ def generate_statement(request):
         form.account_list = user_accounts
         context['form'] = form
         params= {"name":account_name,"accountNo": int(account_id),"today":datetime.datetime.today(), "result": result}
-        
         return Render.render('account_management/pdfTemplate.html', params)
         
     else:

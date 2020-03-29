@@ -1,5 +1,14 @@
 {% extends 'homepage.html' %}
 {% block info %}
+<script>
+    function validateDate(startDate, endDate) {
+        if ((Date.parse(startDate) > Date.parse(endDate))) {
+            alert("End date should be greater than Start date");
+            return false;
+        }
+        return true;
+    }
+</script>
 
 <div class="container">
     <div class="row">
@@ -23,18 +32,17 @@
                         <div class="form-group row">
                             <label for="example-date-input" class="col-2 col-form-label">Start Date</label>
                             <div class="col-10">
-                              <input class="form-control" type="date" value="2020-01-01" id="example-date-input"  name="start_date">
+                              <input class="form-control" type="date" value="{{date_string}}" id="dateInput1"  name="start_date">
                             </div>
                           </div>
                           <div class="form-group row">
                             <label for="example-date-input" class="col-2 col-form-label" >End Date</label>
                             <div class="col-10">
-                              <input class="form-control" type="date" value="2020-01-01" id="example-date-input" name="end_date">
+                              <input class="form-control" type="date" value="{{date_string}}" id="dateInput2" name="end_date">
                             </div>
                           </div>
-                        <button type="submit" class="btn btn-primary">Generate Statement</button>
+                        <button type="submit" class="btn btn-primary" onclick="return validateDate(document.getElementById('dateInput1').value, document.getElementById('dateInput2').value)">Generate Statement</button>
                     </form>                    
-
                 </div>
             </div>
         </div>
