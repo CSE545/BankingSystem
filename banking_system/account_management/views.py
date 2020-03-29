@@ -101,35 +101,42 @@ def generate_statement(request):
             1].strip()
         start_date_string = request.POST["start_date"]
         end_date_string = request.POST["end_date"]
-        start_date = datetime.datetime.strptime(start_date_string, '%Y-%m-%d')
-        end_date = datetime.datetime.strptime(end_date_string, '%Y-%m-%d')
-        transactions_from = FundTransfers.objects.filter(
-            from_account_id=account_id)
-        transactions_from = transactions_from.filter(
-            date__range=[start_date_string, end_date_string])
-        transactions_to = FundTransfers.objects.filter(
-            to_account_id=account_id)
-        transactions_to = transactions_to.filter(
-            date__range=[start_date_string, end_date_string])
-        result = []
-        for i in transactions_to:
-            temp = i.__dict__
-            temp["description"] = i.from_account.user_id.get_full_name()
-            result.append(temp)
+        try:
+            start_date = datetime.datetime.strptime(start_date_string, '%Y-%m-%d')
+            end_date = datetime.datetime.strptime(end_date_string, '%Y-%m-%d')
+            transactions_from = FundTransfers.objects.filter(
+                from_account_id=account_id)
+            transactions_from = transactions_from.filter(
+                date__range=[start_date_string, end_date_string])
+            transactions_to = FundTransfers.objects.filter(
+                to_account_id=account_id)
+            transactions_to = transactions_to.filter(
+                date__range=[start_date_string, end_date_string])
+            result = []
+            for i in transactions_to:
+                temp = i.__dict__
+                temp["description"] = i.from_account.user_id.get_full_name()
+                result.append(temp)
 
-        for i in transactions_from:
-            temp = i.__dict__
-            temp["description"] = i.from_account.user_id.get_full_name()
-            result.append(temp)
+            for i in transactions_from:
+                temp = i.__dict__
+                temp["description"] = i.from_account.user_id.get_full_name()
+                result.append(temp)
 
-        context = {}
-        form = StatementRequestForm()
-        form.account_list = user_accounts
-        context['form'] = form
-        params = {"name": account_name, "accountNo": int(
-            account_id), "today": datetime.datetime.today(), "result": result}
-        return Render.render('account_management/pdfTemplate.html', params)
-
+            context = {}
+            form = StatementRequestForm()
+            form.account_list = user_accounts
+            context['form'] = form
+            params = {"name": account_name, "accountNo": int(
+                account_id), "today": datetime.datetime.today(), "result": result}
+            return Render.render('account_management/pdfTemplate.html', params)
+        except:
+            print("Data entered is not valid")
+            context = {}
+            form = StatementRequestForm()
+            context['form'] = form
+            context['user_accounts'] = user_accounts
+            return render(request, 'account_management/generate_statement.html', context)
     else:
         context = {}
         form = StatementRequestForm()
