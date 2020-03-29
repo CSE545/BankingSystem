@@ -20,7 +20,7 @@ if [ "$CC_RUNTIME_LANGUAGE" = "java" ]; then
 	CC_SRC_PATH=$(pwd)/../chaincode/BankTransactions/java/build/install/BankTransactions
 
 	echo Compiling Java code ...
-	pushd chaincode/BankTransactions/java
+	pushd ../chaincode/BankTransactions/java
 	./gradlew installDist
 	popd
 	echo Finished compiling Java code
