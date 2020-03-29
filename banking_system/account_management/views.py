@@ -1,21 +1,18 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
 from account_management.forms import BankAccountForm, StatementRequestForm
-from django.http import HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
 from account_management.models import AccountRequests, Account, DepositRequest
 from user_management.models import User
 from transaction_management.models import FundTransfers
 from django import forms
 from account_management.utility.manage_accounts import create_account_for_current_request
-from reportlab.pdfgen import canvas
 import datetime
 from django.http import FileResponse
 from io import BytesIO
 from django.http import HttpResponse
 from django.template.loader import get_template
 import xhtml2pdf.pisa as pisa
-from django.db.models import Q
 from account_management.utility.manage_accounts import create_deposit_request
 from account_management.utility.manage_accounts import update_deposit_request, withdraw_money
 # Create your views here.
@@ -23,7 +20,7 @@ from account_management.utility.manage_accounts import update_deposit_request, w
 
 
 """
- * Referenced from Ben Cleary's work on his public GitHub and provided in a GitHub Gist.
+Referenced from Ben Cleary's work on his public GitHub and provided in a GitHub Gist.
  * @author Ben Cleary
  * @url https://gist.github.com/bencleary/1cb0f951362d3fdac954e0ab94d2e6bd/revisions
  * @referenced 3/28/20

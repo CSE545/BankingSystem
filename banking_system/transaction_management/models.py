@@ -22,7 +22,6 @@ TRANSACTION_TYPE = (
 )
 
 
-
 class FundTransfers(models.Model):
     request_id = models.AutoField(primary_key=True)
     from_account = models.ForeignKey(
@@ -83,6 +82,7 @@ class Transaction(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Transaction, self).__init__(*args, **kwargs)
+
 
 class CashierCheck(models.Model):
     request_id = models.AutoField(primary_key=True)
