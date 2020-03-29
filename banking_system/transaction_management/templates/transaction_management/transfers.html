@@ -33,7 +33,7 @@
                     </div>
                   </nav>
                   <div class="tab-content" id="nav-tabContent">
-                    
+
                     <div class="tab-pane fade show active" id="nav-account" role="tabpanel" aria-labelledby="nav-account-tab">
                       <form method="POST" id="accountTransfer" class="transferForm">
                         {% csrf_token %}
@@ -92,14 +92,14 @@
                     </form>
                     </div>
                   </div>
-                  
+
                 </div>
             </div>
         </div>
     </div>
 </div>
 <script>
-  var activeMap = {'ACCOUNT':'#nav-account-tab', 'EMAIL': '#nav-email-tab', 'PHONE':'#nav-phone-tab'}
+  var activeMap = {'ACCOUNT':'#nav-account-tab', 'EMAIL': '#nav-email-tab', 'PHONE':'#nav-phone-tab'};
   var selectedTab = activeMap[$('#activeId').text()];
   $(selectedTab).tab('show')
 </script>
