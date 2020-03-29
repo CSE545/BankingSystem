@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'banking_system',
     'user_management',
     'transaction_management',
     'account_management'
@@ -76,7 +77,7 @@ WSGI_APPLICATION = 'banking_system.wsgi.application'
 
 AUTHENTICATION_BACKENDS = [
     'user_management.custom_backend.CustomAuthBackend',
-    # 'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend'
 ]
 
 # Database
