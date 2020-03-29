@@ -130,7 +130,7 @@ def generate_statement(request):
             params = {"name": account_name, "accountNo": int(
                 account_id), "today": datetime.datetime.today(), "result": result}
             return Render.render('account_management/pdfTemplate.html', params)
-        except:
+        except Exception:
             print("Data entered is not valid")
             context = {}
             form = StatementRequestForm()
