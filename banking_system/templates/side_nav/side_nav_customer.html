@@ -10,7 +10,17 @@
         <a class="dropdown-item" href="/bankaccount/withdraw/">Withdraw</a>
     </div>
 </div>
-<a href="/transactions/transfers/" class="list-group-item list-group-item-action bg-light">Fund Transfers</a>
+<div class="dropdown">
+    <a class="list-group-item list-group-item-action bg-light dropdown-toggle" type="button" id="dropdownMenu3"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Fund Transfers
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+        <a class="dropdown-item" href="/transactions/transfers/send/">Send funds</a>
+        <a class="dropdown-item" href="/transactions/transfers/receive/">Receive funds</a>
+        <a class="dropdown-item" href="/transactions/transfers/requests/">View requests</a>
+    </div>
+</div>
 <a href="/transactions/cashierCheck/" class="list-group-item list-group-item-action bg-light">Cashier Checks</a>
 <div class="dropdown">
     <a class="list-group-item list-group-item-action bg-light dropdown-toggle" type="button" id="dropdownMenu2"

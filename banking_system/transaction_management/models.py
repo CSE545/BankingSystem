@@ -35,6 +35,9 @@ class FundTransfers(models.Model):
         choices=TRANSFER_TYPE,
         default="ACCOUNT"
     )
+    is_request = models.BooleanField(
+        default=False
+    )
 
     def __str__(self):
         return "Created by: {0}, Status: {1}".format(self.from_account, self.status)
@@ -70,7 +73,7 @@ class Transaction(models.Model):
         max_length=10,
         choices=TRANSACTION_TYPE
     )
-
+    
     def __str__(self):
         return "Created by: {0}, Status: {1}".format(self.from_account, self.status)
 

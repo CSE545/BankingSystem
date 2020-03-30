@@ -17,12 +17,16 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    Fund Transfers
+                    {{cardHeader}}
                 </div>
                 <div class="card-body">
                   {% if request_received %}
                     <div class="alert alert-success">
-                        <p><strong>Request received. Fund will be transferred upon approval from an employee.</strong></p>
+                      {% if cardHeader == 'Send Funds' %}
+                          <p><strong>Request received. Funds will be transferred upon approval from an employee.</strong></p>
+                      {% else %}
+                          <p><strong>Request submitted. Funds will be received upon approval from the customer.</strong></p>
+                      {% endif %}
                     </div>
                   {% endif %}
                   <nav>
