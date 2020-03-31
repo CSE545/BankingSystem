@@ -68,7 +68,6 @@
                 },
                 success: function callback(response) {
                     taken_slots = response;
-                    console.log(taken_slots)
                 }
             });
         });
@@ -95,6 +94,7 @@
                     return;
                 }
             }
+            
             $.ajax({
                 type: "POST",
                 url: "/appointments/schedule_appointment/",
