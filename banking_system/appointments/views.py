@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from appointments.utility.handle_appointments import make_appointment
 from appointments.models import Appointment
 from django.http import HttpResponse
+from django.http import JsonResponse
 
 # Create your views here.
 @login_required
@@ -12,7 +13,8 @@ def schedule_appointment(request):
         date = request.POST['date']
         time = request.POST['time']
         appointment_reason = request.POST['appointment_reason']
-        appointment = make_appointment(request.user, date, time, appointment_reason)
+        appointment = make_appointment(
+            request.user, date, time, appointment_reason)
         context['scheduled'] = True
         context['details'] = appointment
     else:
@@ -54,3 +56,19 @@ def cancel_appointment(request):
     app_id = request.POST['app_id']
     Appointment.objects.filter(app_id=app_id).update(status='CANCELLED')
     return HttpResponse("Success")
+
+
+@login_required
+def get_taken_slots(request):
+    context = {}
+    appointments = Appointment.objects.filter(
+        status='REQUESTED'
+    )
+    context['taken_slots'] = {
+        'date': [],
+        'time': []
+    }
+    for app in appointments:
+        context['taken_slots']['date'].append(app.scheduled_date)
+        context['taken_slots']['time'].append(app.scheduled_time)
+    return JsonResponse(context)
