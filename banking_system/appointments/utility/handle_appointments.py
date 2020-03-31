@@ -6,6 +6,6 @@ def make_appointment(user, date, time, appointment_reason):
         scheduled_date=date,
         scheduled_time=time,
         user=user,
-        appointment_reason=appointment_reason
+        reason=appointment_reason
     )
     return appointment

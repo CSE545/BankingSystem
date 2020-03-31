@@ -62,13 +62,17 @@ def cancel_appointment(request):
 def get_taken_slots(request):
     context = {}
     appointments = Appointment.objects.filter(
-        status='REQUESTED'
+        status__in=['REQUESTED', 'SCHEDULED']
     )
     context['taken_slots'] = {
-        'date': [],
-        'time': []
     }
     for app in appointments:
-        context['taken_slots']['date'].append(app.scheduled_date)
-        context['taken_slots']['time'].append(app.scheduled_time)
+        print(context)
+        if app.scheduled_date in context['taken_slots']:
+            context['taken_slots'][app.scheduled_date].append(
+                app.scheduled_time)
+        else:
+            context['taken_slots'][app.scheduled_date] = []
+            context['taken_slots'][app.scheduled_date].append(
+                app.scheduled_time)
     return JsonResponse(context)
