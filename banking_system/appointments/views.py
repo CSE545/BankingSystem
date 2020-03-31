@@ -21,7 +21,7 @@ def schedule_appointment(request):
     else:
         active_appointments = Appointment.objects.filter(
             user=request.user,
-            status='REQUESTED'
+            status__in=['REQUESTED', 'SCHEDULED']
         ).count()
         if active_appointments > 0:
             context['active_appointments'] = True

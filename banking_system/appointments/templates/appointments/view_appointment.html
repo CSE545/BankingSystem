@@ -16,9 +16,9 @@
                                 {% for heading in appointments.headers %}
                                 <th scope="col">{{ heading }}</th>
                                 {% endfor %}
-                                {% if appointments.details.status == 'REQUESTED' or appointments.details.status == 'SCHEDULED' %}
+
                                 <th scope="col">Action</th>
-                                {% endif %}
+
                             </tr>
                         </thead>
                         <tbody>
@@ -30,12 +30,14 @@
                                 <td>{{ value }}</td>
                                 {% endif %}
                                 {% endfor %}
-                                {% if appointments.details.status == 'REQUESTED' or appointments.details.status == 'SCHEDULED' %}
+
                                 <td>
+                                    {% if data.4 == 'REQUESTED' or data.4 == 'SCHEDULED' %}
                                     <button type="button" class="btn btn-primary btn-sm action">Cancel
                                         appointment</button>
+                                    {% endif %}
                                 </td>
-                                {% endif %}
+
                             </tr>
                             {% endfor %}
                         </tbody>
