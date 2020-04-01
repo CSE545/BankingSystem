@@ -27,10 +27,10 @@ def transfers(request):
             context_name = "account_form"
         elif request.POST['formId'] == 'EMAIL':
             form = FundTransferFormEmail(request.POST)
-            context_name = "account_form"
+            context_name = "email_form"
         elif request.POST['formId'] == 'PHONE':
             form = FundTransferFormPhone(request.POST)
-            context_name = "account_form"
+            context_name = "phone_form"
 
         context = {'formId': request.POST['formId']}
 
