@@ -26,7 +26,9 @@
                             <tr>
                                 <th id="{{data.5}}" scope="row">{{ forloop.counter }}</th>
                                 {% for value in data %}
-                                {% if forloop.counter != 6%}
+                                {% if forloop.counter == 2 %}
+                                <td>{{ value }} Hours</td>
+                                {% elif forloop.counter != 6%}
                                 <td>{{ value }}</td>
                                 {% endif %}
                                 {% endfor %}
