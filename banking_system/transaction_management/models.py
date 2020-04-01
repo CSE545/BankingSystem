@@ -76,7 +76,6 @@ class Transaction(models.Model):
         choices=TRANSACTION_TYPE
     )
 
-
     def __str__(self):
         return "Created by: {0}, Status: {1}".format(self.from_account, self.status)
 
