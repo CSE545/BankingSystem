@@ -1,5 +1,4 @@
 from account_management.models import Account
-import datetime
 from django.db import models
 from django.utils.timezone import now
 

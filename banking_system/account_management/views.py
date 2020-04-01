@@ -129,9 +129,10 @@ def generate_statement(request):
                 to_account_id=account_id, created_date__range=[start_date_string, end_date_string]))
 
             transaction_from = list(Transaction.objects.filter(from_account_id=account_id,
-                                                          created_date__range=[start_date_string, end_date_string]))
+                                                               created_date__range=[start_date_string,
+                                                                                    end_date_string]))
             transaction_to = list(Transaction.objects.filter(to_account_id=account_id,
-                                                        created_date__range=[start_date_string, end_date_string]))
+                                                             created_date__range=[start_date_string, end_date_string]))
 
             transfer_to += transaction_to
             transfer_from += transaction_from
@@ -213,8 +214,7 @@ def deposit(request, pk=None):
     if pk and request.POST:
         amount = request.POST['amount']
         account_id = request.POST['account_id']
-        deposit_request = create_deposit_request(
-            request.user, amount, account_id)
+        create_deposit_request(request.user, amount, account_id)
         context['deposit_request_submitted'] = True
         return render(request, 'account_management/deposit.html', context)
     elif pk:

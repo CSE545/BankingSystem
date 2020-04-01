@@ -65,7 +65,8 @@ class FundTransferFormEmail(forms.ModelForm):
             elif User.objects.get(
                     email=self.cleaned_data.get('to_email')).primary_account.account_id == from_account_id.account_id:
                 self._errors['to_email'] = self.error_class([
-                    "Cannot transfer to the same account. Please change your primary account or use account number to transfer."])
+                    "Cannot transfer to the same account. " +
+                    "Please change your primary account or use account number to transfer."])
         return self.cleaned_data
 
     class Meta:
@@ -103,7 +104,8 @@ class FundTransferFormPhone(forms.ModelForm):
             elif User.objects.get(
                     phone=self.cleaned_data.get('to_phone')).primary_account.account_id == from_account_id.account_id:
                 self._errors['to_phone'] = self.error_class([
-                    "Cannot transfer to the same account. Please change your primary account or use account number to transfer."])
+                    "Cannot transfer to the same account. " +
+                    "Please change your primary account or use account number to transfer."])
         return self.cleaned_data
 
     class Meta:
@@ -142,6 +144,7 @@ class TransactionForm(forms.ModelForm):
         model = Transaction
         fields = ("from_account", "to_account", "amount", "status")
         widgets = {'status': forms.HiddenInput(), 'to_account': forms.TextInput()}
+
 
 class CashierCheckForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
