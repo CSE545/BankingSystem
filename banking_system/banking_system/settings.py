@@ -86,9 +86,9 @@ AUTHENTICATION_BACKENDS = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ss_project',
-        'USER': 'bank_admin',
-        'PASSWORD': 'Password#0',
+        'NAME': 'ss_project1',
+        'USER': 'root',
+        'PASSWORD': 'root',
         'HOST': 'localhost',
         'PORT': '3306'
     }
