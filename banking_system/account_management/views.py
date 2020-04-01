@@ -1,32 +1,29 @@
-from django.shortcuts import render, redirect, reverse
-from django.contrib.auth.decorators import login_required
-from account_management.forms import BankAccountForm, StatementRequestForm
-from django.core.exceptions import PermissionDenied
-from account_management.models import AccountRequests, Account, DepositRequest
-from user_management.models import User
-from transaction_management.models import FundTransfers
-from django import forms
-from account_management.utility.manage_accounts import create_account_for_current_request
 import datetime
-from django.http import FileResponse
 from io import BytesIO
-from django.http import HttpResponse
-from django.template.loader import get_template
+
 import xhtml2pdf.pisa as pisa
+from account_management.forms import BankAccountForm, StatementRequestForm
+from account_management.models import AccountRequests, Account, DepositRequest
+from account_management.utility.manage_accounts import create_account_for_current_request
 from account_management.utility.manage_accounts import create_deposit_request
 from account_management.utility.manage_accounts import update_deposit_request, withdraw_money
-# Create your views here.
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.template.loader import get_template
+from transaction_management.models import FundTransfers, Transaction
+from user_management.models import User
 
 
-"""
-Referenced from Ben Cleary's work on his public GitHub and provided in a GitHub Gist.
- * @author Ben Cleary
- * @url https://gist.github.com/bencleary/1cb0f951362d3fdac954e0ab94d2e6bd/revisions
- * @referenced 3/28/20
-"""
+class PDFRender:
+    """
+    Referenced from Ben Cleary's work on his public GitHub and provided in a GitHub Gist.
+     * @author Ben Cleary
+     * @url https://gist.github.com/bencleary/1cb0f951362d3fdac954e0ab94d2e6bd/revisions
+     * @referenced 3/28/20
+    """
 
-
-class Render:
     @staticmethod
     def render(path: str, params: dict):
         template = get_template(path)
@@ -91,6 +88,30 @@ def view_accounts(request):
     return render(request, 'account_management/view_accounts.html', context)
 
 
+class BankStatementRow:
+    def __init__(self, description="No Description", transaction_type="Unknown", amount="$0.00", status="Pending"):
+        self.info = {"description": description, "transaction_type": transaction_type,
+                     "amount": amount, "status": status, "outbound": None, "date": None}
+
+    def outbound(self, outbound):
+        self.info["outbound"] = outbound
+
+    def description(self, description):
+        self.info["description"] = description
+
+    def transaction_type(self, transaction_type):
+        self.info["transaction_type"] = transaction_type
+
+    def amount(self, amount):
+        self.info["amount"] = "$%.2f" % amount
+
+    def status(self, status):
+        self.info["status"] = status
+
+    def date(self, date):
+        self.info["date"] = date
+
+
 @login_required
 def generate_statement(request):
     user_accounts = Account.objects.filter(user_id=request.user)
@@ -102,46 +123,55 @@ def generate_statement(request):
         start_date_string = request.POST["start_date"]
         end_date_string = request.POST["end_date"]
         try:
-            start_date = datetime.datetime.strptime(start_date_string, '%Y-%m-%d')
-            end_date = datetime.datetime.strptime(end_date_string, '%Y-%m-%d')
-            transactions_from = FundTransfers.objects.filter(
-                from_account_id=account_id)
-            transactions_from = transactions_from.filter(
-                date__range=[start_date_string, end_date_string])
-            transactions_to = FundTransfers.objects.filter(
-                to_account_id=account_id)
-            transactions_to = transactions_to.filter(
-                date__range=[start_date_string, end_date_string])
+            transfer_from = list(FundTransfers.objects.filter(
+                from_account_id=account_id, created_date__range=[start_date_string, end_date_string]))
+            transfer_to = list(FundTransfers.objects.filter(
+                to_account_id=account_id, created_date__range=[start_date_string, end_date_string]))
+
+            transaction_from = list(Transaction.objects.filter(from_account_id=account_id,
+                                                          created_date__range=[start_date_string, end_date_string]))
+            transaction_to = list(Transaction.objects.filter(to_account_id=account_id,
+                                                        created_date__range=[start_date_string, end_date_string]))
+
+            transfer_to += transaction_to
+            transfer_from += transaction_from
+
             result = []
-            for i in transactions_to:
-                temp = i.__dict__
-                temp["description"] = i.from_account.user_id.get_full_name()
-                result.append(temp)
+            for transfer in transfer_to:
+                temp = BankStatementRow()
+                temp.description("Sent from %s (%s)" % (transfer.from_account.user_id.get_full_name(),
+                                                        transfer.from_account.user_id.email))
+                temp.transaction_type(transfer.transfer_type)
+                temp.amount(transfer.amount)
+                temp.status(transfer.status)
+                temp.outbound(False)
+                temp.date(transfer.created_date)
+                result.append(temp.info)
 
-            for i in transactions_from:
-                temp = i.__dict__
-                temp["description"] = i.from_account.user_id.get_full_name()
-                result.append(temp)
+            for transfer in transfer_from:
+                temp = BankStatementRow()
+                temp.description("Sent to %s (%s)" % (transfer.to_account.user_id.get_full_name(),
+                                                      transfer.to_account.user_id.email))
+                temp.transaction_type(transfer.transfer_type)
+                temp.amount(transfer.amount)
+                temp.status(transfer.status)
+                temp.outbound(True)
+                temp.date(transfer.created_date)
+                result.append(temp.info)
 
-            context = {}
             form = StatementRequestForm()
             form.account_list = user_accounts
-            context['form'] = form
-            params = {"name": account_name, "accountNo": int(
+            context = {"name": account_name, "accountNo": int(
                 account_id), "today": datetime.datetime.today(), "result": result}
-            return Render.render('account_management/pdfTemplate.html', params)
-        except Exception:
-            print("Data entered is not valid")
-            context = {}
+            return PDFRender.render('account_management/pdfTemplate.html', context)
+        except Exception as e:
+            print("Data entered is not valid", e)
             form = StatementRequestForm()
-            context['form'] = form
-            context['user_accounts'] = user_accounts
+            context = {'form': form, 'user_accounts': user_accounts}
             return render(request, 'account_management/generate_statement.html', context)
     else:
-        context = {}
         form = StatementRequestForm()
-        context['form'] = form
-        context['user_accounts'] = user_accounts
+        context = {'form': form, 'user_accounts': user_accounts}
         return render(request, 'account_management/generate_statement.html', context)
 
 
@@ -256,6 +286,7 @@ def withdraw(request, pk=None):
                 account.account_balance
             ])
     return render(request, 'account_management/withdraw.html', context)
+
 
 # TODO Remove login required annotation with middlewares
 @login_required

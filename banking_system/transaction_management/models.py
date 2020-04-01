@@ -1,7 +1,7 @@
 from account_management.models import Account
 import datetime
 from django.db import models
-
+from django.utils.timezone import now
 
 # Create your models here.
 REQUEST_STATUS = (
@@ -29,8 +29,10 @@ class FundTransfers(models.Model):
     to_account = models.ForeignKey(
         Account, default=None, on_delete=models.CASCADE, related_name='to_account')
     amount = models.FloatField(blank=False, null=False)
-    date = models.DateField(blank=False, null=False,
-                            default=datetime.datetime.now())
+    created_date = models.DateField(blank=False, null=False,
+                                    default=now)
+    approved_date = models.DateField(blank=False, null=True,
+                                     default=None)
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,
@@ -67,6 +69,11 @@ class Transaction(models.Model):
     to_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE,
                                    related_name='transaction_to_account')
     amount = models.FloatField(blank=False, null=False)
+
+    created_date = models.DateField(blank=False, null=False, default=now)
+    approved_date = models.DateField(blank=False, null=True, default=None)
+    approved_time = models.TimeField(blank=False, null=True, default=None)
+
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,
