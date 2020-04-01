@@ -56,7 +56,6 @@
 <script>
 (function test(){
     var statusMap = {"Approve": "APPROVED","Reject": "REJECTED"};
-    console.log("hi")
     $(".action").click(function(e) {
         var status = statusMap[e.target.textContent]
     var request_id = $(e.target).parents('tr').children(":first").text()
