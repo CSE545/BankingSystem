@@ -70,8 +70,7 @@ class Transaction(models.Model):
     amount = models.FloatField(blank=False, null=False)
 
     created_date = models.DateField(blank=False, null=False, default=now)
-    approved_date = models.DateField(blank=False, null=True, default=None)
-    approved_time = models.TimeField(blank=False, null=True, default=None)
+    approved_date_time = models.DateTimeField(blank=False, null=True, default=None)
 
     status = models.CharField(
         max_length=10,
