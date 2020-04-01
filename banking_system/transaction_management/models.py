@@ -109,3 +109,8 @@ class CashierCheck(models.Model):
             self.delete()
         else:
             super(CashierCheck, self).save(force_insert, force_update)
+
+class HyperledgerState(models.Model):
+    id = models.AutoField(primary_key=True)
+    last_transaction_id = models.CharField(max_length=20, default="0")
+    last_hyperledger_id = models.CharField(max_length=20, default="0")
