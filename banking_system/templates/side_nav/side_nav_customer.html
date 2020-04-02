@@ -1,3 +1,7 @@
+    <!-- Dont remove below code: ripu -->
+    <!-- <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Something else here</a> -->
+
 <div class="dropdown">
     <a class="list-group-item list-group-item-action bg-light dropdown-toggle" href="#" id="navbarDropdown"
         role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -8,17 +12,38 @@
         <a class="dropdown-item" href="/bankaccount/open_account/">Open Account</a>
         <a class="dropdown-item" href="/bankaccount/deposit/">Deposit</a>
         <a class="dropdown-item" href="/bankaccount/withdraw/">Withdraw</a>
+        <a class="dropdown-item" href="/bankaccount/generate_statement/">Generate Statement</a>
     </div>
 </div>
-<a href="/transactions/transfers/" class="list-group-item list-group-item-action bg-light">Fund Transfers</a>
+<div class="dropdown">
+    <a class="list-group-item list-group-item-action bg-light dropdown-toggle" type="button" id="dropdownMenu3"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Fund Transfers
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+        <a class="dropdown-item" href="/transactions/transfers/send/">Send funds</a>
+        <a class="dropdown-item" href="/transactions/transfers/receive/">Receive funds</a>
+        <a class="dropdown-item" href="/transactions/transfers/requests/">View requests</a>
+    </div>
+</div>
 <a href="/transactions/cashierCheck/" class="list-group-item list-group-item-action bg-light">Cashier Checks</a>
 <div class="dropdown">
-    <a class="list-group-item list-group-item-action bg-light dropdown-toggle" type="button" id="dropdownMenu2"
+    <a class="list-group-item list-group-item-action bg-light dropdown-toggle" href="#" id="dropdownMenu2"
         data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
         Transactions
     </a>
     <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
         <a class="dropdown-item" href="/transactions/trans/create/">Initiate Transaction</a>
         <a class="dropdown-item" href="/transactions/trans/list/">View Transactions</a>
+    </div>
+</div>
+<div class="dropdown">
+    <a class="list-group-item list-group-item-action bg-light dropdown-toggle" href="#" id="dropdownMenu3"
+        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Appointments
+    </a>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenu3">
+        <a class="dropdown-item" href="/appointments/schedule_appointment/">Schedule</a>
+        <a class="dropdown-item" href="/appointments/view_appointments/">View appointments</a>
     </div>
 </div>

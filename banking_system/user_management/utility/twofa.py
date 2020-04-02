@@ -1,6 +1,6 @@
-import boto3
-import math
 import random
+
+import boto3
 from user_management.models import User
 
 

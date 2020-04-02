@@ -1,5 +1,6 @@
 from account_management.models import Account
 from django.db import models
+from django.utils.timezone import now
 
 # Create your models here.
 REQUEST_STATUS = (
@@ -22,9 +23,15 @@ TRANSACTION_TYPE = (
 
 class FundTransfers(models.Model):
     request_id = models.AutoField(primary_key=True)
-    from_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='from_account')
-    to_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE, related_name='to_account')
+    from_account = models.ForeignKey(
+        Account, default=None, on_delete=models.CASCADE, related_name='from_account')
+    to_account = models.ForeignKey(
+        Account, default=None, on_delete=models.CASCADE, related_name='to_account')
     amount = models.FloatField(blank=False, null=False)
+    created_date = models.DateField(blank=False, null=False,
+                                    default=now)
+    approved_date = models.DateField(blank=False, null=True,
+                                     default=None)
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,
@@ -34,6 +41,16 @@ class FundTransfers(models.Model):
         max_length=10,
         choices=TRANSFER_TYPE,
         default="ACCOUNT"
+    )
+    
+    is_request = models.BooleanField(
+        default=False
+    )
+
+    hyperledger_id = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
@@ -61,6 +78,10 @@ class Transaction(models.Model):
     to_account = models.ForeignKey(Account, default=None, on_delete=models.CASCADE,
                                    related_name='transaction_to_account')
     amount = models.FloatField(blank=False, null=False)
+
+    created_date = models.DateField(blank=False, null=False, default=now)
+    approved_date_time = models.DateTimeField(blank=False, null=True, default=None)
+
     status = models.CharField(
         max_length=10,
         choices=REQUEST_STATUS,
@@ -70,12 +91,18 @@ class Transaction(models.Model):
         max_length=10,
         choices=TRANSACTION_TYPE
     )
+    hyperledger_id = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True
+    )
 
     def __str__(self):
         return "Created by: {0}, Status: {1}".format(self.from_account, self.status)
 
     def __init__(self, *args, **kwargs):
         super(Transaction, self).__init__(*args, **kwargs)
+
 
 class CashierCheck(models.Model):
     request_id = models.AutoField(primary_key=True)
@@ -91,6 +118,11 @@ class CashierCheck(models.Model):
         max_length=10,
         choices=TRANSFER_TYPE,
         default="ACCOUNT"
+    )
+    hyperledger_id = models.CharField(
+        max_length=10,
+        blank=True,
+        null=True
     )
 
     def __str__(self):
@@ -109,3 +141,7 @@ class CashierCheck(models.Model):
             self.delete()
         else:
             super(CashierCheck, self).save(force_insert, force_update)
+
+class HyperledgerState(models.Model):
+    id = models.AutoField(primary_key=True)
+    last_hyperledger_id = models.CharField(max_length=20, default="0")
