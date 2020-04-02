@@ -1,0 +1,51 @@
+{% extends 'homepage.html' %}
+{% block info %}
+<script>
+    function validateDate(startDate, endDate) {
+        if ((Date.parse(startDate) > Date.parse(endDate))) {
+            alert("End date should be greater than Start date");
+            return false;
+        }
+        return true;
+    }
+</script>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Generate Statement
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="statementForm" class="statementForm">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <select class="custom-select" name="account" required>
+                              <option value="">Choose Account</option>
+                              {% for account in user_accounts %}
+                              <option name="{{account}}">{{account}}</option>
+                              {% endfor %}
+                            </select>
+                            <div class="invalid-feedback">Example invalid custom select feedback</div>
+                          </div>
+                        <div class="form-group row">
+                            <label for="example-date-input" class="col-2 col-form-label">Start Date</label>
+                            <div class="col-10">
+                              <input class="form-control" type="date" value="{{date_string}}" id="dateInput1"  name="start_date">
+                            </div>
+                          </div>
+                          <div class="form-group row">
+                            <label for="example-date-input" class="col-2 col-form-label" >End Date</label>
+                            <div class="col-10">
+                              <input class="form-control" type="date" value="{{date_string}}" id="dateInput2" name="end_date">
+                            </div>
+                          </div>
+                        <button type="submit" class="btn btn-primary" onclick="return validateDate(document.getElementById('dateInput1').value, document.getElementById('dateInput2').value)">Generate Statement</button>
+                    </form>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
