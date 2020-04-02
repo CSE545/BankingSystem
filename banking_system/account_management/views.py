@@ -124,8 +124,7 @@ def view_customer_accounts(request, pk=None):
     account_types = (
         "CHECKING",
         "SAVINGS",
-        "CREDIT",
-        )
+        "CREDIT")
     context = {}
     if pk and request.POST:
         account_number = int(request.POST['account_number'])
