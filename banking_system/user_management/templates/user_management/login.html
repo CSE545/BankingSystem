@@ -22,9 +22,29 @@
                         {% endfor %}
                         {% if otp_sent %}
                         <div class="form-group">
-                            <label for="{{ login_form.otp.id_for_label }}"
+                                <label for="{{ login_form.otp.id_for_label }}"
                                 class="control-label">{{ login_form.otp.label }}</label>
-                            {{ login_form.otp }}
+                                <input class="form-control" type="password" id = 'otp' name='otp'>
+                                <div class="content-section" id="VirtualKey">
+                                    <div id="form1" runat="server"><br/>
+                                        <p>Virtual Keyboard</p>
+                                                <input id="button1" type="button" class="Button" value ="1" onclick="input(this);"/> 
+                                                <input id="button2" type="button" class="Button" value ="2" onclick="input(this);" />
+                                                <input id="button3" type="button" class="Button" value ="3" onclick="input(this);" />
+                                                <br />
+                                                <input id="button4" type="button" class="Button" value ="4" onclick="input(this);" />
+                                                <input id="button5" type="button" class="Button" value ="5" onclick="input(this);" />
+                                                <input id="button6" type="button" class="Button" value ="6" onclick="input(this);" />
+                                                <br />
+                                                <input id="button7" type="button" class="Button" value ="7" onclick="input(this);" />
+                                                <input id="button8" type="button" class="Button" value ="8" onclick="input(this);" />
+                                                <input id="button9" type="button" class="Button" value ="9" onclick="input(this);" />
+                                                <br />
+                                                <input id="button0" type="button" class="Button" value ="0" onclick="input(this)" />
+                                                <input id="buttonDelete" type="button" class="ButtonDl" value="Delete" onclick="del();" />
+                                                    
+                                    </div>
+                                </div>
                         </div>
                         {% endif %}
 
@@ -63,4 +83,56 @@
         </div>
     </div>
 </div>
+
+<script>
+    function load() {
+        // Create a array for the random number.
+        var array = new Array();
+
+        while (array.length < 10) {
+            // Get a random number from 0 to 9 via Math.random().
+            var temp = Math.round(Math.random() * 9);
+            // Check if the random number is contained in the array.               
+            if (!contain(array, temp)) {
+                // insert it into the array.
+                array.push(temp);
+            }
+        }
+
+        for (i = 0; i < 10; i++) {
+            // Get the button and set its value to the random number.
+            var btn = document.getElementById("btn" + i);
+            btn.value = array[i];
+        }
+    }
+
+    function contain(array, num) {
+        // Check if the random number is contained in the array.    
+        for (var i = 0; i < array.length; i++) {
+            if (array[i] == num) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function input(e) {
+        // Get the TextBox object.
+        var tbInput = document.getElementById("otp");
+
+        // As e is the button, its value is the text on it.
+        // Add the value to the TextBox.
+        tbInput.value = tbInput.value + e.value;
+    }
+
+    function del() {
+        // Get the TextBox object.
+        var tbInput = document.getElementById("otp");
+
+        // Remove the last char in the TextBox.
+        tbInput.value = tbInput.value.substr(0, tbInput.value.length - 1);
+    }
+
+</script>
+
 {% endblock %}
