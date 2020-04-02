@@ -32,6 +32,7 @@ def open_account(request):
     return render(request, 'account_management/open_account.html', context)
 
 def open_customer_account(request):
+    """ Used by Tier 2 employees to open new customer bank account."""
     context = {}
     if request.POST:
         form = CustomerAccountForm(request.POST)
@@ -76,65 +77,84 @@ def view_accounts(request):
         ])
     return render(request, 'account_management/view_accounts.html', context)
 
-# Tier 2 employees accessing customer accounts
 @login_required
-def view_customer_accounts(request):
+def delete_customer_bank_accounts(request):
+    """ Tier 2 employees deleting customer accounts. """
     context = {}
     if request.POST:
-        print(request.POST['operation_type'])
         account_number = int(request.POST['account_number'])
-        if request.POST['operation_type'] == 'DELETE':
-            # account_number = int(request.POST['account_number'])
-            print("account number", request.POST['account_number'])
-            # Checking if the selected account is the primary account of the customer
-            results = User.objects.filter(primary_account_id=account_number)
-            if results.count() > 0:
-                print("This account is the customer's primary account!")
-                for result in results:
-                    user_id = result.user_id
-                    print("user_id", user_id)
-                print("Finding if user have another account that can be made the primary account")  
-                customer_accounts = Account.objects.filter(user_id=user_id)
-                found = False
-                for acc in customer_accounts:
-                    if acc.account_id != account_number:
-                        print(acc.account_id)
-                        if acc.account_type == 'CREDIT':
-                            continue
+        # Checking if the selected account is the primary account of the customer
+        results = User.objects.filter(primary_account_id=account_number)
+        if results.count() > 0:
+            # This account is the customer's primary account
+            for result in results:
+                user_id = result.user_id
+            # Finding if user have another account that can be made the primary account
+            customer_accounts = Account.objects.filter(user_id=user_id)
+            for acc in customer_accounts:
+                if acc.account_id != account_number:
+                    if acc.account_type == 'CREDIT':
+                        continue
+                    # Update the primary account for the user
+                    user = User.objects.get(user_id=user_id)
+                    user.primary_account_id = acc.account_id
+                    user.save()
+                    break
 
-                        user = User.objects.get(user_id=user_id)
-                        print("user primary account ", user.primary_account_id)
-                        user.primary_account_id = acc.account_id
-                        user.save()
-                        found = True
-                        break
-                    else:
-                        print("account id equal to selected account!")
-                if not found:
-                    print("The customer doesn't have another account that" +
-                          " can be made the primary account")
-                    return render(request, 'customer_account_deletion_failed.html')
-                else:
-                    Account.objects.filter(account_id=account_number).delete()
-        elif request.POST['operation_type'] == 'MODIFY':
-            print("in Modify", account_number)
-            account_details = Account.objects.get(account_id=account_number)
-            print(account_details)
-            context['is_modify_clicked'] = True
-            context['user_accounts'] = {
+        Account.objects.filter(account_id=account_number).delete()
+
+    customer_bank_accounts = Account.objects.filter()
+    context['account_details'] = {
+        'headers': ['Account number', 'Account type', 'Account balance', 'Action'],
+        'accounts': []
+    }
+    for acc in customer_bank_accounts:
+        context['account_details']['accounts'].append([
+            acc.account_id,
+            acc.account_type,
+            acc.account_balance
+        ])
+    if request.POST:
+        context['account_deleted'] = True
+    return render(request, 'account_management/delete_customer_bank_accounts.html', context)
+
+@login_required
+def view_customer_accounts(request, pk=None):
+    """ Tier 2 employees accessing customer accounts. """
+    account_types = (
+        "CHECKING",
+        "SAVINGS",
+        "CREDIT",
+        )
+    context = {}
+    if pk and request.POST:
+        account_number = int(request.POST['account_number'])
+        account_type = request.POST['account_type']
+        account = Account.objects.get(account_id=account_number)
+        account.account_type = account_type
+        account.save()
+    elif pk:
+        print("In here!!")
+        context['account_selected'] = True
+        current_account = Account.objects.get(account_id=pk)
+        context['choices'] = account_types
+        context['selected_choice'] = current_account.account_type
+        context['user_accounts'] = {
             'headers': ['Account number', 'Account type', 'Account balance'],
             'details': {
-                'account_balance': account_details.account_balance,
-                'account_number': account_details.account_id,
-                'account_type': account_details.account_type,
+                'account_balance': current_account.account_balance,
+                'account_number': current_account.account_id,
+                'account_type': current_account.account_type,
             }
-            }
+        }
+        return render(request, 'account_management/view_customer_bank_accounts.html', context)
     else:
         customer_bank_accounts = Account.objects.filter()
         context['account_details'] = {
             'headers': ['Account number', 'Account type', 'Account balance', 'Action'],
             'accounts': []
         }
+        context['select_account'] = True
         for acc in customer_bank_accounts:
             context['account_details']['accounts'].append([
                 acc.account_id,
@@ -143,11 +163,22 @@ def view_customer_accounts(request):
             ])
     return render(request, 'account_management/view_customer_bank_accounts.html', context)
 
-def create_customer_account(request):
-    #Find customers from all of the users
-    customers = User.objects.filter(user_type='CUSTOMER').values('user_id', 'email', 'first_name', 'last_name')
-
-
+@login_required
+def view_customer_accounts_t1(request):
+    """ Used by tier 1 emplloyees to view customer bank accounts. """
+    customer_bank_accounts = Account.objects.filter()
+    context = {}
+    context['account_details'] = {
+        'headers': ['Account number', 'Account type', 'Account balance'],
+        'accounts': []
+    }
+    for acc in customer_bank_accounts:
+        context['account_details']['accounts'].append([
+            acc.account_id,
+            acc.account_type,
+            acc.account_balance
+        ])
+    return render(request, 'account_management/view_customer_bank_accounts_t1.html', context)
 
 @login_required
 def view_requests(request):

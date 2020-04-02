@@ -1,7 +1,11 @@
 {% extends 'homepage.html' %}
 {% block info %}
-
 <div class="container">
+    {% if account_created %}
+        <div class="alert alert-success">
+            <p><strong>A bank account is created for the selected user.</strong></p>
+        </div>
+    {% else %}
     <div class="row">
         <div class="col">
             <div class="card">
@@ -9,11 +13,6 @@
                     Open customer bank account
                 </div>
                 <div class="card-body">
-                    {% if account_created %}
-                    <div class="alert alert-success">
-                        <p><strong>A Bank account is created for the selected user.</strong></p>
-                    </div>
-                    {% else %}
                     <form method="POST">{% csrf_token %}
                         {% for field in open_customer_account_form%}
                             <div class="control-group">
@@ -27,10 +26,10 @@
                             {% endfor %}
                             <button style="margin-top: 10px" type="submit" class="btn btn-primary">Create</button>
                     </form>
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
+    {% endif %}
 </div>
 {% endblock %}

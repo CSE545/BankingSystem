@@ -102,7 +102,7 @@ class User(AbstractBaseUser):
         choices=USER_TYPE
     )
     primary_account = models.ForeignKey(
-        'account_management.Account', default=None, on_delete=models.CASCADE, null=True, blank=True)
+        'account_management.Account', default=None, on_delete=models.SET_NULL, null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name',
                        'last_name', 'password', 'phone_number']
