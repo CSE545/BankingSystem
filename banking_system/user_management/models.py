@@ -228,7 +228,8 @@ class UserLog(models.Model):
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return "Log Id: {0}, UserId: {1}, Log Level: {2}, Log Str: {3}".format(self.log_id, self.user_id, self.log_type, self.log)
+        return "Log Id: {0}, UserId: {1}, Log Level: {2}, Log Str: {3}".format(self.log_id, self.user_id, self.log_type,
+                                                                               self.log)
 
 
 class employee_info_update(models.Model):

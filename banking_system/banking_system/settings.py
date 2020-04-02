@@ -26,7 +26,7 @@ SECRET_KEY = 'joq^zb4q3j+k_t8l9(4$3c%g%y$cvvlg#rr#@il1(xicu0q@lo'
 DEBUG = True
 
 LOGOUT_REDIRECT_URL = "/accounts/login"
-ALLOWED_HOSTS = ["cse545.zlmonroe.com", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["cse545.zlmonroe.com", "localhost", "127.0.0.1", "34.222.142.224"]
 
 # Application definition
 
@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'banking_system',
     'user_management',
     'transaction_management',
-    'account_management'
+    'account_management',
+    'appointments'
 ]
 
 MIDDLEWARE = [
@@ -87,8 +88,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'ss_project',
-        'USER': 'bank_admin',
-        'PASSWORD': 'Password#0',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        # 'USER': 'bank_admin',
+        # 'PASSWORD': 'Password#0',
         'HOST': 'localhost',
         'PORT': '3306'
     }
@@ -140,3 +143,6 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'bankingsystem545@gmail.com'
 EMAIL_HOST_PASSWORD = 'cse545project'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+SESSION_COOKIE_AGE = 3 * 60
+SESSION_SAVE_EVERY_REQUEST = True

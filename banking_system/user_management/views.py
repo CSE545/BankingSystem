@@ -3,7 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from user_management.forms import RegistrationForm, LoginForm, EditForm, AccountOverrideLoginForm
 from user_management.models import User, employee_info_update, OverrideRequest, CustomerInfoUpdate, UserLog
-from user_management.utility.twofa import generate_otp, get_user_phone_number, save_otp_in_db  # , send_otp
+from user_management.utility.twofa import generate_otp  # , send_otp
+
 
 # Create your views here.
 
@@ -106,7 +107,8 @@ def edit_profile(request):
                         user_id=user_id, log_str="customer request already exists for edit profile", log_type="debug")
                     return render(request, 'customer_request_already_exists.html')
 
-                new_entry = CustomerInfoUpdate(user_id=user_id, email=data.get('email'), first_name=data.get('first_name'),
+                new_entry = CustomerInfoUpdate(user_id=user_id, email=data.get('email'),
+                                               first_name=data.get('first_name'),
                                                last_name=data.get('last_name'), phone_number=data.get('phone_number'),
                                                gender=data.get('gender'), status='NEW')
                 new_entry.save()
@@ -147,6 +149,7 @@ def edit_profile(request):
                         log_str="Profile Edit Failed: Non POST call", log_type="debug")
         return render(request, 'user_management/edit_profile.html', context)
 
+
 # use this function only in POST calls. Writing in db is not recommended in GET calls.
 
 
@@ -171,7 +174,8 @@ def show_pending_employee_requests(request):
             user_object.phone_number = request.POST['phone_number']
             user_object.gender = request.POST['gender']
             user_object.save()
-            create_user_log(user_id=request.POST['user_id'], log_str="Request Approved for edit by " + str(request.user.user_id),
+            create_user_log(user_id=request.POST['user_id'],
+                            log_str="Request Approved for edit by " + str(request.user.user_id),
                             log_type="info")
 
         return render(request, 'user_management/pendingEmployeeRequests.html')
@@ -206,7 +210,7 @@ def show_pending_customer_requests(request):
             user_object.save()
             create_user_log(user_id=request.POST['user_id'],
                             log_str="Request Approved for edit by " +
-                            str(request.user.user_id),
+                                    str(request.user.user_id),
                             log_type="info")
 
         return render(request, 'user_management/pendingCustomerRequests.html')
@@ -235,7 +239,8 @@ def generate_support_context(request, errors=""):
     cleaned_headers = [u"User ID", u"Email",
                        u"First Name", u"Last Name", u"User Type"]
 
-    users = [[getattr(user, header) for header in headers] for user in User.objects.exclude(user_id=request.user.user_id)
+    users = [[getattr(user, header) for header in headers] for user in
+             User.objects.exclude(user_id=request.user.user_id)
              if user.user_type in ["T1", "T2", "T3"]]
 
     req_headers = [u"id", u"for_id", u"requesting_id", u"status"]
@@ -267,7 +272,6 @@ def generate_support_context(request, errors=""):
 
 @login_required
 def technical_support(request):
-
     if request.POST:
         if request.POST["action"] == "REQUEST_ACCESS":
             requesting_id = request.user.user_id
@@ -275,7 +279,7 @@ def technical_support(request):
             if OverrideRequest.objects.filter(requesting_id=requesting_id, for_id=for_id, status="NEW").count() > 0:
                 create_user_log(user_id=requesting_id,
                                 log_str="Request for technical support for " +
-                                str(for_id) + " already exist",
+                                        str(for_id) + " already exist",
                                 log_type="debug")
                 return render(request, 'user_management/technicalSupport.html',
                               generate_support_context(request, "REQUEST_EXISTS"))
@@ -285,7 +289,7 @@ def technical_support(request):
                 new_request.save()
                 create_user_log(user_id=requesting_id,
                                 log_str="Request for technical support for " +
-                                str(for_id) + " added",
+                                        str(for_id) + " added",
                                 log_type="debug")
         elif request.POST["action"] == "DELETE":
             print(request.POST)
@@ -354,8 +358,7 @@ def override_request(request):
                         for req in override_requests_for_user]
     for user in requesting_users:
         corresponding_user = User.objects.filter(user_id=user["id"])[0]
-        user["name"] = corresponding_user.first_name + \
-            " " + corresponding_user.last_name
+        user["name"] = corresponding_user.first_name + " " + corresponding_user.last_name
 
     context = {
         "override_requests": requesting_users
@@ -372,14 +375,14 @@ def override_request(request):
             override.save()
             create_user_log(user_id=requesting_id,
                             log_str="Override Request accepted for " +
-                            str(for_id),
+                                    str(for_id),
                             log_type="info")
         elif request.POST["action"] == "DENIED":
             override.status = "DENIED"
             override.save()
             create_user_log(user_id=requesting_id,
                             log_str="Override Request denied for " +
-                            str(for_id),
+                                    str(for_id),
                             log_type="debug")
 
     return render(request, "user_management/overrideRequests.html", context)
