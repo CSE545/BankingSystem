@@ -12,7 +12,7 @@ def homepage(request):
     email = request.user.email
     user = User.objects.get(email=email)
     context['user_type'] = user.user_type
-    print(user.user_type)
+    context['user'] = user.first_name
     if user.user_type == "CUSTOMER":
         tile = getCustomerTile(user)
     elif user.user_type == 'T1':

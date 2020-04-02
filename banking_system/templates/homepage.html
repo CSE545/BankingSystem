@@ -88,7 +88,7 @@
         <br>
         <div class="container-fluid">
             {% block info %}
-            <p>Welcome Monika!</p>
+            <p>Welcome {{user}}!</p>
             <div class="card-deck">
                 {% for tile in tilesData %}
                 <div class="card {{tile.class}}">
