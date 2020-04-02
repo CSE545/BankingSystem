@@ -1,0 +1,110 @@
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from appointments.utility.handle_appointments import make_appointment
+from appointments.models import Appointment
+from django.http import HttpResponse
+from django.http import JsonResponse
+from django.core.exceptions import PermissionDenied
+
+# Create your views here.
+@login_required
+def schedule_appointment(request):
+    context = {}
+    if request.POST:
+        date = request.POST['date']
+        time = request.POST['time']
+        appointment_reason = request.POST['appointment_reason']
+        appointment = make_appointment(
+            request.user, date, time, appointment_reason)
+        context['scheduled'] = True
+        context['details'] = appointment
+    else:
+        active_appointments = Appointment.objects.filter(
+            user=request.user,
+            status__in=['REQUESTED', 'SCHEDULED']
+        ).count()
+        if active_appointments > 0:
+            context['active_appointments'] = True
+        else:
+            context['initial_view'] = True
+    return render(request, 'appointments/schedule_appointment.html', context)
+
+
+@login_required
+def view_appointments(request):
+    context = {}
+    appointments = Appointment.objects.filter(
+        user=request.user
+    )
+    context['appointments'] = {
+        'headers': ['Appointment date', 'Appointment time', 'Reason', 'Created on', 'Status'],
+        'details': []
+    }
+    for app in appointments:
+        context['appointments']['details'].append([
+            app.scheduled_date,
+            app.scheduled_time,
+            app.reason,
+            app.created_at,
+            app.status,
+            app.app_id
+        ])
+    return render(request, 'appointments/view_appointment.html', context)
+
+
+@login_required
+def cancel_appointment(request):
+    app_id = request.POST['app_id']
+    Appointment.objects.filter(app_id=app_id).update(status='CANCELLED')
+    return HttpResponse("Success")
+
+
+@login_required
+def get_taken_slots(request):
+    context = {}
+    appointments = Appointment.objects.filter(
+        status__in=['REQUESTED', 'SCHEDULED']
+    )
+    context['taken_slots'] = {}
+    for app in appointments:
+        if app.scheduled_date in context['taken_slots']:
+            context['taken_slots'][app.scheduled_date].append(
+                app.scheduled_time)
+        else:
+            context['taken_slots'][app.scheduled_date] = []
+            context['taken_slots'][app.scheduled_date].append(
+                app.scheduled_time)
+    return JsonResponse(context)
+
+
+@login_required
+def view_app_requests(request):
+    if request.user.user_type != 'T1':
+        raise PermissionDenied()
+    context = {}
+    appointments = Appointment.objects.filter(
+        status='REQUESTED'
+    )
+    context['appointments'] = {
+        'headers': ['Appointment date', 'Appointment time', 'Reason', 'Created on', 'Status'],
+        'details': []
+    }
+    for app in appointments:
+        context['appointments']['details'].append([
+            app.scheduled_date,
+            app.scheduled_time,
+            app.reason,
+            app.created_at,
+            app.status,
+            app.app_id
+        ])
+    context['initial_view'] = True
+    return render(request, 'appointments/view_app_requests.html', context)
+
+
+@login_required
+def update_app_request(request):
+    app_id = request.POST['app_id']
+    updated_status = request.POST['updated_status']
+    Appointment.objects.filter(app_id=app_id).update(status=updated_status)
+    return HttpResponse("Success")
