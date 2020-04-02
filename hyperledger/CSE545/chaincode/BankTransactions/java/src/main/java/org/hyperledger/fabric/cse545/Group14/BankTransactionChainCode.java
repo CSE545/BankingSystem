@@ -55,7 +55,7 @@ public class BankTransactionChainCode implements ContractInterface {
     @Transaction()
     public BankTransactions createBankTransactions(final Context ctx, final String key, final String request_id,
                                                    final String amount, final String from_account,
-                                                   final String to_account) {
+                                                   final String to_account, final String transfer_type) {
         ChaincodeStub chaincodeStub = ctx.getStub();
         String bankTransactionsState = chaincodeStub.getStringState(key);
         if (!bankTransactionsState.isEmpty()) {
@@ -64,7 +64,7 @@ public class BankTransactionChainCode implements ContractInterface {
             throw new ChaincodeException(errorMessage);
         }
 
-        BankTransactions bankTransaction = new BankTransactions(request_id, amount, from_account, to_account);
+        BankTransactions bankTransaction = new BankTransactions(request_id, amount, from_account, to_account, transfer_type);
         bankTransactionsState = genson.serialize(bankTransaction);
         chaincodeStub.putStringState(key, bankTransactionsState);
 
