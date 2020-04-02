@@ -101,38 +101,6 @@
             </div>
         </div>
     </div>
-    <br>
-    <div class="row">
-      <div class="col">
-        <div class="card">
-          <div class="card-header">
-            {% if cardHeader == 'Send Funds' %}
-                Past Fund Transfers
-            {% else %}
-                Past Fund Requests
-            {% endif %}
-          </div>
-          <div class="card-body" style="height: 500px; overflow: scroll;">
-              <table class="table table-bordered">
-                  <tr>
-                      {% for header in pastFundTransfersData.headers %}
-                          <th>{{ header }}</th>
-                      {% endfor %}
-                      </tr>
-                      {% for row in pastFundTransfersData.rows %}
-                      <tr>
-                          {% for value in row %}
-                              <td>{{value}}</td>
-                          {% endfor %}
-                      </tr>
-                  {% endfor %}
-              </table>
-          </div>
-      </div>
-      </div>
-
-      </div>
-    </div>
 </div>
 <script>
   var activeMap = {'ACCOUNT':'#nav-account-tab', 'EMAIL': '#nav-email-tab', 'PHONE':'#nav-phone-tab'};
