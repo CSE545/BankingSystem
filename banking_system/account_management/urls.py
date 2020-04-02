@@ -7,6 +7,7 @@ urlpatterns = [
     path('open_account/', views.open_account, name="open_account"),
     path('view_requests/', views.view_requests, name="view_requests"),
     path('view_accounts/', views.view_accounts, name="view_accounts"),
+    path('generate_statement/', views.generate_statement, name="generate_statement"),
     path('deposit/', views.deposit, name="deposit"),
     re_path(r'^deposit/(?P<pk>\d+)/$', views.deposit, name="deposit_with_pk"),
     path('withdraw/', views.withdraw, name="withdraw"),

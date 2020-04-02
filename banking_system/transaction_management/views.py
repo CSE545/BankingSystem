@@ -2,7 +2,8 @@ from account_management.models import Account
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db.models import Q
 from django.shortcuts import render
-from transaction_management.forms import FundTransferForm, FundTransferFormEmail, FundTransferFormPhone, TransactionForm, CashierCheckForm, FundRequestForm, FundRequestFormEmail, FundRequestFormPhone
+from transaction_management.forms import FundTransferForm, FundTransferFormEmail, FundTransferFormPhone, \
+    TransactionForm, CashierCheckForm, FundRequestForm, FundRequestFormEmail, FundRequestFormPhone
 from transaction_management.models import FundTransfers, Transaction, CashierCheck
 from user_management.models import User
 
@@ -13,10 +14,20 @@ from user_management.models import User
 def sendFunds(request):
     from_accounts = Account.objects.filter(user_id=request.user.user_id).exclude(account_type="CREDIT")
     if request.POST:
+        account_form = FundTransferForm()
+        email_form = FundTransferFormEmail()
+        phone_form = FundTransferFormPhone()
+        account_form.fields['from_account'].queryset = from_accounts
+        email_form.fields['from_account'].queryset = from_accounts
+        phone_form.fields['from_account'].queryset = from_accounts
+
+        context_name = "unknown_form"
         if request.POST['formId'] == 'ACCOUNT':
             form = FundTransferForm(request.POST)
+            context_name = "account_form"
         elif request.POST['formId'] == 'EMAIL':
             form = FundTransferFormEmail(request.POST)
+            context_name = "email_form"
         elif request.POST['formId'] == 'PHONE':
             form = FundTransferFormPhone(request.POST)
         context = {'formId': request.POST['formId'], 'cardHeader': 'Send Funds'}
@@ -26,16 +37,13 @@ def sendFunds(request):
         account_form.fields['from_account'].queryset = from_accounts
         email_form.fields['from_account'].queryset = from_accounts
         phone_form.fields['from_account'].queryset = from_accounts
+        context_name = "phone_form"
         form.fields['from_account'].queryset = from_accounts
         context['account_form'] = account_form
         context['email_form'] = email_form
         context['phone_form'] = phone_form
-        if request.POST['formId'] == 'ACCOUNT':
-            context['account_form'] = form
-        elif request.POST['formId'] == 'EMAIL':
-            context['email_form'] = form
-        elif request.POST['formId'] == 'PHONE':
-            context['phone_form'] = form
+        context[context_name] = form
+
         if form.is_valid():
             s = request.POST.dict()
             if s['formId'] == 'EMAIL':
@@ -205,8 +213,10 @@ def fundRequests(request):
 def t1_check(user):
     return user.user_type == "T1"
 
+
 def t2_check(user):
     return user.user_type == "T2"
+
 
 @login_required
 @user_passes_test(t1_check)
@@ -224,8 +234,9 @@ def nonCriticalPendingFundTransfers(request):
                         status=request.POST['status'])
                     Account.objects.filter(account_id=curFundObj.from_account_id).update(
                         account_balance=curBal - curFundObj.amount)
-                    Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(
-                        account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
+                    Account.objects.filter(account_id=curFundObj.to_account_id).update(
+                        account_balance=Account.objects.get(
+                            account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
                 else:
                     context["pendingFundTransfersData"]["error"] = "Rejected: Insufficient funds"
                     FundTransfers.objects.filter(request_id=int(
@@ -269,6 +280,7 @@ def nonCriticalPendingFundTransfers(request):
             ])
         return render(request, 'transaction_management/pendingFundTransfers.html', context)
 
+
 @login_required
 @user_passes_test(t2_check)
 def criticalPendingFundTransfers(request):
@@ -285,8 +297,9 @@ def criticalPendingFundTransfers(request):
                         status=request.POST['status'])
                     Account.objects.filter(account_id=curFundObj.from_account_id).update(
                         account_balance=curBal - curFundObj.amount)
-                    Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(
-                        account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
+                    Account.objects.filter(account_id=curFundObj.to_account_id).update(
+                        account_balance=Account.objects.get(
+                            account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
                 else:
                     context["pendingFundTransfersData"]["error"] = "Rejected: Insufficient funds"
                     FundTransfers.objects.filter(request_id=int(
@@ -427,6 +440,7 @@ def cashierCheck(request):
             ])
         return render(request, 'transaction_management/cashierCheck.html', context)
 
+
 @login_required
 @user_passes_test(t1_check)
 def pendingCashierChecks(request):
@@ -454,7 +468,8 @@ def pendingCashierChecks(request):
     else:
         context = {}
         context['pendingCashierChecksData'] = {
-            'headers': [u'Transaction Id', u'From Account', u'Pay to the Order of', u'Amount', u'Status', u'Approve', u'Reject'],
+            'headers': [u'Transaction Id', u'From Account', u'Pay to the Order of', u'Amount', u'Status', u'Approve',
+                        u'Reject'],
             'rows': [],
             'error': ""
         }
