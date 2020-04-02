@@ -32,5 +32,6 @@ urlpatterns = [
         template_name='user_management/password_reset_complete.html'), name='password_reset_complete'),
     path('', views.homepage, name='home'),
     path('transactions/', include('transaction_management.urls')),
-    path('bankaccount/', include('account_management.urls'))
+    path('bankaccount/', include('account_management.urls')),
+    path('appointments/', include('appointments.urls'))
 ]
