@@ -47,7 +47,6 @@ def sendFunds(request):
             instance.transfer_type = s['formId']
             instance.save()
             context['request_received'] = True
-        return render(request, 'transaction_management/transfers.html', context)
     else:
         context = {'formId': 'ACCOUNT', 'cardHeader': 'Send Funds'}
         account_form = FundTransferForm()
@@ -59,11 +58,26 @@ def sendFunds(request):
         context['account_form'] = account_form
         context['email_form'] = email_form
         context['phone_form'] = phone_form
-        return render(request, 'transaction_management/transfers.html', context)
+
+    context['pastFundTransfersData'] = {'headers': [u'Transaction Id', u'Requested From', u'Requested By', u'Amount', u'Status'],
+                                        'rows': []}
+    curUserAccounts = Account.objects.filter(user_id=request.user.user_id).only('account_id')
+    for e in FundTransfers.objects.filter(is_request=False).filter(from_account__in=curUserAccounts).order_by('-request_id'):
+        context['pastFundTransfersData']['rows'].append([
+            e.request_id,
+            str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+            " " + e.from_account.user_id.last_name,
+            str(e.to_account.account_id) + ":" + e.to_account.user_id.first_name +
+            " " + e.to_account.user_id.last_name,
+            e.amount,
+            e.status
+        ])
+    return render(request, 'transaction_management/transfers.html', context)
 
 @login_required
 def receiveFunds(request):
     to_accounts = Account.objects.filter(user_id=request.user.user_id).exclude(account_type="CREDIT")
+    context = {'formId': 'ACCOUNT', 'cardHeader': 'Request Funds'}
     if request.POST:
         if request.POST['formId'] == 'ACCOUNT':
             form = FundRequestForm(request.POST)
@@ -71,7 +85,7 @@ def receiveFunds(request):
             form = FundRequestFormEmail(request.POST)
         elif request.POST['formId'] == 'PHONE':
             form = FundRequestFormPhone(request.POST)
-        context = {'formId': request.POST['formId'], 'cardHeader': 'Request Funds'}
+        context['formId'] = request.POST['formId']
         account_form = FundRequestForm()
         email_form = FundRequestFormEmail()
         phone_form = FundRequestFormPhone()
@@ -100,9 +114,8 @@ def receiveFunds(request):
             instance.is_request = True
             instance.save()
             context['request_received'] = True
-        return render(request, 'transaction_management/transfers.html', context)
     else:
-        context = {'formId': 'ACCOUNT', 'cardHeader': 'Request Funds'}
+        
         account_form = FundRequestForm()
         email_form = FundRequestFormEmail()
         phone_form = FundRequestFormPhone()
@@ -112,7 +125,21 @@ def receiveFunds(request):
         context['account_form'] = account_form
         context['email_form'] = email_form
         context['phone_form'] = phone_form
-        return render(request, 'transaction_management/transfers.html', context)
+
+    context['pastFundTransfersData'] = {'headers': [u'Transaction Id', u'Requested From', u'Requested By', u'Amount', u'Status'],
+                                        'rows': []}
+    curUserAccounts = Account.objects.filter(user_id=request.user.user_id).only('account_id')
+    for e in FundTransfers.objects.filter(is_request=True).filter(to_account__in=curUserAccounts).order_by('-request_id'):
+        context['pastFundTransfersData']['rows'].append([
+            e.request_id,
+            str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+            " " + e.from_account.user_id.last_name,
+            str(e.to_account.account_id) + ":" + e.to_account.user_id.first_name +
+            " " + e.to_account.user_id.last_name,
+            e.amount,
+            e.status
+        ])
+    return render(request, 'transaction_management/transfers.html', context)
 
 @login_required
 def fundRequests(request):
