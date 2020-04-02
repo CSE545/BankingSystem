@@ -1,0 +1,36 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Open customer bank account
+                </div>
+                <div class="card-body">
+                    {% if account_created %}
+                    <div class="alert alert-success">
+                        <p><strong>A Bank account is created for the selected user.</strong></p>
+                    </div>
+                    {% else %}
+                    <form method="POST">{% csrf_token %}
+                        {% for field in open_customer_account_form%}
+                            <div class="control-group">
+                                <label class="control-label" for="username">{{ field.label_tag }}</label>
+                                {{ field }}
+                                {% for error in field.errors %}
+                                <p style="color: red;">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+
+                            {% endfor %}
+                            <button style="margin-top: 10px" type="submit" class="btn btn-primary">Create</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

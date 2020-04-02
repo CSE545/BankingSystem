@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, reverse
 from django.contrib.auth.decorators import login_required
-from account_management.forms import BankAccountForm
+from account_management.forms import BankAccountForm, CustomerAccountForm
 from django.core.exceptions import PermissionDenied
 from account_management.models import AccountRequests, Account, DepositRequest
 from user_management.models import User
@@ -31,6 +31,21 @@ def open_account(request):
         context['bank_form'] = form
     return render(request, 'account_management/open_account.html', context)
 
+def open_customer_account(request):
+    context = {}
+    if request.POST:
+        form = CustomerAccountForm(request.POST)
+        if form.is_valid():
+            account_type = form.cleaned_data['account_type']
+            customer_info = form.cleaned_data['customer']
+            user = User.objects.filter(email=customer_info.email).get()
+            new_record = Account(account_type=account_type, user_id=user)
+            new_record.save()
+            context['account_created'] = True
+    else:
+        form = CustomerAccountForm()
+        context['open_customer_account_form'] = form
+    return render(request, 'account_management/open_customer_account.html', context)
 
 @login_required
 def view_accounts(request):
@@ -60,6 +75,78 @@ def view_accounts(request):
             primary_account_flag
         ])
     return render(request, 'account_management/view_accounts.html', context)
+
+# Tier 2 employees accessing customer accounts
+@login_required
+def view_customer_accounts(request):
+    context = {}
+    if request.POST:
+        print(request.POST['operation_type'])
+        account_number = int(request.POST['account_number'])
+        if request.POST['operation_type'] == 'DELETE':
+            # account_number = int(request.POST['account_number'])
+            print("account number", request.POST['account_number'])
+            # Checking if the selected account is the primary account of the customer
+            results = User.objects.filter(primary_account_id=account_number)
+            if results.count() > 0:
+                print("This account is the customer's primary account!")
+                for result in results:
+                    user_id = result.user_id
+                    print("user_id", user_id)
+                print("Finding if user have another account that can be made the primary account")  
+                customer_accounts = Account.objects.filter(user_id=user_id)
+                found = False
+                for acc in customer_accounts:
+                    if acc.account_id != account_number:
+                        print(acc.account_id)
+                        if acc.account_type == 'CREDIT':
+                            continue
+
+                        user = User.objects.get(user_id=user_id)
+                        print("user primary account ", user.primary_account_id)
+                        user.primary_account_id = acc.account_id
+                        user.save()
+                        found = True
+                        break
+                    else:
+                        print("account id equal to selected account!")
+                if not found:
+                    print("The customer doesn't have another account that" +
+                          " can be made the primary account")
+                    return render(request, 'customer_account_deletion_failed.html')
+                else:
+                    Account.objects.filter(account_id=account_number).delete()
+        elif request.POST['operation_type'] == 'MODIFY':
+            print("in Modify", account_number)
+            account_details = Account.objects.get(account_id=account_number)
+            print(account_details)
+            context['is_modify_clicked'] = True
+            context['user_accounts'] = {
+            'headers': ['Account number', 'Account type', 'Account balance'],
+            'details': {
+                'account_balance': account_details.account_balance,
+                'account_number': account_details.account_id,
+                'account_type': account_details.account_type,
+            }
+            }
+    else:
+        customer_bank_accounts = Account.objects.filter()
+        context['account_details'] = {
+            'headers': ['Account number', 'Account type', 'Account balance', 'Action'],
+            'accounts': []
+        }
+        for acc in customer_bank_accounts:
+            context['account_details']['accounts'].append([
+                acc.account_id,
+                acc.account_type,
+                acc.account_balance
+            ])
+    return render(request, 'account_management/view_customer_bank_accounts.html', context)
+
+def create_customer_account(request):
+    #Find customers from all of the users
+    customers = User.objects.filter(user_type='CUSTOMER').values('user_id', 'email', 'first_name', 'last_name')
+
 
 
 @login_required

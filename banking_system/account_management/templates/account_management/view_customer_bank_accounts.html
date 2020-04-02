@@ -1,0 +1,99 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    View customer bank accounts
+                </div>
+                <div class="card-body">
+                    {% if is_modify_clicked %}
+                    <div id="modify">
+                        <form method="POST" action="/bankaccount/view_customer_bank_accounts/">
+                            <div class="form-group row">
+                                <label for="account_number" class="col-sm-2 col-form-label">Account number</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_number"
+                                        value="{{ user_accounts.details.account_number }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="account_type" class="col-sm-2 col-form-label">Account type</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_type"
+                                        value="{{ user_accounts.details.account_type }}">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="account_balance" class="col-sm-2 col-form-label">Account balance</label>
+                                <div class="col-sm-10">
+                                    <input type="text" readonly class="form-control-plaintext" id="account_balance"
+                                        value="{{ user_accounts.details.account_balance }}">
+                                </div>
+                            </div>
+                            </div>
+                            <button type="button" class="btn btn-primary action">Submit</button>
+                        </form>
+                    </div>
+                    {% endif %}
+                    <div id="view_account">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    {% for heading in account_details.headers %}
+                                        <th scope="col">{{ heading }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in account_details.accounts %}
+                                <tr>
+                                    {% for value in data %}
+                                            <td>{{ value }}</td>
+                                    {% endfor %}
+                                    <td>
+                                        <button class="action btn btn-success btn-sm">Modify</button>
+                                        <button class="action btn btn-danger btn-sm">Delete Account</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function test() {
+        var statusMap = {"Modify": "MODIFY", "Delete Account": "DELETE"};
+        $(".action").click(function (e) {
+            var operation_type = statusMap[e.target.textContent]
+            var account_number = $(e.target).parents('tr').children(":first").text()
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    operation_type,
+                    account_number
+                },
+                success: function callback(response) {
+                    console.log(response);
+                    if(operation_type == 'MODIFY'){
+                        console.log("in modify");
+                        $('#modify').show();
+                        $('#view_account').hide();
+                    }
+                    //$("#init").show();    
+                    // location.reload();
+
+                }
+            });
+        })
+    })()
+</script>
+{% endblock %}
