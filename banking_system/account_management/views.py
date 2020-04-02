@@ -14,7 +14,7 @@ from django.shortcuts import render
 from django.template.loader import get_template
 from transaction_management.models import FundTransfers, Transaction
 from user_management.models import User
-from user_management.utility.twofa import generate_otp, save_otp_in_db #, send_otp
+from user_management.utility.twofa import generate_otp, save_otp_in_db # , send_otp
 
 
 class PDFRender:
