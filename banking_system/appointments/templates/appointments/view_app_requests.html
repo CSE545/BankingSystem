@@ -1,0 +1,75 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Appointments
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                {% for heading in appointments.headers %}
+                                <th scope="col">{{ heading }}</th>
+                                {% endfor %}
+
+                                <th scope="col">Action</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for data in appointments.details %}
+                            <tr>
+                                <th id="{{data.5}}" scope="row">{{ forloop.counter }}</th>
+                                {% for value in data %}
+                                {% if forloop.counter == 2 %}
+                                <td>{{ value }} Hours</td>
+                                {% elif forloop.counter != 6%}
+                                <td>{{ value }}</td>
+                                {% endif %}
+                                {% endfor %}
+                                
+                                <td>
+                                    <button type="button" class="btn btn-success btn-sm action">Schedule</button>
+                                    <button type="button" class="btn btn-danger btn-sm action">Deny</button>
+                                </td>
+                                
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        let statusMap = { "Schedule": "SCHEDULED", "Deny": "DENIED" };
+        $(".action").click(function (e) {
+            let updated_status = statusMap[e.target.textContent];
+            let app_id = $($(e.target).parents('tr').children()[0]).attr('id');
+            console.log(app_id)
+            $.ajax({
+                type: "POST",
+                url: "/appointments/update_app_request/",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    app_id,
+                    updated_status
+                },
+                success: function callback(response) {
+                    location.reload();
+                },
+                error: function callback(response) {
+                    alert('Something went wrong.');
+                }
+            });
+        })
+    });
+</script>
+{% endblock %}

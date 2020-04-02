@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'banking_system',
     'user_management',
     'transaction_management',
-    'account_management'
+    'account_management',
+    'appointments'
 ]
 
 MIDDLEWARE = [
