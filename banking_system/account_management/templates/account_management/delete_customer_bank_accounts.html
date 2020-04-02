@@ -1,0 +1,66 @@
+{% extends 'homepage.html' %}
+{% block info %}
+{% if account_deleted %}
+    <div id="account_deleted">
+        <div class="alert alert-success">
+        <p style="text-align:center"><strong>The selected customer bank account has been deleted</strong></p>
+        </div>
+    </div>
+{% endif %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Delete customer bank accounts
+                </div>
+                <div class="card-body">
+                    <div id="delete_account">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    {% for heading in account_details.headers %}
+                                        <th scope="col">{{ heading }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in account_details.accounts %}
+                                <tr>
+                                    {% for value in data %}
+                                            <td>{{ value }}</td>
+                                    {% endfor %}
+                                    <td>
+                                        <button class="action btn btn-danger btn-sm">Delete Account</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function test() {
+        $(".action").click(function (e) {
+            var account_number = $(e.target).parents('tr').children(":first").text()
+            console.log(account_number)
+            $.ajax({
+                type: "POST",
+                url: "",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    account_number
+                },
+                success: function callback(response) { 
+                    location.reload();
+
+                }
+            });
+        })
+    })()
+</script>
+{% endblock %}
