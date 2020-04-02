@@ -40,6 +40,16 @@
         #wrapper.toggled #sidebar-wrapper {
             margin-left: -15rem;
         }
+
+        .tile-color1 {
+            background-color: #aecbfa;
+        }
+        .tile-color2 {
+            background-color: #cbf0f8;
+        }
+        .tile-color3 {
+            background-color: #e8eaed;
+        }
     }
 </style>
 <div class="d-flex" id="wrapper">
@@ -61,10 +71,7 @@
     </div>
 
     <div id="page-content-wrapper">
-
         <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
-
-
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 
                 {% if user_type == 'CUSTOMER' %}
@@ -78,9 +85,21 @@
                 {% endif %}
             </div>
         </nav>
-
+        <br>
         <div class="container-fluid">
             {% block info %}
+            <p>Welcome Monika!</p>
+            <div class="card-deck">
+                {% for tile in tilesData %}
+                <div class="card {{tile.class}}">
+                  <div class="card-body text-center">
+                      {% for line in tile.lines %}
+                        <p class="card-text">{{line}}</p>
+                        {% endfor %}
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
             {% endblock %}
         </div>
     </div>
