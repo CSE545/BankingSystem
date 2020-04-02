@@ -59,13 +59,13 @@
         <div class="sidebar-heading">Banking System </div>
         <div class="list-group list-group-flush">
             {% if user_type == 'CUSTOMER' %}
-                {% include 'side_nav/side_nav_customer.html' %}
+            {% include 'side_nav/side_nav_customer.html' %}
             {% elif user_type == 'T3' %}
-                {% include 'side_nav/side_nav_t3.html' %}
+            {% include 'side_nav/side_nav_t3.html' %}
             {% elif user_type == 'T2' %}
-                {% include 'side_nav/side_nav_t2.html' %}
+            {% include 'side_nav/side_nav_t2.html' %}
             {% elif user_type == 'T1' %}
-                {% include 'side_nav/side_nav_employee.html' %}
+            {% include 'side_nav/side_nav_employee.html' %}
             {% endif %}
         </div>
     </div>
@@ -73,15 +73,15 @@
     <div id="page-content-wrapper">
         <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                
+
                 {% if user_type == 'CUSTOMER' %}
-                    {% include 'top_nav/top_nav_customer.html' %}
+                {% include 'top_nav/top_nav_customer.html' %}
                 {% elif user_type == 'T3' %}
-                    {% include 'top_nav/top_nav_t3.html' %}
+                {% include 'top_nav/top_nav_t3.html' %}
                 {% elif user_type == 'T2' %}
-                    {% include 'top_nav/top_nav_t2.html' %}
+                {% include 'top_nav/top_nav_t2.html' %}
                 {% elif user_type == 'T1' %}
-                    {% include 'top_nav/top_nav_employee.html' %}
+                {% include 'top_nav/top_nav_employee.html' %}
                 {% endif %}
             </div>
         </nav>

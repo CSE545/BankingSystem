@@ -1,0 +1,123 @@
+{% extends 'homepage.html' %}
+{% block info %}
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="card">
+                <div class="card-header">
+                    Schedule appointments
+                </div>
+                <div class="card-body">
+                    {% if initial_view %}
+                    <div id="init">
+                        <form>
+                            <div class="form-group row">
+                                <label for="appointment_time" class="col-sm-2 col-form-label">Select date and time</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="appointment_time" />
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="appointment_reason" class="col-sm-2 col-form-label">Reason</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="appointment_reason" />
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary action">Submit</button>
+                        </form>
+                    </div>
+                    {% elif active_appointments %}
+                    <div class="alert alert-danger">
+                        <p><strong>You already have an appointment scheduled.</strong></p>
+                    </div>
+                    {% endif %}
+                    <div style="display: none;" id="result" class="alert alert-success">
+                        <p><strong>Appointment requested. You can see the status of your appointment in the view appointments tab.</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        let taken_slots = {};
+        $('#appointment_time').datetimepicker({
+            onGenerate: function (ct) {
+                $(this).find('.xdsoft_date.xdsoft_weekend')
+                    .addClass('xdsoft_disabled');
+            },
+            allowTimes: [
+                '09:00', '10:00', '11:00', '12:00',
+                '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'
+            ],
+            formatDate: 'm.d.Y',
+            formatTime: 'H.i',
+            defaultDate: new Date(),
+            defaultTime: '10:00',
+            disabledDates: [],
+            minDate: '+01.02.1970',
+        });
+        $(document).ready(function(){
+            $.ajax({
+                type: "GET",
+                url: "/appointments/get_taken_slots/",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function callback(response) {
+                    taken_slots = response;
+                }
+            });
+        });
+        $(".action").click(function (e) {
+            if($('#appointment_time').val() === '') {
+                alert('Date and time not selected');
+                return;
+            }
+            let date_time = $('#appointment_time').val().split(' ');
+            let appointment_reason = $('#appointment_reason').val();
+            if(appointment_reason === '') {
+                alert('Appointment reason needed.');
+                return;
+            }
+            if(date_time.length < 2) {
+                alert('Invalid date selected');
+                return;
+            }
+            let date = date_time[0];
+            let time = date_time[1];
+            let today_date = new Date();
+            today_date.setHours(0,0,0,0);
+            let selected_date = new Date(date);
+            debugger;
+            if(selected_date.getTime() <= today_date.getTime()) {
+                alert('Appointments can only be scheduled starting tomorrow.');
+                return;
+            }
+            if(date in taken_slots.taken_slots) {            
+                if(taken_slots.taken_slots[date].indexOf(time) > -1) {
+                    alert('Time slot already taken. Choose either a different date or a time slot.')
+                    return;
+                }
+            }
+            
+            $.ajax({
+                type: "POST",
+                url: "/appointments/schedule_appointment/",
+                data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    date,
+                    time,
+                    appointment_reason
+                },
+                success: function callback(response) {
+                    $('#init').hide();
+                    $('#result').show();
+                }
+            });
+        })
+    });
+</script>
+{% endblock %}
