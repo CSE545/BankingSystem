@@ -1,9 +1,10 @@
 from django.contrib.auth.decorators import login_required
-from user_management.models import User, CustomerInfoUpdate, OverrideRequest
+from user_management.models import User, CustomerInfoUpdate, OverrideRequest, employee_info_update
 from django.shortcuts import render
 from account_management.models import Account, DepositRequest, AccountRequests
 from django.db.models import Sum
 from transaction_management.models import FundTransfers, CashierCheck
+from appointments.models import Appointment
 
 @login_required
 def homepage(request):
@@ -19,7 +20,7 @@ def homepage(request):
     elif user.user_type == 'T2':
         tile = getT2Tile(user)
     elif user.user_type == 'T3':
-        tile = getT2Tile(user)
+        tile = getT3Tile(user)
     context['tilesData'] = tile
     return render(request, 'homepage.html', context)
    
@@ -65,6 +66,7 @@ def getT1Tile(user):
     lines = []
     lines.append("Number of override requests: " + str(OverrideRequest.objects.filter(status='NEW').count()))
     lines.append("Number of information update requests: " + str(CustomerInfoUpdate.objects.filter(status="NEW").count()))
+    lines.append("Number of appointment requests: " + str(Appointment.objects.filter(status="REQUESTED").count()))
     tile['lines'] = lines
     tile['class'] = 'tile-color2'
     t1Tile.append(tile)
@@ -91,16 +93,13 @@ def getT3Tile(user):
     t3Tile = []
     tile = {}
     lines = []
-    lines.append("Number of deposit requests: " + str(DepositRequest.objects.filter(status='NEW').count()))
-    lines.append("Number of fund transfer requests: " + str(FundTransfers.objects.filter(is_request=False).filter(status="NEW").filter(amount__lt=1000).count()))
-    lines.append("Number of cashier check requests: " + str(CashierCheck.objects.filter(status="NEW").count()))
+    lines.append("Number of employee info update requests: " + str(employee_info_update.objects.filter(status='NEW').count()))
     tile['lines'] = lines
     tile['class'] = 'tile-color1'
     t3Tile.append(tile)
     tile = {}
     lines = []
-    lines.append("Number of override requests: " + str(OverrideRequest.objects.filter(status='NEW').count()))
-    lines.append("Number of information update requests: " + str(CustomerInfoUpdate.objects.filter(status="NEW").count()))
+    lines.append("Number of overrides requested by you: " + str(OverrideRequest.objects.filter(requesting_id=user.user_id, status="NEW").count()))
     tile['lines'] = lines
     tile['class'] = 'tile-color2'
     t3Tile.append(tile)
