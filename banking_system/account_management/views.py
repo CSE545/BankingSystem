@@ -170,6 +170,11 @@ def generate_statement(request):
                 context = {'form': form, 'user_accounts': user_accounts}
                 context['invalid_otp'] = True
                 return render(request, 'account_management/generate_statement.html', context)
+            otp = generate_otp()
+            print('otp', otp)
+            save_otp_in_db(otp, request.user)
+            context['otp_sent'] = True
+            context['invalid_otp'] = False
             return PDFRender.render('account_management/pdfTemplate.html', context)
         except Exception as e:
             print("Data entered is not valid", e)
