@@ -14,6 +14,7 @@ from django.shortcuts import render
 from django.template.loader import get_template
 from transaction_management.models import FundTransfers, Transaction
 from user_management.models import User
+from user_management.utility.twofa import generate_otp, save_otp_in_db  # , send_otp
 
 
 class PDFRender:
@@ -122,6 +123,7 @@ def generate_statement(request):
             1].strip()
         start_date_string = request.POST["start_date"]
         end_date_string = request.POST["end_date"]
+        received_otp = request.POST["otp"]
         try:
             transfer_from = list(FundTransfers.objects.filter(
                 from_account_id=account_id, created_date__range=[start_date_string, end_date_string]))
@@ -161,9 +163,16 @@ def generate_statement(request):
                 result.append(temp.info)
 
             form = StatementRequestForm()
+
             form.account_list = user_accounts
             context = {"name": account_name, "accountNo": int(
                 account_id), "today": datetime.datetime.today(), "result": result}
+
+            if received_otp != str(request.user.userlogin.last_otp):
+                context = {'form': form, 'user_accounts': user_accounts}
+                context['invalid_otp'] = True
+                return render(request, 'account_management/generate_statement.html', context)
+
             return PDFRender.render('account_management/pdfTemplate.html', context)
         except Exception as e:
             print("Data entered is not valid", e)
@@ -173,6 +182,14 @@ def generate_statement(request):
     else:
         form = StatementRequestForm()
         context = {'form': form, 'user_accounts': user_accounts}
+        otp = generate_otp()
+        print('otp', otp)
+        save_otp_in_db(otp, request.user)
+        context['otp_sent'] = True
+        # user = get_user_phone_number(request.user.email)
+        # Uncomment this once the sns credentials are added in twofa.py file
+        # send_otp(otp, user.phone_number)
+
         return render(request, 'account_management/generate_statement.html', context)
 
 

@@ -41,8 +41,24 @@
                               <input class="form-control" type="date" value="{{date_string}}" id="dateInput2" name="end_date">
                             </div>
                           </div>
+                          <div class="form-group row">
+                            <label for="{{ form.otp.id_for_label }}" class="col-2 col-form-label">OTP</label>
+                              <div class="col-10">
+                                <input type="password" id="otp" name="otp" required>
+                              </div>
+                          </div>
+                          {% if invalid_otp %}
+                            <div class="alert alert-danger">
+                              <strong>Invalid OTP.</strong> <br/>
+                            </div>
+                          {% endif %}
+                          {% if otp_sent %}
+                            <div class="alert alert-success">
+                              <strong>Enter OTP you received via text</strong> <br/>
+                            </div>
+                          {% endif %}
                         <button type="submit" class="btn btn-primary" onclick="return validateDate(document.getElementById('dateInput1').value, document.getElementById('dateInput2').value)">Generate Statement</button>
-                    </form>                    
+                    </form>
                 </div>
             </div>
         </div>
