@@ -5,17 +5,17 @@
         <div class="col">
             <div class="card">
                 <div class="card-header">
-                    Pending Fund Transfers
+                    Pending Transactions
                 </div>
                 <div class="card-body">
-                    <p id="error_msg" style="display:none"> {{pendingFundTransfersData.error}} </p>
+                    <p id="error_msg" style="display:none"> {{pendingTransactionsData.error}} </p>
                     <table class="table table-bordered">
                         <tr>
-                            {% for header in pendingFundTransfersData.headers %}
+                            {% for header in pendingTransactionsData.headers %}
                                 <th>{{ header }}</th>
                             {% endfor %}
                             </tr>
-                            {% for row in pendingFundTransfersData.rows %}
+                            {% for row in pendingTransactionsData.rows %}
                             <tr>
                                 {% for value in row %}
                                     <td>{{value}}</td>
@@ -30,16 +30,16 @@
         </br>
             <div class="card">
                 <div class="card-header">
-                    Approved/Rejected Fund Transfers
+                    Approved/Rejected Transactions
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">
                         <tr>
-                            {% for header in actionedFundTransfersData.headers %}
+                            {% for header in actionedTransactionsData.headers %}
                                 <th>{{ header }}</th>
                             {% endfor %}
                             </tr>
-                            {% for row in actionedFundTransfersData.rows %}
+                            {% for row in actionedTransactionsData.rows %}
                             <tr>
                                 {% for value in row %}
                                     <td>{{value}}</td>

@@ -343,6 +343,127 @@ def criticalPendingFundTransfers(request):
             ])
         return render(request, 'transaction_management/pendingFundTransfers.html', context)
 
+@login_required
+@user_passes_test(t1_check)
+def nonCriticalPendingTransactions(request):
+    if request.POST:
+        context = {"pendingTransactionsData": {"error": ""}}
+        curFundObj = Transaction.objects.get(
+            request_id=int(request.POST['request_id']))
+        if curFundObj.amount < 1000:
+            if (request.POST['status'] == "APPROVED"):
+                curBal = Account.objects.get(
+                    account_id=curFundObj.from_account_id).account_balance
+                if curBal >= curFundObj.amount:
+                    Transaction.objects.filter(request_id=int(request.POST['request_id'])).update(
+                        status=request.POST['status'])
+                    Account.objects.filter(account_id=curFundObj.from_account_id).update(
+                        account_balance=curBal - curFundObj.amount)
+                    Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(
+                        account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
+                else:
+                    context["pendingTransactionsData"]["error"] = "Rejected: Insufficient funds"
+                    Transaction.objects.filter(request_id=int(
+                        request.POST['request_id'])).update(status="REJECTED")
+
+            else:
+                Transaction.objects.filter(request_id=int(request.POST['request_id'])).update(
+                    status=request.POST['status'])
+        return render(request, 'transaction_management/pendingTransactions.html', context)
+    else:
+        context = {}
+        context['pendingTransactionsData'] = {
+            'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status', u'Approve', u'Reject'],
+            'rows': [],
+            'error': ""
+        }
+        for e in Transaction.objects.filter(status="NEW").filter(amount__lt=1000):
+            context['pendingTransactionsData']['rows'].append([
+                e.request_id,
+                str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+                " " + e.from_account.user_id.last_name,
+                str(e.to_account.account_id) + ":" + e.to_account.user_id.first_name +
+                " " + e.to_account.user_id.last_name,
+                e.amount,
+                e.status
+            ])
+
+        context['actionedTransactionsData'] = {
+            'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status'],
+            'rows': []
+        }
+        for e in Transaction.objects.filter(~Q(status="NEW")).filter(amount__lt=1000):
+            context['actionedTransactionsData']['rows'].append([
+                e.request_id,
+                str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+                " " + e.from_account.user_id.last_name,
+                str(e.to_account.account_id) + ":" + e.to_account.user_id.first_name +
+                " " + e.to_account.user_id.last_name,
+                e.amount,
+                e.status
+            ])
+        return render(request, 'transaction_management/pendingTransactions.html', context)
+
+@login_required
+@user_passes_test(t2_check)
+def criticalPendingTransactions(request):
+    if request.POST:
+        context = {"pendingTransactionsData": {"error": ""}}
+        curFundObj = Transaction.objects.get(
+            request_id=int(request.POST['request_id']))
+        if curFundObj.amount >= 1000:
+            if (request.POST['status'] == "APPROVED"):
+                curBal = Account.objects.get(
+                    account_id=curFundObj.from_account_id).account_balance
+                if curBal >= curFundObj.amount:
+                    Transaction.objects.filter(request_id=int(request.POST['request_id'])).update(
+                        status=request.POST['status'])
+                    Account.objects.filter(account_id=curFundObj.from_account_id).update(
+                        account_balance=curBal - curFundObj.amount)
+                    Account.objects.filter(account_id=curFundObj.to_account_id).update(account_balance=Account.objects.get(
+                        account_id=curFundObj.to_account_id).account_balance + curFundObj.amount)
+                else:
+                    context["pendingTransactionsData"]["error"] = "Rejected: Insufficient funds"
+                    Transaction.objects.filter(request_id=int(
+                        request.POST['request_id'])).update(status="REJECTED")
+
+            else:
+                Transaction.objects.filter(request_id=int(request.POST['request_id'])).update(
+                    status=request.POST['status'])
+        return render(request, 'transaction_management/pendingTransactions.html', context)
+    else:
+        context = {'pendingTransactionsData': {
+            'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status', u'Approve', u'Reject'],
+            'rows': [],
+            'error': ""
+        }}
+        for e in Transaction.objects.filter(status="NEW").filter(amount__gte=1000):
+            context['pendingTransactionsData']['rows'].append([
+                e.request_id,
+                str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+                " " + e.from_account.user_id.last_name,
+                str(e.to_account.account_id) + ":" + e.to_account.user_id.first_name +
+                " " + e.to_account.user_id.last_name,
+                e.amount,
+                e.status
+            ])
+
+        context['actionedTransactionsData'] = {
+            'headers': [u'Transaction Id', u'From Account', u'To Account', u'Amount', u'Status'],
+            'rows': []
+        }
+        for e in Transaction.objects.filter(~Q(status="NEW")).filter(amount__gte=1000):
+            context['actionedTransactionsData']['rows'].append([
+                e.request_id,
+                str(e.from_account.account_id) + ":" + e.from_account.user_id.first_name +
+                " " + e.from_account.user_id.last_name,
+                str(e.to_account.account_id) + ":" + e.to_account.user_id.first_name +
+                " " + e.to_account.user_id.last_name,
+                e.amount,
+                e.status
+            ])
+        return render(request, 'transaction_management/pendingTransactions.html', context)
+
 
 @login_required
 def transaction(request):
