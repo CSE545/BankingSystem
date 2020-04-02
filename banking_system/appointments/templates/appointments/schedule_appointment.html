@@ -88,6 +88,14 @@
             }
             let date = date_time[0];
             let time = date_time[1];
+            let today_date = new Date();
+            today_date.setHours(0,0,0,0);
+            let selected_date = new Date(date);
+            debugger;
+            if(selected_date.getTime() <= today_date.getTime()) {
+                alert('Appointments can only be scheduled starting tomorrow.');
+                return;
+            }
             if(date in taken_slots.taken_slots) {            
                 if(taken_slots.taken_slots[date].indexOf(time) > -1) {
                     alert('Time slot already taken. Choose either a different date or a time slot.')
