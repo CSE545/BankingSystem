@@ -42,6 +42,11 @@ class FundTransfers(models.Model):
         choices=TRANSFER_TYPE,
         default="ACCOUNT"
     )
+    
+    is_request = models.BooleanField(
+        default=False
+    )
+
     hyperledger_id = models.CharField(
         max_length=10,
         blank=True,
