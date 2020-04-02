@@ -8,11 +8,6 @@
                     Technical Support Management
                 </div>
                 <div class="card-body">
-                    {% if errors == "REQUEST_EXISTS" %}
-                    <div class="alert alert-danger">
-                        <strong>A request for an override for that user already exists!</strong> <br/>
-                    </div>
-                    {% endif %}
                     <h1>Request an Override</h1>
                     <table class="table table-bordered">
                         <tr>
@@ -25,15 +20,9 @@
                             {% for value in row %}
                             <td>{{value}}</td>
                             {% endfor %}
-                            {% with row|first as id %}
                             <td>
-                                <form action="" method="POST">{% csrf_token %}
-                                    <input type="hidden" id="action_request" name="action" value='REQUEST_ACCESS'>
-                                    <input type="hidden" id="user_id" name="user_id" value='{{ id }}'>
-                                    <input type="submit" class="btn btn-primary btn-sm" value="Request">
-                                </form>
+                                <button class="action btn btn-primary btn-sm">Request</button>
                             </td>
-                            {% endwith %}
                         </tr>
                         {% endfor %}
                     </table>
@@ -50,27 +39,15 @@
                             <td>{{value}}</td>
                             {% endfor %}
                             {% with row|last as last %}
-                            {% with row|first as id %}
                                 {% if last == 'NEW' %}
                                 <td>
-                                    <form action="" method="POST">{% csrf_token %}
-                                        <input type="hidden" id="action_delete" name="action" value='DELETE'>
-                                        <input type="hidden" id="request-id-delete" name="request-id" value='{{ id }}'>
-                                        <input type="submit" class="btn btn-danger btn-sm" value="Delete">
-                                    </form>
+                                    <button class="action btn btn-danger btn-sm">Delete</button>
                                 </td>
-                                {% elif last == 'EXPIRED' or last == "DENIED" %}
-                                    <td></td>
                                 {% else %}
-                                        <td>
-                                            <form action="/accounts/accountOverrideLogin/" method="POST">{% csrf_token %}
-                                                <input type="hidden" id="action" name="action" value='SEND_OTP'>
-                                                <input type="hidden" id="request-id" name="request-id" value='{{ id }}'>
-                                                <input type="submit" class="btn btn-success btn-sm" value="Login">
-                                            </form>
-                                        </td>
+                                <td>
+                                    <button class="action btn btn-success btn-sm">Login</button>
+                                </td>
                                 {% endif %}
-                            {% endwith %}
                             {% endwith %}
                         </tr>
                         {% endfor %}
@@ -83,7 +60,7 @@
 <script src="https://code.jquery.com/jquery-3.1.0.js"></script>
 <script>
     (function request() {
-        let action_map = {Request: "REQUEST_ACCESS"};
+        let action_map = {Request: "REQUEST_ACCESS", Delete: "DELETE", Login: "LOGIN"};
         $(".action").click(function (e) {
             let action = action_map[e.target.textContent];
             let user_id = $(e.target).parents('tr').children(":first").text();

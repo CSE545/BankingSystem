@@ -1,6 +1,6 @@
-import random
-
 import boto3
+import math
+import random
 from user_management.models import User
 
 
@@ -23,11 +23,11 @@ def send_otp(otp, phone_number):
 
 
 def generate_otp():
-    digits = "123456789"
+    digits = "0123456789"
     OTP = ""
 
     for i in range(4):
-        OTP += digits[random.randrange(0, 9, 1)]
+        OTP += digits[math.floor(random.random() * 10)]
 
     return OTP
 

@@ -3,9 +3,9 @@ from user_management.models import User
 
 
 class CustomAuthBackend(ModelBackend):
-    def authenticate(self, request, email=None, password=None):
+    def authenticate(self, request, username=None, password=None):
         try:
-            user = User.objects.get(email=email)
+            user = User.objects.get(email=username)
             success = user.check_password(password)
             if success:
                 return user

@@ -92,7 +92,7 @@ class User(AbstractBaseUser):
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
     password = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=20, unique=True)
+    phone_number = models.CharField(max_length=20)
     gender = models.CharField(
         max_length=6,
         choices=GENDER
@@ -101,8 +101,6 @@ class User(AbstractBaseUser):
         max_length=20,
         choices=USER_TYPE
     )
-    primary_account = models.ForeignKey(
-        'account_management.Account', default=None, on_delete=models.SET_NULL, null=True, blank=True)
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name',
                        'last_name', 'password', 'phone_number']
@@ -200,59 +198,7 @@ def login_failed(sender, credentials, request, **kwargs):
         print('Login failed: User does not exist')
 
 
-class UserLog(models.Model):
-    CRITICAL = "critical"
-    INFO = "info"
-    WARN = "warn"
-    DEBUG = "debug"
-    ERROR = "error"
-    TYPES = [
-        (CRITICAL, 'critical'),
-        (INFO, 'info'),
-        (WARN, 'warn'),
-        (DEBUG, 'debug'),
-        (ERROR, 'error')
-    ]
-    log_id = models.AutoField(primary_key=True)
-    user_id = models.ForeignKey(
-        User, default=None, on_delete=models.CASCADE)
-    log = models.CharField(
-        max_length=2000,
-        default="",
-        null=False
-    )
-    log_type = models.CharField(
-        max_length=9,
-        choices=TYPES
-    )
-    created = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return "Log Id: {0}, UserId: {1}, Log Level: {2}, Log Str: {3}".format(self.log_id, self.user_id, self.log_type,
-                                                                               self.log)
-
-
 class employee_info_update(models.Model):
-    user_id = models.IntegerField(blank=False, default=0)
-    email = models.EmailField(verbose_name="email",
-                              max_length=60, null=True, blank=True)
-    first_name = models.CharField(max_length=100, null=True, blank=True)
-    last_name = models.CharField(max_length=100, null=True, blank=True)
-    phone_number = models.CharField(max_length=20, null=True, blank=True)
-    gender = models.CharField(
-        max_length=6,
-        choices=GENDER,
-        null=True,
-        blank=True
-    )
-    status = models.CharField(
-        max_length=10,
-        choices=REQUEST_STATUS,
-        default='NEW'
-    )
-
-
-class CustomerInfoUpdate(models.Model):
     user_id = models.IntegerField(blank=False, default=0)
     email = models.EmailField(verbose_name="email",
                               max_length=60, null=True, blank=True)
