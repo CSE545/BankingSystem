@@ -1,7 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from user_management.models import User, UserPendingApproval
-from user_management.utility.twofa import generate_otp, get_user_phone_number, save_otp_in_db  # , send_otp
+from user_management.models import User, UserPendingApproval, UserLogin
+from user_management.utility.twofa import (
+    generate_otp,
+    get_user_phone_number,
+    save_otp_in_db,
+)  # , send_otp
 
 
 GENDER = (
@@ -21,14 +25,19 @@ class RegistrationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
         for field in iter(self.fields):
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
+            self.fields[field].widget.attrs.update({"class": "form-control"})
 
     class Meta:
         model = User
-        fields = ("email", "first_name", "last_name", "password1",
-                  "password2", "phone_number", "gender")
+        fields = (
+            "email",
+            "first_name",
+            "last_name",
+            "password1",
+            "password2",
+            "phone_number",
+            "gender",
+        )
 
 
 class LoginForm(AuthenticationForm):
@@ -36,29 +45,27 @@ class LoginForm(AuthenticationForm):
 
     def clean(self):
         otp = generate_otp()
-        if '_otp' in self.request.session:
-            print(self.request.session['_otp'])
+        if "_otp" in self.request.session:
+            print(self.request.session["_otp"])
         else:
-            print('otp', otp)
+            print("otp", otp)
         cleaned_data = super().clean()
-        user = get_user_phone_number(cleaned_data['username'])
+        user = get_user_phone_number(cleaned_data["username"])
         # Uncomment this once the sns credentials are added in twofa.py file
         # send_otp(otp, user.phone_number)
         if '_otp' in self.request.session and self.cleaned_data['otp'] != '':
-            if str(self.request.session['_otp']) != str(self.cleaned_data['otp']):
+            if str(UserLogin.objects.get(user=user).last_otp) != str(self.cleaned_data['otp']):
                 raise forms.ValidationError("Invalid OTP.")
-            del self.request.session['_otp']
+            del self.request.session["_otp"]
         else:
-            self.request.session['_otp'] = otp
+            self.request.session["_otp"] = otp
             save_otp_in_db(otp, user)
             raise forms.ValidationError("Enter OTP you received via text")
 
     def __init__(self, *args, **kwargs):
         super(LoginForm, self).__init__(*args, **kwargs)
         for field in iter(self.fields):
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
+            self.fields[field].widget.attrs.update({"class": "form-control"})
 
     class Meta:
         model = User
@@ -71,18 +78,14 @@ class AccountOverrideLoginForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super(AccountOverrideLoginForm, self).__init__(*args, **kwargs)
         for field in iter(self.fields):
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
+            self.fields[field].widget.attrs.update({"class": "form-control"})
 
 
 class EditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(EditForm, self).__init__(*args, **kwargs)
         for field in iter(self.fields):
-            self.fields[field].widget.attrs.update({
-                'class': 'form-control'
-            })
+            self.fields[field].widget.attrs.update({"class": "form-control"})
 
     class Meta:
         model = UserPendingApproval
