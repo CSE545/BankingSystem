@@ -99,7 +99,8 @@ class User(AbstractBaseUser):
     )
     user_type = models.CharField(
         max_length=20,
-        choices=USER_TYPE
+        choices=USER_TYPE,
+        default='CUSTOMER'
     )
     primary_account = models.ForeignKey(
         'account_management.Account', default=None, on_delete=models.SET_NULL, null=True, blank=True)
