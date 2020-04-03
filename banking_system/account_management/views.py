@@ -287,13 +287,15 @@ def generate_statement(request):
             form.account_list = user_accounts
             context = {"name": account_name, "accountNo": int(
                 account_id), "today": datetime.datetime.today(), "result": result}
-            if received_otp != str(request.user.userlogin.last_otp):
+            if received_otp != str(request.user.statementotp.last_otp):
                 context = {'form': form, 'user_accounts': user_accounts}
                 context['invalid_otp'] = True
                 return render(request, 'account_management/generate_statement.html', context)
             otp = generate_otp()
             print('otp', otp)
-            save_otp_in_db(otp, request.user)
+            user = User.objects.get(email=request.user.email)
+            user.statementotp.last_otp = otp
+            user.statementotp.save()
             context['otp_sent'] = True
             context['invalid_otp'] = False
             return PDFRender.render('account_management/pdfTemplate.html', context)
@@ -307,7 +309,9 @@ def generate_statement(request):
         context = {'form': form, 'user_accounts': user_accounts}
         otp = generate_otp()
         print('otp', otp)
-        save_otp_in_db(otp, request.user)
+        user = User.objects.get(email=request.user.email)
+        user.statementotp.last_otp = otp
+        user.statementotp.save()
         context['otp_sent'] = True
         # user = get_user_phone_number(request.user.email)
         # send_otp(otp, request.user.phone_number)
