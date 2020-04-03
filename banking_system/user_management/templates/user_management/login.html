@@ -60,6 +60,7 @@
                         </div>
                         {% endif %}
 
+                        {% if not user_none %}
                         {% for error in login_form.non_field_errors %}
                             {% if error == "Invalid OTP." %}
                             <div class="alert alert-danger">
@@ -72,6 +73,7 @@
                             </div>
                             {% endif %}
                         {% endfor %}
+                        {% endif %}
 
                         <button style="margin-bottom: 10px" type="submit" class="btn btn-primary">Login</button>
                         <br>
