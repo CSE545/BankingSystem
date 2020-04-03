@@ -17,6 +17,7 @@ def login_view(request):
     context = {}
     if request.POST:
         email = request.POST['username']
+        email = email.strip()
         password = request.POST['password']
         user = authenticate(email=email, password=password)
         if user is not None:
