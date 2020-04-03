@@ -139,6 +139,12 @@ class UserLogin(models.Model):
     def __str__(self):
         return "First name: {0}".format(self.user)
 
+class StatementOtp(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    last_otp = models.IntegerField(blank=False, default=0)
+
+    def __str__(self):
+        return "First name: {0}".format(self.user)
 
 class UserPendingApproval(models.Model):
     created_by = models.ForeignKey(
@@ -188,6 +194,7 @@ class UserPendingApproval(models.Model):
 def user_created(sender, instance, created, **kwargs):
     if created:
         UserLogin.objects.create(user=instance)
+        StatementOtp.objects.create(user=instance)
 
 
 @receiver(user_login_failed)
