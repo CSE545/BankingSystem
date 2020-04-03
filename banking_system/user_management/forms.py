@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from user_management.models import User, UserPendingApproval
+from user_management.models import User, UserPendingApproval, UserLogin
 from user_management.utility.twofa import generate_otp, get_user_phone_number, save_otp_in_db  # , send_otp
 
 
@@ -45,7 +45,7 @@ class LoginForm(AuthenticationForm):
         # Uncomment this once the sns credentials are added in twofa.py file
         # send_otp(otp, user.phone_number)
         if '_otp' in self.request.session:
-            if str(self.request.session['_otp']) != str(self.cleaned_data['otp']):
+            if str(UserLogin.objects.get(user = user)) != str(self.cleaned_data['otp']):
                 raise forms.ValidationError("Invalid OTP.")
             del self.request.session['_otp']
         else:
