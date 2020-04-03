@@ -62,6 +62,7 @@ def open_account(request):
         context['bank_form'] = form
     return render(request, 'account_management/open_account.html', context)
 
+
 def open_customer_account(request):
     """ Used by Tier 2 employees to open new customer bank account."""
     context = {}
@@ -78,6 +79,7 @@ def open_customer_account(request):
         form = CustomerAccountForm()
         context['open_customer_account_form'] = form
     return render(request, 'account_management/open_customer_account.html', context)
+
 
 @login_required
 def view_accounts(request):
@@ -107,6 +109,7 @@ def view_accounts(request):
             primary_account_flag
         ])
     return render(request, 'account_management/view_accounts.html', context)
+
 
 @login_required
 def delete_customer_bank_accounts(request):
@@ -148,6 +151,7 @@ def delete_customer_bank_accounts(request):
     if request.POST:
         context['account_deleted'] = True
     return render(request, 'account_management/delete_customer_bank_accounts.html', context)
+
 
 @login_required
 def view_customer_accounts(request, pk=None):
@@ -193,6 +197,7 @@ def view_customer_accounts(request, pk=None):
             ])
     return render(request, 'account_management/view_customer_bank_accounts.html', context)
 
+
 @login_required
 def view_customer_accounts_t1(request):
     """ Used by tier 1 emplloyees to view customer bank accounts. """
@@ -209,6 +214,7 @@ def view_customer_accounts_t1(request):
             acc.account_balance
         ])
     return render(request, 'account_management/view_customer_bank_accounts_t1.html', context)
+
 
 class BankStatementRow:
     def __init__(self, description="No Description", transaction_type="Unknown", amount="$0.00", status="Pending"):
