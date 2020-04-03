@@ -53,10 +53,8 @@ class LoginForm(AuthenticationForm):
         user = get_user_phone_number(cleaned_data["username"])
         # Uncomment this once the sns credentials are added in twofa.py file
         # send_otp(otp, user.phone_number)
-        if "_otp" in self.request.session:
-            if str(UserLogin.objects.get(user=user).last_otp) != str(
-                self.cleaned_data["otp"]
-            ):
+        if '_otp' in self.request.session and self.cleaned_data['otp'] != '':
+            if str(UserLogin.objects.get(user=user).last_otp) != str(self.cleaned_data['otp']):
                 raise forms.ValidationError("Invalid OTP.")
             del self.request.session["_otp"]
         else:
