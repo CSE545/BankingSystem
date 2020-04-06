@@ -1,5 +1,5 @@
 from django.contrib.auth import login, authenticate, logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render, redirect
 from user_management.forms import RegistrationForm, LoginForm, EditForm, AccountOverrideLoginForm
 from user_management.models import User, employee_info_update, OverrideRequest, CustomerInfoUpdate, UserLog
@@ -152,15 +152,19 @@ def edit_profile(request):
 
 
 # use this function only in POST calls. Writing in db is not recommended in GET calls.
-
-
 def create_user_log(user_id, log_str, log_type):
     user_log = UserLog.objects.create(user_id=User.objects.get(
         user_id=user_id), log=log_str, log_type=log_type)
     user_log.save()
 
+def t3_check(user):
+    return user.user_type == "T3"
+
+def t1_check(user):
+    return user.user_type == "T1"
 
 @login_required
+@user_passes_test(t3_check)
 def show_pending_employee_requests(request):
     if request.POST:
         employee_info_update.objects.filter(user_id=int(
@@ -195,6 +199,7 @@ def show_pending_employee_requests(request):
 
 
 @login_required
+@user_passes_test(t1_check)
 def show_pending_customer_requests(request):
     if request.POST:
         CustomerInfoUpdate.objects.filter(user_id=int(
@@ -272,6 +277,7 @@ def generate_support_context(request, errors=""):
 
 
 @login_required
+@user_passes_test(t3_check)
 def technical_support(request):
     if request.POST:
         if request.POST["action"] == "REQUEST_ACCESS":
