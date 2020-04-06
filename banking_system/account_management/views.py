@@ -11,7 +11,7 @@ from account_management.models import AccountRequests, Account, DepositRequest
 from account_management.utility.manage_accounts import create_account_for_current_request
 from account_management.utility.manage_accounts import create_deposit_request
 from account_management.utility.manage_accounts import update_deposit_request, withdraw_money
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -20,6 +20,11 @@ from transaction_management.models import FundTransfers, Transaction
 from user_management.models import User
 from user_management.utility.twofa import generate_otp, save_otp_in_db  # , send_otp
 
+def t1_check(user):
+    return user.user_type == "T1"
+
+def t2_check(user):
+    return user.user_type == "T2"
 
 class PDFRender:
     """
@@ -63,6 +68,8 @@ def open_account(request):
     return render(request, 'account_management/open_account.html', context)
 
 
+@login_required
+@user_passes_test(t2_check)
 def open_customer_account(request):
     """ Used by Tier 2 employees to open new customer bank account."""
     context = {}
@@ -112,6 +119,7 @@ def view_accounts(request):
 
 
 @login_required
+@user_passes_test(t2_check)
 def delete_customer_bank_accounts(request):
     """ Tier 2 employees deleting customer accounts. """
     context = {}
@@ -154,6 +162,7 @@ def delete_customer_bank_accounts(request):
 
 
 @login_required
+@user_passes_test(t2_check)
 def view_customer_accounts(request, pk=None):
     """ Tier 2 employees accessing customer accounts. """
     account_types = (
@@ -199,6 +208,7 @@ def view_customer_accounts(request, pk=None):
 
 
 @login_required
+@user_passes_test(t1_check)
 def view_customer_accounts_t1(request):
     """ Used by tier 1 emplloyees to view customer bank accounts. """
     customer_bank_accounts = Account.objects.filter()
@@ -325,6 +335,7 @@ def generate_statement(request):
 
 
 @login_required
+@user_passes_test(t2_check)
 def view_requests(request):
     if request.user.user_type != 'T2':
         raise PermissionDenied()
@@ -438,6 +449,7 @@ def withdraw(request, pk=None):
 
 # TODO Remove login required annotation with middlewares
 @login_required
+@user_passes_test(t1_check)
 def customer_deposits(request):
     context = {}
     if request.POST:
